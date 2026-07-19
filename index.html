@@ -11,7 +11,7 @@
         h2 { color: var(--primary); text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 0; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
         .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; margin-top: 15px; cursor: pointer; font-weight: bold; font-size: 16px; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -19,76 +19,97 @@
     <h2>Weekly Risala Report</h2>
     <form id="dataForm" onsubmit="submitForm(event)">
         
+        <!-- Chain Selection (Always Visible) -->
         <select id="chainType" onchange="toggleFields()" required>
             <option value="">-- Select Chain --</option>
             <option value="central">Central Chain</option>
             <option value="department">Department Chain</option>
         </select>
 
-        <!-- Name Field: Strict English Letters & Space ONLY -->
-        <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[a-zA-Z\s]+$" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" title="Sirf English letters allowed hain" required>
+        <!-- Hidden Group: All Other Fields -->
+        <div id="allFields" class="hidden">
+            
+            <!-- Name Field -->
+            <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[a-zA-Z\s]+$" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" title="Sirf English letters allowed hain" required>
 
-        <!-- Mobile Number: 10 Digits, NO ZERO START -->
-        <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
+            <!-- Mobile Number -->
+            <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
 
-        <!-- Pincode: 6 Digits, NO ZERO START -->
-        <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length==6) fetchPin(this.value);" required>
+            <!-- Pincode -->
+            <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length==6) fetchPin(this.value);" required>
 
-        <div id="centralFields" class="hidden">
-            <select id="nigranLevel">
-                <option value="">Select Nigran Level</option>
-                <option>Alaqa Nigran</option>
-                <option>District/Circle Nigran</option>
-                <option>Division Nigran</option>
-                <option>Region Nigran</option>
-                <option>State Nigran</option>
-                <option>Zaili Nigran</option>
-            </select>
-        </div>
-        
-        <div id="deptFields" class="hidden">
-            <select id="zimmedarLevel">
-                <option value="">Select Zimmedar Level</option>
-                <option>City/Alaqa</option>
-                <option>District/City/Circle</option>
-                <option>Division</option>
-                <option>Gaon/Zaili Halqa</option>
-                <option>Hind Satah (HOD)/Muawwin HOD</option>
-                <option>Moallim/Imaam/Moazzin</option>
-                <option>Office/Assistant Zimmedar</option>
-                <option>Region</option>
-                <option>Rukne Hind Mushawarat</option>
-                <option>State</option>
-            </select>
-            <select id="departmentList">
-                <option value="">Select Department</option>
-                <option>12 Maah</option>
-                <option>HR Department</option>
-                <option>IT Department</option>
-                <!-- Add your remaining original departments here -->
-            </select>
-        </div>
+            <!-- Central Fields -->
+            <div id="centralFields" class="hidden">
+                <select id="nigranLevel">
+                    <option value="">Select Nigran Level</option>
+                    <option>Alaqa Nigran</option>
+                    <option>District/Circle Nigran</option>
+                    <option>Division Nigran</option>
+                    <option>Region Nigran</option>
+                    <option>State Nigran</option>
+                    <option>Zaili Nigran</option>
+                </select>
+            </div>
+            
+            <!-- Department Fields -->
+            <div id="deptFields" class="hidden">
+                <select id="zimmedarLevel">
+                    <option value="">Select Zimmedar Level</option>
+                    <option>City/Alaqa</option>
+                    <option>District/City/Circle</option>
+                    <option>Division</option>
+                    <option>Gaon/Zaili Halqa</option>
+                    <option>Hind Satah (HOD)/Muawwin HOD</option>
+                    <option>Moallim/Imaam/Moazzin</option>
+                    <option>Office/Assistant Zimmedar</option>
+                    <option>Region</option>
+                    <option>Rukne Hind Mushawarat</option>
+                    <option>State</option>
+                </select>
+                <select id="departmentList">
+                    <option value="">Select Department</option>
+                    <option>12 Maah</option>
+                    <option>HR Department</option>
+                    <option>IT Department</option>
+                    <!-- Baaki original departments yahan add kar lein -->
+                </select>
+            </div>
 
-        <input type="text" id="district" placeholder="District" readonly required>
-        <input type="text" id="division" placeholder="Division" readonly>
-        <input type="text" id="state" placeholder="State" readonly>
-        <input type="text" id="region" placeholder="Region" readonly>
+            <!-- Readonly Location Fields -->
+            <input type="text" id="district" placeholder="District" readonly required>
+            <input type="text" id="division" placeholder="Division" readonly>
+            <input type="text" id="state" placeholder="State" readonly>
+            <input type="text" id="region" placeholder="Region" readonly>
 
-        <!-- Risala Count: Max 4 Digits, NO ZERO START -->
-        <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
+            <!-- Risala Count -->
+            <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
 
-        <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button>
+            <!-- Submit Button -->
+            <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button>
+
+        </div> <!-- End of Hidden Group -->
     </form>
 </div>
 
 <script>
-    // Zaroori: Yahan apna Google Script ka naya Deploy kiya hua URL daalein
+    // Yahan apna deploy kiya hua Google Script URL daalein
     const scriptURL = "https://docs.google.com/spreadsheets/d/1-Hrs_jjDJ8AiJacKW4f9Mdd-A_QvCtbB-h7r0H5dDZg/edit?usp=sharing";
 
     function toggleFields() {
         const c = document.getElementById("chainType").value;
-        document.getElementById("centralFields").classList.toggle("hidden", c !== 'central');
-        document.getElementById("deptFields").classList.toggle("hidden", c !== 'department');
+        const allFields = document.getElementById("allFields");
+
+        // Agar koi chain select nahi hai to form hide kar do
+        if (c === "") {
+            allFields.classList.add("hidden");
+        } else {
+            // Agar chain select ho gayi to form show karo
+            allFields.classList.remove("hidden");
+            
+            // Central ya Department ke hisaab se fields dikhao
+            document.getElementById("centralFields").classList.toggle("hidden", c !== 'central');
+            document.getElementById("deptFields").classList.toggle("hidden", c !== 'department');
+        }
     }
 
     async function fetchPin(pin) {
@@ -101,13 +122,12 @@
                 document.getElementById("division").value = d.division;
                 document.getElementById("state").value = d.state;
                 document.getElementById("region").value = d.region;
-                document.getElementById("pincode").setCustomValidity(""); // Pincode Sahi hai
+                document.getElementById("pincode").setCustomValidity(""); 
             } else {
                 document.getElementById("district").value = "";
                 document.getElementById("division").value = "";
                 document.getElementById("state").value = "";
                 document.getElementById("region").value = "";
-                // Agar pincode sheet me na ho to error message show karega:
                 document.getElementById("pincode").setCustomValidity("Yeh Pincode Sheet mein record nahi hai. Kripya sahi Pincode daalein.");
                 document.getElementById("pincode").reportValidity();
             }
@@ -142,7 +162,7 @@
             alert(result.message);
             if(result.status === "Success") {
                 document.getElementById("dataForm").reset();
-                toggleFields();
+                toggleFields(); // Form submit hone ke baad dobara fields hide kar dega
             }
         } catch(err) {
             alert("Network Error. Please try again.");
