@@ -1,174 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Risala Report</title>
-    
-    <!-- WhatsApp & Social Media Link Preview Tags (Permanent Setup) -->
-    <meta property="og:title" content="Weekly Risala Report">
-    <meta property="og:description" content="Har Hafte Risala Parh Ya Sunkar Murshid Ki Duaon Me Hissa Paane Ke Liye Report Submit Kijiye.">
-    <!-- Ab image link fix kar di gayi hai, sirf GitHub par photo replace karni hogi -->
-    <meta property="og:image" content="https://weekly-risala-report.vercel.app/banner.jpg">
-    <meta property="og:image:type" content="image/jpeg">
-    <meta property="og:url" content="https://weekly-risala-report.vercel.app">
-    <meta property="og:type" content="website">
-
-    <style>
-        :root { --primary: #008080; --hover: #005959; --bg: #e0f2f1; --light-bg: #f0faf9; }
-        body { font-family: Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .form-container { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 10px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); }
-        .header-image { width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; display: none; }
-        h2 { color: var(--primary); text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin-bottom: 5px; }
-        
-        .dynamic-subheading { text-align: center; color: white; background-color: var(--primary); padding: 10px; border-radius: 5px; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
-        
-        label { font-weight: bold; display: block; margin-top: 15px; color: #333; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 15px; }
-        input[readonly] { background-color: var(--light-bg); color: var(--primary); font-weight: bold; }
-        .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; font-size: 16px; border-radius: 5px; margin-top: 25px; cursor: pointer; font-weight: bold; }
-        .hidden { display: none !important; }
-        
-        .message-box { text-align: center; padding: 20px; font-size: 18px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; }
-    </style>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Weekly Risala Report</title>
+<style>:root{--primary:#008080;} body{font-family:sans-serif; background:#e0f2f1; padding:20px; display:flex; justify-content:center;} .container{background:white; width:100%; max-width:500px; padding:20px; border-radius:10px; border-top:6px solid var(--primary);} input,select{width:100%; padding:10px; margin:10px 0; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;} button{background:var(--primary); color:white; padding:15px; width:100%; border:none; border-radius:5px; cursor:pointer;}</style>
 </head>
 <body>
-<div class="form-container" id="mainWrapper">
-    <img id="dynamicThumbnail" src="" alt="Thumbnail" class="header-image">
-    <h2 id="dynamicHeading">Loading...</h2>
-    <div id="dynamicSubheading" class="dynamic-subheading"></div>
-    <div id="loadingOverlay">Checking Form Status...</div>
-    
-    <!-- Link Off and Success Messages -->
-    <div id="linkOffMessage" class="hidden message-box">Aap Ne Deri Kardi Hai Link Off Ho Chuki Hai Khair Koi Baat Nahi, Niyyat Farmalijiye Keh Next Time On Time Risala Padh Kar Link Men Report Submit Karege.</div>
-    <div id="successMessage" class="hidden message-box">Allah Kareem Aap Ko Murshid Ki Dua Ka Faizan Nasib Farmaye<br>Aameen. جَزَاک اللہ خَیْرًا</div>
-    
-    <form id="dataForm" class="hidden" onsubmit="return submitForm(event)">
-        <label>Chain Select Karein:</label>
-        <select id="chainType" onchange="showChainFields()" required>
-            <option value="">-- Select Chain --</option>
-            <option value="central">Central Chain</option>
-            <option value="department">Department Chain</option>
-        </select>
-        
-        <div id="all-fields" class="hidden">
-            <!-- Name Field -->
-            <label>Name:</label> 
-            <input type="text" id="userName" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" title="Sirf alphabets (text) hi allow hain" required>
-            
-            <!-- Contact Number Field -->
-            <label>Contact Number:</label> 
-            <input type="text" id="contactNumber" minlength="10" maxlength="10" pattern="[1-9][0-9]{9}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" title="10 digit ka number darj karein jo 0 se shuru na ho" required>
-            
-            <!-- Pincode Field -->
-            <label>Pincode:</label> 
-            <input type="text" id="pincode" minlength="6" maxlength="6" pattern="[1-9][0-9]{5}" oninput="this.setCustomValidity(''); this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length === 6) fetchDistrict();" title="6 digit ka Pincode darj karein jo 0 se shuru na ho" required>
-            <div style="font-size: 12px; color: #555; margin-top: 5px; margin-bottom: 5px; line-height: 1.4;">
-                Jis Zimmedar Ki Jis District Men Zimmedari Hai Woh Disrict Ka Pincode Add Kare, HOD/RHM/Office Zimmedar Inki Rehaish Jis District Men Usi Ka Pincode Add Kare.
-            </div>
-            
-            <div id="central-fields" class="hidden">
-                <label>Nigran Level:</label> 
-                <select id="nigranLevel"><option value="">-- Select --</option><option>Alaqa Nigran</option><option>District/Circle Nigran</option><option>Division Nigran</option><option>Region Nigran</option><option>State Nigran</option><option>Zaili Nigran</option></select>
-            </div>
-            
-            <div id="department-fields" class="hidden">
-                <label>Zimmedar Level:</label> 
-                <select id="zimmedarLevel"><option value="">-- Select --</option><option>City/Alaqa</option><option>District/City/Circle</option><option>Division</option><option>Gaon/Zaili Halqa</option><option>Hind Satah (HOD)/Muawwin HOD</option><option>Moallim/Imaam/Moazzin</option><option>Office/Assistant Zimmedar</option><option>Region</option><option>Rukne Hind Mushawarat</option><option>State</option></select>
-                <label>Department:</label> 
-                <select id="departmentList"><option value="">-- Select --</option><option>12 Maah</option><option>Al Madinatul Ilmiya</option><option>Audit Department</option><option>Construction Department</option><option>Darul Ifta Ahle Sunnat</option><option>Darul Madinah English School</option><option>Darul Sunnah</option><option>Donation Box</option><option>Donation Cell</option><option>Education Department</option><option>Faizan Weekend Islamic Classes</option><option>Faizane Madina</option><option>FGN Channel</option><option>Finance Department</option><option>Gareeb Nawaz Online Academy</option><option>Gharelu Sadqa Box</option><option>GNRF (Plantation)</option><option>Haftawar Ijtema O Madani Muzakara</option><option>Hajj O Umrah</option><option>HMO</option><option>HR Department</option><option>Imamat Course</option><option>Imame Masajid</option><option>Islahe Aamaal</option><option>IT Department</option><option>Jamiatul Madina Boys</option><option>Jamiatul Madina Girls</option><option>Kafan Dafan</option><option>Khuddamul Masajid wal Madaris</option><option>Madani Courses</option><option>Madrasatul Madina Balighan</option><option>Madrasatul Madina Boys</option><option>Madrasatul Madina Girls</option><option>Majlise Rabita</option><option>Maktabatul Madina</option><option>Media Department</option><option>Model Jamia Tul Madina</option><option>Mohabbate Badhao</option><option>Muawanat Barae Islami Behne</option><option>Property Department</option><option>Professionals Department</option><option>Purchase Department</option><option>Qafila Department</option><option>Rabita Barae Tajiran/ Khususi Tajiran</option><option>Rabta Bil Ulama wal Mashaikh & Mazarate Auliya</option><option>Reporting Desk - HMO</option><option>Roohani Ilaj</option><option>Schedule</option><option>Sharai Rehnumai Desk</option><option>Social Media</option><option>Special Persons Department</option><option>TAD</option><option>Taqseeme Rasail</option><option>Tibbi Ilaj</option><option>Translation Department</option><option>Ushr wa Atraf Gaon</option></select>
-            </div>
-            
-            <!-- Risala Report Field -->
-            <label>Risala Report:</label> 
-            <input type="text" id="risalaReport" maxlength="5" pattern="[1-9][0-9]{0,4}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" title="Maximum 5 digits, 0 se shuru nahi ho sakta" required>
-            <div style="font-size: 12px; color: #555; margin-top: 5px; margin-bottom: 5px; line-height: 1.4;">
-                Aap ki & Aap Ki Koshish Se Is Hafte Kitno Ne Risala Padha Suna.
-            </div>
-            
-            <!-- Location Fields (End Me) -->
-            <label>Region:</label> <input type="text" id="region" readonly>
-            <label>State:</label> <input type="text" id="state" readonly>
-            <label>Division:</label> <input type="text" id="division" readonly>
-            <label>District:</label> <input type="text" id="district" readonly required>
-            
-        </div>
-        <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button><div id="submitStatus" style="text-align:center;margin-top:10px;"></div>
+<div class="container">
+    <h2 id="heading" style="color:var(--primary); text-align:center;">Loading...</h2>
+    <form id="dataForm" onsubmit="submitForm(event)">
+        <select id="chainType" onchange="toggleFields()" required><option value="">-- Select Chain --</option><option value="central">Central</option><option value="department">Department</option></select>
+        <input type="text" id="userName" placeholder="Name" required>
+        <input type="tel" id="contactNumber" placeholder="Mobile Number" required>
+        <input type="text" id="pincode" placeholder="Pincode" oninput="if(this.value.length==6) fetchPin(this.value)" required>
+        <div id="extraFields"></div>
+        <input type="text" id="district" placeholder="District" readonly>
+        <input type="text" id="division" placeholder="Division" readonly>
+        <input type="text" id="state" placeholder="State" readonly>
+        <input type="text" id="region" placeholder="Region" readonly>
+        <input type="number" id="risalaReport" placeholder="Risala Count" required>
+        <button type="submit" id="submitBtn">Submit Report</button>
     </form>
 </div>
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbw4CJdIi24Hnywnn7txSnL6CZL2c9Zj9CVGm1HcaWE2skYMbjLNOk4uw2ORIjLJ28Qt/exec";
-    const themes = {
-        "Peacock": { primary: "#008080", hover: "#005959", bg: "#e0f2f1", lightBg: "#f0faf9" },
-        "Blue":    { primary: "#0056b3", hover: "#003d82", bg: "#e6f2ff", lightBg: "#f0f7ff" },
-        "Red":     { primary: "#dc3545", hover: "#a71d2a", bg: "#fcebec", lightBg: "#fdf3f4" },
-        "Green":   { primary: "#28a745", hover: "#1e7e34", bg: "#e8f5e9", lightBg: "#f1f8f1" },
-        "Orange":  { primary: "#fd7e14", hover: "#c6600d", bg: "#fff2e6", lightBg: "#fff8f0" },
-        "Purple":  { primary: "#6f42c1", hover: "#59339d", bg: "#f3e8ff", lightBg: "#f9f4ff" },
-        "Dark":    { primary: "#343a40", hover: "#23272b", bg: "#e9ecef", lightBg: "#f8f9fa" },
-        "Teal":    { primary: "#20c997", hover: "#17a2b8", bg: "#e0fafa", lightBg: "#f0fcfc" },
-        "Brown":   { primary: "#795548", hover: "#5d4037", bg: "#efebe9", lightBg: "#f5f3f1" },
-        "Pink":    { primary: "#e83e8c", hover: "#c23373", bg: "#fcecf3", lightBg: "#fdf4f7" }
-    };
-    function applyTheme(t) { let s = themes[t] || themes["Peacock"]; document.documentElement.style.setProperty('--primary', s.primary); document.documentElement.style.setProperty('--hover', s.hover); document.documentElement.style.setProperty('--bg', s.bg); document.documentElement.style.setProperty('--light-bg', s.lightBg); }
-    window.onload = function() {
-        fetch(scriptURL + "?checkStatus=true").then(r => r.json()).then(data => {
-            document.getElementById("loadingOverlay").classList.add("hidden");
-            if(data.thumbnail) { 
-                let img = document.getElementById("dynamicThumbnail");
-                let fId = data.thumbnail.split('/d/')[1]?.split('/')[0];
-                if(fId) { img.src = "https://lh3.googleusercontent.com/d/" + fId; img.style.display = "block"; }
-            }
-            document.getElementById("dynamicHeading").innerHTML = data.heading;
-            document.getElementById("dynamicSubheading").innerHTML = data.subheading;
-            applyTheme(data.theme);
-            if(data.status === "OFF") document.getElementById("linkOffMessage").classList.remove("hidden");
-            else document.getElementById("dataForm").classList.remove("hidden");
-        });
-    };
-    function showChainFields() { const c = document.getElementById("chainType").value; document.getElementById("all-fields").classList.remove("hidden"); document.getElementById("central-fields").classList.toggle("hidden", c !== "central"); document.getElementById("department-fields").classList.toggle("hidden", c !== "department"); }
+    const scriptURL = "PASTE_YOUR_DEPLOYED_WEB_APP_URL_HERE";
     
-    function fetchDistrict() { 
-        let pInput = document.getElementById("pincode");
-        fetch(scriptURL + "?pincode=" + pInput.value).then(r => r.json()).then(d => { 
-            document.getElementById("district").value = d.district; 
-            document.getElementById("division").value = d.division; 
-            document.getElementById("state").value = d.state; 
-            document.getElementById("region").value = d.region; 
-            
-            if (d.district === "Not Found" || d.district === "") {
-                pInput.setCustomValidity("Yeh Pincode record mein nahi hai. Kripya sahi Pincode add karein.");
-                pInput.reportValidity();
-            } else {
-                pInput.setCustomValidity("");
-            }
-        }); 
+    async function fetchPin(pin) {
+        const res = await fetch(scriptURL + "?action=pincode&pin=" + pin);
+        const d = await res.json();
+        if(d) {
+            document.getElementById("district").value = d.district;
+            document.getElementById("division").value = d.division;
+            document.getElementById("state").value = d.state;
+            document.getElementById("region").value = d.region;
+        }
     }
-    
-    function submitForm(e){
-e.preventDefault();
-const btn=document.getElementById("submitBtn");
-if(btn.disabled) return false;
-btn.disabled=true;
-btn.innerText="Submitting...";
-document.getElementById("submitStatus").innerText="Please wait...";
-fetch(scriptURL,{method:"POST",body:JSON.stringify({ chainType: document.getElementById("chainType").value, userName: document.getElementById("userName").value, contactNumber: document.getElementById("contactNumber").value, nigranLevel: document.getElementById("nigranLevel").value, zimmedarLevel: document.getElementById("zimmedarLevel").value, departmentList: document.getElementById("departmentList").value, risalaReport: document.getElementById("risalaReport").value, pincode: document.getElementById("pincode").value, district: document.getElementById("district").value, division: document.getElementById("division").value, state: document.getElementById("state").value, region: document.getElementById("region").value })}).then(r=>r.json()).then(d=>{
- if(d.status==="Success"){
-  document.getElementById("dataForm").classList.add("hidden");
-  document.getElementById("successMessage").classList.remove("hidden");
- }else{
-  alert(d.message||d.status);
-  btn.disabled=false;
-  btn.innerText="Submit Report";
-  document.getElementById("submitStatus").innerText="";
- }
-}).catch(()=>{
- alert("Network error. Please try again.");
- btn.disabled=false;
- btn.innerText="Submit Report";
- document.getElementById("submitStatus").innerText="";
-});
-}
+
+    async function submitForm(e) {
+        e.preventDefault();
+        const btn = document.getElementById("submitBtn");
+        btn.innerText = "Submitting..."; btn.disabled = true;
+        const data = {
+            chainType: document.getElementById("chainType").value,
+            userName: document.getElementById("userName").value,
+            contactNumber: document.getElementById("contactNumber").value,
+            pincode: document.getElementById("pincode").value,
+            risalaReport: document.getElementById("risalaReport").value,
+            nigranLevel: document.getElementById("chainType").value === "central" ? "Central" : "",
+            zimmedarLevel: "", departmentList: ""
+        };
+        const res = await fetch(scriptURL, {method: "POST", body: JSON.stringify(data)});
+        const result = await res.json();
+        alert(result.message);
+        btn.innerText = "Submit Report"; btn.disabled = false;
+    }
 </script>
 </body>
 </html>
