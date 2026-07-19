@@ -19,24 +19,20 @@
     <h2>Weekly Risala Report</h2>
     <form id="dataForm" onsubmit="submitForm(event)">
         
-        <!-- Chain Selection (Always Visible) - UPDATED -->
         <select id="chainType" onchange="toggleFields()" required>
             <option value="">-- Select Chain --</option>
             <option value="nigran">Nigran</option>
             <option value="department">Department</option>
         </select>
 
-        <!-- Hidden Group: All Other Fields -->
         <div id="allFields" class="hidden">
             
             <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[a-zA-Z\s]+$" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" title="Sirf English letters allowed hain" required>
 
             <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
 
-            <!-- Pincode Field -->
             <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length==6) fetchPin(this.value);" required>
 
-            <!-- Nigran Fields (Updated Logic) -->
             <div id="centralFields" class="hidden">
                 <select id="nigranLevel">
                     <option value="">Select Nigran Level</option>
@@ -49,7 +45,6 @@
                 </select>
             </div>
             
-            <!-- Department Fields -->
             <div id="deptFields" class="hidden">
                 <select id="zimmedarLevel">
                     <option value="">Select Zimmedar Level</option>
@@ -113,7 +108,7 @@
                     <option>Rabta Bil Ulama wal Mashaikh</option>
                     <option>Reporting Desk - HMO</option>
                     <option>Roohani Ilaj</option>
-                    <option>Schedule</option>
+                    <option>Schedule - HMO</option>
                     <option>Sharai Rehnumai Desk</option>
                     <option>Social Media</option>
                     <option>Special Persons Department</option>
@@ -126,25 +121,25 @@
                 </select>
             </div>
 
-            <!-- Readonly Location Fields -->
             <input type="text" id="district" placeholder="District" readonly required>
             <input type="text" id="division" placeholder="Division" readonly>
             <input type="text" id="state" placeholder="State" readonly>
             <input type="text" id="region" placeholder="Region" readonly>
 
-            <!-- Risala Count -->
             <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
 
-            <!-- Submit Button -->
             <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button>
 
-        </div> <!-- End of Hidden Group -->
+        </div> 
     </form>
 </div>
 
 <script>
     // YAHAN APNA NAYA DEPLOY KIYA HUA GOOGLE SCRIPT URL ZAROOR DAALEIN
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzFrxTNanchEWtbUf3PSRpFH-QJGOqiFpa2-GVmy8zu0nOZSolGGQtE87TS9OcEOw0v/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwTzDXQRrqc9eW6K8h0dOH0EjYe3ARH7rKS47eWYKzExTIpgyLRmGK4sCPhbwT1SVPh/exec";
+    
+    // UPDATE: Frontend memory cache for instant loading
+    let localPinCache = {}; 
 
     function toggleFields() {
         const c = document.getElementById("chainType").value;
@@ -154,28 +149,38 @@
             allFields.classList.add("hidden");
         } else {
             allFields.classList.remove("hidden");
-            
-            // "nigran" aur "department" ke hisaab se logic update
             document.getElementById("centralFields").classList.toggle("hidden", c !== 'nigran');
             document.getElementById("deptFields").classList.toggle("hidden", c !== 'department');
         }
     }
 
     async function fetchPin(pin) {
+        // Agar yeh pincode pehle se local cache me hai, toh 0.1s mein load hoga
+        if (localPinCache[pin]) {
+            document.getElementById("district").value = localPinCache[pin].district;
+            document.getElementById("division").value = localPinCache[pin].division;
+            document.getElementById("state").value = localPinCache[pin].state;
+            document.getElementById("region").value = localPinCache[pin].region;
+            document.getElementById("pincode").setCustomValidity(""); 
+            return;
+        }
+
         try {
-            // API Call
+            document.getElementById("district").value = "Loading...";
+            
             const res = await fetch(scriptURL + "?action=pincode&pin=" + pin);
             const d = await res.json();
             
             if(d && d.district) {
-                // Auto Fill Logic
+                // Naya data aane par usko cache mein save kar lenge
+                localPinCache[pin] = d; 
+
                 document.getElementById("district").value = d.district;
                 document.getElementById("division").value = d.division;
                 document.getElementById("state").value = d.state;
                 document.getElementById("region").value = d.region;
                 document.getElementById("pincode").setCustomValidity(""); 
             } else {
-                // Agar pincode sheet mein nahi hai
                 document.getElementById("district").value = "";
                 document.getElementById("division").value = "";
                 document.getElementById("state").value = "";
@@ -194,7 +199,6 @@
         btn.disabled = true; btn.innerText = "Submitting...";
         
         const data = {
-            // Yahan wapas wahi dikhega jo user select karega
             chainType: document.getElementById("chainType").options[document.getElementById("chainType").selectedIndex].text,
             userName: document.getElementById("userName").value,
             contactNumber: document.getElementById("contactNumber").value,
