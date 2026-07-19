@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Risala Report</title>
     <style>
         :root { --primary: #008080; }
         body { font-family: Arial, sans-serif; background-color: #e0f2f1; padding: 20px; display: flex; justify-content: center; }
@@ -16,36 +18,71 @@
 <div class="form-container">
     <h2>Weekly Risala Report</h2>
     <form id="dataForm" onsubmit="submitForm(event)">
+        
         <select id="chainType" onchange="toggleFields()" required>
             <option value="">-- Select Chain --</option>
             <option value="central">Central Chain</option>
             <option value="department">Department Chain</option>
         </select>
 
-        <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[A-Za-z ]+$" title="Only English alphabets allowed" required>
-        <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
-        <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length==6) fetchPin(this.value)" required>
+        <!-- Name Field: Strict English Letters & Space ONLY -->
+        <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[a-zA-Z\s]+$" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" title="Sirf English letters allowed hain" required>
+
+        <!-- Mobile Number: 10 Digits, NO ZERO START -->
+        <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
+
+        <!-- Pincode: 6 Digits, NO ZERO START -->
+        <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length==6) fetchPin(this.value);" required>
 
         <div id="centralFields" class="hidden">
-            <select id="nigranLevel"><option value="">Select Nigran Level</option><option>Alaqa Nigran</option></select>
+            <select id="nigranLevel">
+                <option value="">Select Nigran Level</option>
+                <option>Alaqa Nigran</option>
+                <option>District/Circle Nigran</option>
+                <option>Division Nigran</option>
+                <option>Region Nigran</option>
+                <option>State Nigran</option>
+                <option>Zaili Nigran</option>
+            </select>
         </div>
+        
         <div id="deptFields" class="hidden">
-            <select id="zimmedarLevel"><option value="">Select Zimmedar Level</option><option>City/Alaqa</option></select>
-            <select id="departmentList"><option value="">Select Department</option><option>HR Department</option></select>
+            <select id="zimmedarLevel">
+                <option value="">Select Zimmedar Level</option>
+                <option>City/Alaqa</option>
+                <option>District/City/Circle</option>
+                <option>Division</option>
+                <option>Gaon/Zaili Halqa</option>
+                <option>Hind Satah (HOD)/Muawwin HOD</option>
+                <option>Moallim/Imaam/Moazzin</option>
+                <option>Office/Assistant Zimmedar</option>
+                <option>Region</option>
+                <option>Rukne Hind Mushawarat</option>
+                <option>State</option>
+            </select>
+            <select id="departmentList">
+                <option value="">Select Department</option>
+                <option>12 Maah</option>
+                <option>HR Department</option>
+                <option>IT Department</option>
+                <!-- Add your remaining original departments here -->
+            </select>
         </div>
 
-        <input type="text" id="district" placeholder="District" readonly>
+        <input type="text" id="district" placeholder="District" readonly required>
         <input type="text" id="division" placeholder="Division" readonly>
         <input type="text" id="state" placeholder="State" readonly>
         <input type="text" id="region" placeholder="Region" readonly>
 
-        <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+        <!-- Risala Count: Max 4 Digits, NO ZERO START -->
+        <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
 
         <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button>
     </form>
 </div>
 
 <script>
+    // Zaroori: Yahan apna Google Script ka naya Deploy kiya hua URL daalein
     const scriptURL = "https://docs.google.com/spreadsheets/d/1-Hrs_jjDJ8AiJacKW4f9Mdd-A_QvCtbB-h7r0H5dDZg/edit?usp=sharing";
 
     function toggleFields() {
@@ -55,14 +92,28 @@
     }
 
     async function fetchPin(pin) {
-        const res = await fetch(scriptURL + "?action=pincode&pin=" + pin);
-        const d = await res.json();
-        if(d.district) {
-            document.getElementById("district").value = d.district;
-            document.getElementById("division").value = d.division;
-            document.getElementById("state").value = d.state;
-            document.getElementById("region").value = d.region;
-        } else { alert("Pincode Not Found"); }
+        try {
+            const res = await fetch(scriptURL + "?action=pincode&pin=" + pin);
+            const d = await res.json();
+            
+            if(d.district) {
+                document.getElementById("district").value = d.district;
+                document.getElementById("division").value = d.division;
+                document.getElementById("state").value = d.state;
+                document.getElementById("region").value = d.region;
+                document.getElementById("pincode").setCustomValidity(""); // Pincode Sahi hai
+            } else {
+                document.getElementById("district").value = "";
+                document.getElementById("division").value = "";
+                document.getElementById("state").value = "";
+                document.getElementById("region").value = "";
+                // Agar pincode sheet me na ho to error message show karega:
+                document.getElementById("pincode").setCustomValidity("Yeh Pincode Sheet mein record nahi hai. Kripya sahi Pincode daalein.");
+                document.getElementById("pincode").reportValidity();
+            }
+        } catch(error) {
+            console.error("API Error", error);
+        }
     }
 
     async function submitForm(e) {
@@ -75,9 +126,9 @@
             userName: document.getElementById("userName").value,
             contactNumber: document.getElementById("contactNumber").value,
             pincode: document.getElementById("pincode").value,
-            nigranLevel: document.getElementById("nigranLevel").value,
-            zimmedarLevel: document.getElementById("zimmedarLevel").value,
-            departmentList: document.getElementById("departmentList").value,
+            nigranLevel: document.getElementById("nigranLevel") ? document.getElementById("nigranLevel").value : "",
+            zimmedarLevel: document.getElementById("zimmedarLevel") ? document.getElementById("zimmedarLevel").value : "",
+            departmentList: document.getElementById("departmentList") ? document.getElementById("departmentList").value : "",
             risalaReport: document.getElementById("risalaReport").value,
             district: document.getElementById("district").value,
             division: document.getElementById("division").value,
@@ -85,9 +136,18 @@
             region: document.getElementById("region").value
         };
         
-        const res = await fetch(scriptURL, {method: "POST", body: JSON.stringify(data)});
-        const result = await res.json();
-        alert(result.message);
+        try {
+            const res = await fetch(scriptURL, {method: "POST", body: JSON.stringify(data)});
+            const result = await res.json();
+            alert(result.message);
+            if(result.status === "Success") {
+                document.getElementById("dataForm").reset();
+                toggleFields();
+            }
+        } catch(err) {
+            alert("Network Error. Please try again.");
+        }
+        
         btn.disabled = false; btn.innerText = "Submit Report";
     }
 </script>
