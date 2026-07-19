@@ -138,8 +138,17 @@
     // YAHAN APNA NAYA DEPLOY KIYA HUA GOOGLE SCRIPT URL ZAROOR DAALEIN
     const scriptURL = "https://script.google.com/macros/s/AKfycbwTzDXQRrqc9eW6K8h0dOH0EjYe3ARH7rKS47eWYKzExTIpgyLRmGK4sCPhbwT1SVPh/exec";
     
-    // UPDATE: Frontend memory cache for instant loading
-    let localPinCache = {}; 
+    // NAYA: Local database banaya jo background mein load hoga
+    let globalPinDatabase = {}; 
+
+    // Jab form pehli baar load hota hai, background mein chupke se saare pincode download kar leta hai
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            const res = await fetch(scriptURL + "?action=load_all");
+            globalPinDatabase = await res.json();
+            console.log("Pincodes ready!");
+        } catch(e) {}
+    });
 
     function toggleFields() {
         const c = document.getElementById("chainType").value;
@@ -155,16 +164,17 @@
     }
 
     async function fetchPin(pin) {
-        // Agar yeh pincode pehle se local cache me hai, toh 0.1s mein load hoga
-        if (localPinCache[pin]) {
-            document.getElementById("district").value = localPinCache[pin].district;
-            document.getElementById("division").value = localPinCache[pin].division;
-            document.getElementById("state").value = localPinCache[pin].state;
-            document.getElementById("region").value = localPinCache[pin].region;
+        // INSTANT CHECK (0.001 Second Time) ⚡
+        if (globalPinDatabase && globalPinDatabase[pin]) {
+            document.getElementById("district").value = globalPinDatabase[pin].district;
+            document.getElementById("division").value = globalPinDatabase[pin].division;
+            document.getElementById("state").value = globalPinDatabase[pin].state;
+            document.getElementById("region").value = globalPinDatabase[pin].region;
             document.getElementById("pincode").setCustomValidity(""); 
-            return;
+            return; // Yahan kaam khatam, server ke paas jaane ki zarurat nahi!
         }
 
+        // Agar kisi wajah se background load nahi hua, tab server check karega (Fallback)
         try {
             document.getElementById("district").value = "Loading...";
             
@@ -172,9 +182,6 @@
             const d = await res.json();
             
             if(d && d.district) {
-                // Naya data aane par usko cache mein save kar lenge
-                localPinCache[pin] = d; 
-
                 document.getElementById("district").value = d.district;
                 document.getElementById("division").value = d.division;
                 document.getElementById("state").value = d.state;
