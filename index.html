@@ -5,11 +5,10 @@
     <style>
         :root { --primary: #008080; }
         body { font-family: Arial, sans-serif; background-color: #e0f2f1; padding: 20px; display: flex; justify-content: center; }
-        .form-container { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 10px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); }
-        h2 { color: var(--primary); text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
-        label { font-weight: bold; display: block; margin-top: 15px; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; margin-top: 25px; cursor: pointer; font-weight: bold; }
+        .form-container { background: white; width: 100%; max-width: 500px; padding: 20px; border-radius: 10px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); }
+        h2 { color: var(--primary); text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 0; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; margin-top: 15px; cursor: pointer; font-weight: bold; font-size: 16px; }
         .hidden { display: none; }
     </style>
 </head>
@@ -17,47 +16,37 @@
 <div class="form-container">
     <h2>Weekly Risala Report</h2>
     <form id="dataForm" onsubmit="submitForm(event)">
-        <label>Chain Select Karein:</label>
         <select id="chainType" onchange="toggleFields()" required>
             <option value="">-- Select Chain --</option>
             <option value="central">Central Chain</option>
             <option value="department">Department Chain</option>
         </select>
 
-        <label>Name (English Only):</label>
-        <input type="text" id="userName" pattern="^[A-Za-z ]+$" title="Only English alphabets allowed" required>
-
-        <label>Mobile Number (10 Digits):</label>
-        <input type="text" id="contactNumber" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
-
-        <label>Pincode (6 Digits):</label>
-        <input type="text" id="pincode" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length==6) fetchPin(this.value)" required>
+        <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[A-Za-z ]+$" title="Only English alphabets allowed" required>
+        <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+        <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length==6) fetchPin(this.value)" required>
 
         <div id="centralFields" class="hidden">
-            <label>Nigran Level:</label>
-            <select id="nigranLevel"><option>Alaqa Nigran</option></select>
+            <select id="nigranLevel"><option value="">Select Nigran Level</option><option>Alaqa Nigran</option></select>
         </div>
         <div id="deptFields" class="hidden">
-            <label>Zimmedar Level:</label>
-            <select id="zimmedarLevel"><option>City/Alaqa</option></select>
-            <label>Department:</label>
-            <select id="departmentList"><option>HR Department</option></select>
+            <select id="zimmedarLevel"><option value="">Select Zimmedar Level</option><option>City/Alaqa</option></select>
+            <select id="departmentList"><option value="">Select Department</option><option>HR Department</option></select>
         </div>
 
-        <label>District:</label> <input type="text" id="district" readonly>
-        <label>Division:</label> <input type="text" id="division" readonly>
-        <label>State:</label> <input type="text" id="state" readonly>
-        <label>Region:</label> <input type="text" id="region" readonly>
+        <input type="text" id="district" placeholder="District" readonly>
+        <input type="text" id="division" placeholder="Division" readonly>
+        <input type="text" id="state" placeholder="State" readonly>
+        <input type="text" id="region" placeholder="Region" readonly>
 
-        <label>Weekly Risala Report (Max 4 Digits):</label>
-        <input type="text" id="risalaReport" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+        <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
 
-        <button type="submit" class="btn-submit">Submit Report</button>
+        <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button>
     </form>
 </div>
 
 <script>
-    const scriptURL = "PASTE_YOUR_WEB_APP_URL_HERE";
+    const scriptURL = "PASTE_YOUR_NEW_WEB_APP_URL_HERE";
 
     function toggleFields() {
         const c = document.getElementById("chainType").value;
@@ -73,11 +62,14 @@
             document.getElementById("division").value = d.division;
             document.getElementById("state").value = d.state;
             document.getElementById("region").value = d.region;
-        }
+        } else { alert("Pincode Not Found"); }
     }
 
     async function submitForm(e) {
         e.preventDefault();
+        const btn = document.getElementById("submitBtn");
+        btn.disabled = true; btn.innerText = "Submitting...";
+        
         const data = {
             chainType: document.getElementById("chainType").value,
             userName: document.getElementById("userName").value,
@@ -92,8 +84,11 @@
             state: document.getElementById("state").value,
             region: document.getElementById("region").value
         };
-        await fetch(scriptURL, {method: "POST", body: JSON.stringify(data)});
-        alert("Report Submitted Successfully!");
+        
+        const res = await fetch(scriptURL, {method: "POST", body: JSON.stringify(data)});
+        const result = await res.json();
+        alert(result.message);
+        btn.disabled = false; btn.innerText = "Submit Report";
     }
 </script>
 </body>
