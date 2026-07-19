@@ -42,12 +42,12 @@
             <div id="centralFields" class="hidden">
                 <select id="nigranLevel">
                     <option value="">Select Nigran Level</option>
-                    <option>Alaqa Nigran</option>
-                    <option>District/Circle Nigran</option>
-                    <option>Division Nigran</option>
                     <option>Region Nigran</option>
                     <option>State Nigran</option>
-                    <option>Zaili Nigran</option>
+                    <option>Division Nigran</option>
+                    <option>District/Cirlcle Nigran</option>
+                    <option>Alaqa/City Nigran</option>
+                    <option>Zaili Halqa Nigran</option>
                 </select>
             </div>
             
@@ -55,23 +55,76 @@
             <div id="deptFields" class="hidden">
                 <select id="zimmedarLevel">
                     <option value="">Select Zimmedar Level</option>
-                    <option>City/Alaqa</option>
-                    <option>District/City/Circle</option>
-                    <option>Division</option>
-                    <option>Gaon/Zaili Halqa</option>
-                    <option>Hind Satah (HOD)/Muawwin HOD</option>
-                    <option>Moallim/Imaam/Moazzin</option>
-                    <option>Office/Assistant Zimmedar</option>
+                    <option>RHM</option>
+                    <option>Hind Satah (HOD)</option>
                     <option>Region</option>
-                    <option>Rukne Hind Mushawarat</option>
                     <option>State</option>
+                    <option>Division</option>
+                    <option>District/Circle</option>
+                    <option>Alaqa/City</option>
+                    <option>Moallim/Mudarris</option>
+                    <option>Imaam/Moazzin</option>
+                    <option>Office / Assistant (HOD/RHM)</option>
                 </select>
                 <select id="departmentList">
                     <option value="">Select Department</option>
-                    <option>12 Maah</option>
+                    <option>Audit Department</option>
+                    <option>Al Madinatul Ilmiya</option>
+                    <option>Assasajat</option>
+                    <option>Construction Department</option>
+                    <option>Darul Ifta Ahle Sunnat</option>
+                    <option>Darul Madinah English School</option>
+                    <option>Darus Sunnah</option>
+                    <option>Education Department</option>
+                    <option>Faizan Weekend Islamic Classes</option>
+                    <option>Faizane Madina</option>
+                    <option>FGN Channel</option>
+                    <option>Finance Department</option>
+                    <option>Gareeb Nawaz Online Academy</option>
+                    <option>Gharelu Sadqa Box</option>
+                    <option>GNRF (Plantation)</option>
+                    <option>Haftawar Ijtema O Madani Muzakara</option>
+                    <option>Hajj O Umrah</option>
+                    <option>Hind Mushawarat Office</option>
+                    <option>HMO</option>
                     <option>HR Department</option>
+                    <option>Imamat Course</option>
+                    <option>Imame Masajid</option>
+                    <option>Islahe Aamaal</option>
                     <option>IT Department</option>
-                    <!-- Baaki original departments yahan add kar lein -->
+                    <option>Jamiatul Madina Boys</option>
+                    <option>Jamiatul Madina Girls</option>
+                    <option>Kafan Dafan</option>
+                    <option>Khuddamul Masajid wal Madaris</option>
+                    <option>Legal Advisory Board</option>
+                    <option>Madani Atiyyat Box</option>
+                    <option>Madani Courses</option>
+                    <option>Madrasatul Madina Balighan</option>
+                    <option>Madrasatul Madina Boys</option>
+                    <option>Madrasatul Madina Girls</option>
+                    <option>Majlise Rabita</option>
+                    <option>Maktabatul Madina</option>
+                    <option>Model Jamia Tul Madina</option>
+                    <option>Mohabbate Badhao</option>
+                    <option>Muawanat Barae Islami Behne</option>
+                    <option>Property Department</option>
+                    <option>Purchase Department</option>
+                    <option>Qafila Department</option>
+                    <option>Rabta Barae Khususi Tajiran</option>
+                    <option>Rabta Barae Tajiran</option>
+                    <option>Rabta Bil Ulama wal Mashaikh</option>
+                    <option>Reporting Desk - HMO</option>
+                    <option>Roohani Ilaj</option>
+                    <option>Schedule - HMO</option>
+                    <option>Sharai Rehnumai Desk</option>
+                    <option>Social Media</option>
+                    <option>Special Persons Department</option>
+                    <option>TAD</option>
+                    <option>Taqseeme Rasail</option>
+                    <option>Tibbi Ilaj</option>
+                    <option>Translation Department</option>
+                    <option>Ushr wa Atraf Gaon</option>
+                    <option>Waqf Amlak</option>
                 </select>
             </div>
 
@@ -93,7 +146,7 @@
 
 <script>
     // Yahan apna deploy kiya hua Google Script URL daalein
-    const scriptURL = "https://docs.google.com/spreadsheets/d/1-Hrs_jjDJ8AiJacKW4f9Mdd-A_QvCtbB-h7r0H5dDZg/edit?usp=sharing";
+    const scriptURL = "PASTE_YOUR_NEW_WEB_APP_URL_HERE";
 
     function toggleFields() {
         const c = document.getElementById("chainType").value;
