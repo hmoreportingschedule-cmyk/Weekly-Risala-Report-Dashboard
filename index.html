@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Risala Report</title>
     <style>
-        :root { --primary: #008080; } /* Default is Picock */
+        :root { --primary: #008080; }
         body { font-family: Arial, sans-serif; background-color: #e0f2f1; padding: 20px; display: flex; justify-content: center; }
         .form-container { background: white; width: 100%; max-width: 500px; padding: 20px; border-radius: 10px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); }
         h2 { color: var(--primary); text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 0; }
-        .dynamic-subheading { text-align: center; color: white; background-color: var(--primary); padding: 10px; border-radius: 5px; font-weight: bold; margin-bottom: 15px; }
-        .message-box { text-align: center; padding: 20px; font-size: 16px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; line-height: 1.5; }
-        .header-image { width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
         .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; margin-top: 15px; cursor: pointer; font-weight: bold; font-size: 16px; }
         .hidden { display: none !important; }
@@ -19,209 +16,144 @@
 </head>
 <body>
 <div class="form-container">
-    
-    <!-- Loading Message -->
-    <div id="loadingMessage" style="text-align: center; color: var(--primary); font-weight: bold;">Checking Form Status... Please Wait.</div>
-
-    <!-- Link Off Message -->
-    <div id="linkOffMessage" class="hidden message-box">
-        Aap Ne Deri Kardi Hai Link Off Ho Chuki Hai Khair Koi Baat Nahi, Niyyat Farmalijiye Keh Next Time On Time Risala Padh Kar Link Men Report Submit Karege.
-    </div>
-
-    <!-- Main Form Wrapper -->
-    <div id="mainContent" class="hidden">
+    <h2>Weekly Risala Report</h2>
+    <form id="dataForm" onsubmit="submitForm(event)">
         
-        <img id="dynamicThumbnail" src="" alt="Thumbnail" class="header-image hidden">
-        <h2 id="dynamicHeading">Weekly Risala Report</h2>
-        <div id="dynamicSubheading" class="dynamic-subheading hidden"></div>
+        <select id="chainType" onchange="toggleFields()" required>
+            <option value="">-- Select Chain --</option>
+            <option value="nigran">Nigran</option>
+            <option value="department">Department</option>
+        </select>
 
-        <form id="dataForm" onsubmit="submitForm(event)">
+        <div id="allFields" class="hidden">
             
-            <select id="chainType" onchange="toggleFields()" required>
-                <option value="">-- Select Chain --</option>
-                <option value="nigran">Nigran</option>
-                <option value="department">Department</option>
-            </select>
+            <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[a-zA-Z\s]+$" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" title="Sirf English letters allowed hain" required>
 
-            <div id="allFields" class="hidden">
-                <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[a-zA-Z\s]+$" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" title="Sirf English letters allowed hain" required>
-                <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
-                <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length==6) fetchPin(this.value);" required>
+            <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
 
-                <div id="centralFields" class="hidden">
-                    <select id="nigranLevel">
-                        <option value="">Select Nigran Level</option>
-                        <option>Region Nigran</option>
-                        <option>State Nigran</option>
-                        <option>Division Nigran</option>
-                        <option>District/Cirlcle Nigran</option>
-                        <option>Alaqa/City Nigran</option>
-                        <option>Zaili Halqa Nigran</option>
-                    </select>
-                </div>
-                
-                <div id="deptFields" class="hidden">
-                    <select id="zimmedarLevel">
-                        <option value="">Select Zimmedar Level</option>
-                        <option>RHM</option>
-                        <option>Hind Satah (HOD)</option>
-                        <option>Region</option>
-                        <option>State</option>
-                        <option>Division</option>
-                        <option>District/Circle</option>
-                        <option>Alaqa/City</option>
-                        <option>Moallim/Mudarris</option>
-                        <option>Imaam/Moazzin</option>
-                        <option>Office / Assistant (HOD/RHM)</option>
-                    </select>
-                    <select id="departmentList">
-                        <option value="">Select Department</option>
-                        <option>Audit Department</option>
-                        <option>Al Madinatul Ilmiya</option>
-                        <option>Assasajat</option>
-                        <option>Construction Department</option>
-                        <option>Darul Ifta Ahle Sunnat</option>
-                        <option>Darul Madinah English School</option>
-                        <option>Darus Sunnah</option>
-                        <option>Education Department</option>
-                        <option>Faizan Weekend Islamic Classes</option>
-                        <option>Faizane Madina</option>
-                        <option>FGN Channel</option>
-                        <option>Finance Department</option>
-                        <option>Gareeb Nawaz Online Academy</option>
-                        <option>Gharelu Sadqa Box</option>
-                        <option>GNRF (Plantation)</option>
-                        <option>Haftawar Ijtema O Madani Muzakara</option>
-                        <option>Hajj O Umrah</option>
-                        <option>Hind Mushawarat Office</option>
-                        <option>HMO</option>
-                        <option>HR Department</option>
-                        <option>Imamat Course</option>
-                        <option>Imame Masajid</option>
-                        <option>Islahe Aamaal</option>
-                        <option>IT Department</option>
-                        <option>Jamiatul Madina Boys</option>
-                        <option>Jamiatul Madina Girls</option>
-                        <option>Kafan Dafan</option>
-                        <option>Khuddamul Masajid wal Madaris</option>
-                        <option>Legal Advisory Board</option>
-                        <option>Madani Atiyyat Box</option>
-                        <option>Madani Courses</option>
-                        <option>Madrasatul Madina Balighan</option>
-                        <option>Madrasatul Madina Boys</option>
-                        <option>Madrasatul Madina Girls</option>
-                        <option>Majlise Rabita</option>
-                        <option>Maktabatul Madina</option>
-                        <option>Model Jamia Tul Madina</option>
-                        <option>Mohabbate Badhao</option>
-                        <option>Muawanat Barae Islami Behne</option>
-                        <option>Property Department</option>
-                        <option>Purchase Department</option>
-                        <option>Qafila Department</option>
-                        <option>Rabta Barae Khususi Tajiran</option>
-                        <option>Rabta Barae Tajiran</option>
-                        <option>Rabta Bil Ulama wal Mashaikh</option>
-                        <option>Reporting Desk - HMO</option>
-                        <option>Roohani Ilaj</option>
-                        <option>Schedule - HMO</option>
-                        <option>Sharai Rehnumai Desk</option>
-                        <option>Social Media</option>
-                        <option>Special Persons Department</option>
-                        <option>TAD</option>
-                        <option>Taqseeme Rasail</option>
-                        <option>Tibbi Ilaj</option>
-                        <option>Translation Department</option>
-                        <option>Ushr wa Atraf Gaon</option>
-                        <option>Waqf Amlak</option>
-                    </select>
-                </div>
+            <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length==6) fetchPin(this.value);" required>
 
-                <input type="text" id="district" placeholder="District" readonly required>
-                <input type="text" id="division" placeholder="Division" readonly>
-                <input type="text" id="state" placeholder="State" readonly>
-                <input type="text" id="region" placeholder="Region" readonly>
-                <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
+            <div id="centralFields" class="hidden">
+                <select id="nigranLevel">
+                    <option value="">Select Nigran Level</option>
+                    <option>Region Nigran</option>
+                    <option>State Nigran</option>
+                    <option>Division Nigran</option>
+                    <option>District/Cirlcle Nigran</option>
+                    <option>Alaqa/City Nigran</option>
+                    <option>Zaili Halqa Nigran</option>
+                </select>
+            </div>
+            
+            <div id="deptFields" class="hidden">
+                <select id="zimmedarLevel">
+                    <option value="">Select Zimmedar Level</option>
+                    <option>RHM</option>
+                    <option>Hind Satah (HOD)</option>
+                    <option>Region</option>
+                    <option>State</option>
+                    <option>Division</option>
+                    <option>District/Circle</option>
+                    <option>Alaqa/City</option>
+                    <option>Moallim/Mudarris</option>
+                    <option>Imaam/Moazzin</option>
+                    <option>Office / Assistant (HOD/RHM)</option>
+                </select>
+                <select id="departmentList">
+                    <option value="">Select Department</option>
+                    <option>Audit Department</option>
+                    <option>Al Madinatul Ilmiya</option>
+                    <option>Assasajat</option>
+                    <option>Construction Department</option>
+                    <option>Darul Ifta Ahle Sunnat</option>
+                    <option>Darul Madinah English School</option>
+                    <option>Darus Sunnah</option>
+                    <option>Education Department</option>
+                    <option>Faizan Weekend Islamic Classes</option>
+                    <option>Faizane Madina</option>
+                    <option>FGN Channel</option>
+                    <option>Finance Department</option>
+                    <option>Gareeb Nawaz Online Academy</option>
+                    <option>Gharelu Sadqa Box</option>
+                    <option>GNRF (Plantation)</option>
+                    <option>Haftawar Ijtema O Madani Muzakara</option>
+                    <option>Hajj O Umrah</option>
+                    <option>Hind Mushawarat Office</option>
+                    <option>HMO</option>
+                    <option>HR Department</option>
+                    <option>Imamat Course</option>
+                    <option>Imame Masajid</option>
+                    <option>Islahe Aamaal</option>
+                    <option>IT Department</option>
+                    <option>Jamiatul Madina Boys</option>
+                    <option>Jamiatul Madina Girls</option>
+                    <option>Kafan Dafan</option>
+                    <option>Khuddamul Masajid wal Madaris</option>
+                    <option>Legal Advisory Board</option>
+                    <option>Madani Atiyyat Box</option>
+                    <option>Madani Courses</option>
+                    <option>Madrasatul Madina Balighan</option>
+                    <option>Madrasatul Madina Boys</option>
+                    <option>Madrasatul Madina Girls</option>
+                    <option>Majlise Rabita</option>
+                    <option>Maktabatul Madina</option>
+                    <option>Model Jamia Tul Madina</option>
+                    <option>Mohabbate Badhao</option>
+                    <option>Muawanat Barae Islami Behne</option>
+                    <option>Property Department</option>
+                    <option>Purchase Department</option>
+                    <option>Qafila Department</option>
+                    <option>Rabta Barae Khususi Tajiran</option>
+                    <option>Rabta Barae Tajiran</option>
+                    <option>Rabta Bil Ulama wal Mashaikh</option>
+                    <option>Reporting Desk - HMO</option>
+                    <option>Roohani Ilaj</option>
+                    <option>Schedule - HMO</option>
+                    <option>Sharai Rehnumai Desk</option>
+                    <option>Social Media</option>
+                    <option>Special Persons Department</option>
+                    <option>TAD</option>
+                    <option>Taqseeme Rasail</option>
+                    <option>Tibbi Ilaj</option>
+                    <option>Translation Department</option>
+                    <option>Ushr wa Atraf Gaon</option>
+                    <option>Waqf Amlak</option>
+                </select>
+            </div>
 
-                <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button>
-            </div> 
-        </form>
-    </div>
+            <input type="text" id="district" placeholder="District" readonly required>
+            <input type="text" id="division" placeholder="Division" readonly>
+            <input type="text" id="state" placeholder="State" readonly>
+            <input type="text" id="region" placeholder="Region" readonly>
+
+            <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button>
+
+        </div> 
+    </form>
 </div>
 
 <script>
     // YAHAN APNA NAYA DEPLOY KIYA HUA GOOGLE SCRIPT URL ZAROOR DAALEIN
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwTzDXQRrqc9eW6K8h0dOH0EjYe3ARH7rKS47eWYKzExTIpgyLRmGK4sCPhbwT1SVPh/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxBqyjndRhInhDHad49Hk1N1RpFJDlEvAK5ym2qsZg/dev";
     
-    // CUSTOM THEMES 
-    const themes = {
-        "picock": "#008080", "green": "#28a745", "gray": "#6c757d", 
-        "blue": "#0056b3", "brown": "#795548", "maroon": "#800000", "purple": "#6f42c1"
-    };
-
+    // NAYA: Local database banaya jo background mein load hoga
     let globalPinDatabase = {}; 
 
+    // Jab form pehli baar load hota hai, background mein chupke se saare pincode download kar leta hai
     document.addEventListener("DOMContentLoaded", async () => {
         try {
-            // Fetch Settings
-            const setRes = await fetch(scriptURL + "?action=settings");
-            const settings = await setRes.json();
-            
-            document.getElementById("loadingMessage").classList.add("hidden");
-
-            // 1. Theme Check & Apply
-            if (settings.theme) {
-                let themeKey = settings.theme.toString().toLowerCase().trim();
-                if (themes[themeKey]) {
-                    document.documentElement.style.setProperty('--primary', themes[themeKey]);
-                }
-            }
-
-            // 2. Heading & SubHeading Apply
-            if (settings.heading) {
-                document.getElementById("dynamicHeading").innerText = settings.heading;
-            }
-            if (settings.subHeading) {
-                document.getElementById("dynamicSubheading").innerText = settings.subHeading;
-                document.getElementById("dynamicSubheading").classList.remove("hidden");
-            }
-
-            // 3. Google Drive Image Thumbnail
-            if (settings.thumbnail) {
-                let thumbUrl = settings.thumbnail;
-                if (thumbUrl.includes('/d/')) {
-                    let fId = thumbUrl.split('/d/')[1].split('/')[0];
-                    thumbUrl = "https://lh3.googleusercontent.com/d/" + fId;
-                }
-                if (thumbUrl) {
-                    document.getElementById("dynamicThumbnail").src = thumbUrl;
-                    document.getElementById("dynamicThumbnail").classList.remove("hidden");
-                }
-            }
-
-            // 4. Form ON/OFF Status Check
-            let linkStatus = settings.status ? settings.status.toString().toUpperCase().trim() : "AUTO";
-            if (linkStatus === "OFF") {
-                document.getElementById("linkOffMessage").classList.remove("hidden");
-                document.getElementById("mainContent").classList.add("hidden");
-            } else {
-                document.getElementById("linkOffMessage").classList.add("hidden");
-                document.getElementById("mainContent").classList.remove("hidden");
-            }
-
-            // Fetch Background Pincodes
-            const pinRes = await fetch(scriptURL + "?action=load_all");
-            globalPinDatabase = await pinRes.json();
-
-        } catch(e) {
-            console.error("API se data fetch nahi ho paya", e);
-            document.getElementById("loadingMessage").classList.add("hidden");
-            document.getElementById("mainContent").classList.remove("hidden");
-        }
+            const res = await fetch(scriptURL + "?action=load_all");
+            globalPinDatabase = await res.json();
+            console.log("Pincodes ready!");
+        } catch(e) {}
     });
 
     function toggleFields() {
         const c = document.getElementById("chainType").value;
         const allFields = document.getElementById("allFields");
+
         if (c === "") {
             allFields.classList.add("hidden");
         } else {
@@ -232,18 +164,23 @@
     }
 
     async function fetchPin(pin) {
+        // INSTANT CHECK (0.001 Second Time) ⚡
         if (globalPinDatabase && globalPinDatabase[pin]) {
             document.getElementById("district").value = globalPinDatabase[pin].district;
             document.getElementById("division").value = globalPinDatabase[pin].division;
             document.getElementById("state").value = globalPinDatabase[pin].state;
             document.getElementById("region").value = globalPinDatabase[pin].region;
             document.getElementById("pincode").setCustomValidity(""); 
-            return; 
+            return; // Yahan kaam khatam, server ke paas jaane ki zarurat nahi!
         }
+
+        // Agar kisi wajah se background load nahi hua, tab server check karega (Fallback)
         try {
             document.getElementById("district").value = "Loading...";
+            
             const res = await fetch(scriptURL + "?action=pincode&pin=" + pin);
             const d = await res.json();
+            
             if(d && d.district) {
                 document.getElementById("district").value = d.district;
                 document.getElementById("division").value = d.division;
@@ -255,7 +192,7 @@
                 document.getElementById("division").value = "";
                 document.getElementById("state").value = "";
                 document.getElementById("region").value = "";
-                document.getElementById("pincode").setCustomValidity("Yeh Pincode Sheet mein record nahi hai.");
+                document.getElementById("pincode").setCustomValidity("Yeh Pincode Sheet mein record nahi hai. Kripya sahi Pincode daalein.");
                 document.getElementById("pincode").reportValidity();
             }
         } catch(error) {
@@ -294,6 +231,7 @@
         } catch(err) {
             alert("Network Error. Please try again.");
         }
+        
         btn.disabled = false; btn.innerText = "Submit Report";
     }
 </script>
