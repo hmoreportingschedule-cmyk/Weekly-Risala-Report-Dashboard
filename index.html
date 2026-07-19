@@ -13,6 +13,7 @@
         .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; margin-top: 15px; cursor: pointer; font-weight: bold; font-size: 16px; }
         .hidden { display: none !important; }
         
+        /* New Dynamic Elements Styles */
         .header-image { width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; }
         .dynamic-subheading { text-align: center; color: white; background-color: var(--primary); padding: 10px; border-radius: 5px; font-weight: bold; margin-bottom: 15px; }
         .message-box { text-align: center; padding: 20px; font-size: 16px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; line-height: 1.5; }
@@ -21,11 +22,15 @@
 <body>
 <div class="form-container">
     
+    <!-- Loading Message -->
     <div id="loadingMessage" style="text-align: center; color: var(--primary); font-weight: bold; padding: 20px;">Checking Form Status... Please Wait.</div>
 
-    <!-- Link Off Message Box -->
-    <div id="linkOffMessage" class="hidden message-box"></div>
+    <!-- Link Off Message -->
+    <div id="linkOffMessage" class="hidden message-box">
+        Aap Ne Deri Kardi Hai Link Off Ho Chuki Hai Khair Koi Baat Nahi, Niyyat Farmalijiye Keh Next Time On Time Risala Padh Kar Link Men Report Submit Karege.
+    </div>
 
+    <!-- Main Content Wrapper -->
     <div id="mainContent" class="hidden">
         
         <img id="dynamicThumbnail" src="" alt="Thumbnail" class="header-image hidden">
@@ -43,7 +48,9 @@
             <div id="allFields" class="hidden">
                 
                 <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[a-zA-Z\s]+$" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" title="Sirf English letters allowed hain" required>
+
                 <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
+
                 <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length==6) fetchPin(this.value);" required>
 
                 <div id="centralFields" class="hidden">
@@ -152,6 +159,7 @@
     // YAHAN APNA NAYA DEPLOY KIYA HUA GOOGLE SCRIPT URL ZAROOR DAALEIN
     const scriptURL = "https://script.google.com/macros/s/AKfycbxBqyjndRhInhDHad49Hk1N1RpFJDlEvAK5ym2qsZg/dev";
     
+    // CUSTOM THEMES 
     const themes = {
         "picock": "#008080", "green": "#28a745", "gray": "#6c757d", 
         "blue": "#0056b3", "brown": "#795548", "maroon": "#800000", "purple": "#6f42c1"
@@ -161,6 +169,7 @@
 
     document.addEventListener("DOMContentLoaded", async () => {
         try {
+            // Yahan API se Data fetch kar rahe hain
             const setRes = await fetch(scriptURL + "?action=settings");
             const textData = await setRes.text();
             
@@ -196,7 +205,7 @@
                 document.getElementById("dynamicSubheading").classList.remove("hidden");
             }
 
-            // Apply Thumbnail
+            // Apply Google Drive Image Thumbnail
             if (settings.thumbnail) {
                 let thumbUrl = settings.thumbnail;
                 if (thumbUrl.includes('/d/')) {
@@ -208,10 +217,6 @@
                     document.getElementById("dynamicThumbnail").classList.remove("hidden");
                 }
             }
-
-            // Naya: Custom Link Off Message Setup
-            const defaultOffMsg = "Aap Ne Deri Kardi Hai Link Off Ho Chuki Hai Khair Koi Baat Nahi, Niyyat Farmalijiye Keh Next Time On Time Risala Padh Kar Link Men Report Submit Karege.";
-            document.getElementById("linkOffMessage").innerText = settings.offMessage ? settings.offMessage : defaultOffMsg;
 
             // Apply Status Logic
             if (settings.status === "OFF") {
@@ -302,7 +307,7 @@
         try {
             const res = await fetch(scriptURL, {method: "POST", body: JSON.stringify(data)});
             const result = await res.json();
-            alert(result.message); // Yahan sheet se aaya hua final message dikhega
+            alert(result.message);
             if(result.status === "Success") {
                 document.getElementById("dataForm").reset();
                 toggleFields(); 
