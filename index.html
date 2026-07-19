@@ -19,26 +19,24 @@
     <h2>Weekly Risala Report</h2>
     <form id="dataForm" onsubmit="submitForm(event)">
         
-        <!-- Chain Selection (Always Visible) -->
+        <!-- Chain Selection (Always Visible) - UPDATED -->
         <select id="chainType" onchange="toggleFields()" required>
             <option value="">-- Select Chain --</option>
-            <option value="central">Central Chain</option>
-            <option value="department">Department Chain</option>
+            <option value="nigran">Nigran</option>
+            <option value="department">Department</option>
         </select>
 
         <!-- Hidden Group: All Other Fields -->
         <div id="allFields" class="hidden">
             
-            <!-- Name Field -->
             <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[a-zA-Z\s]+$" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" title="Sirf English letters allowed hain" required>
 
-            <!-- Mobile Number -->
             <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
 
-            <!-- Pincode -->
+            <!-- Pincode Field -->
             <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length==6) fetchPin(this.value);" required>
 
-            <!-- Central Fields -->
+            <!-- Nigran Fields (Updated Logic) -->
             <div id="centralFields" class="hidden">
                 <select id="nigranLevel">
                     <option value="">Select Nigran Level</option>
@@ -115,7 +113,7 @@
                     <option>Rabta Bil Ulama wal Mashaikh</option>
                     <option>Reporting Desk - HMO</option>
                     <option>Roohani Ilaj</option>
-                    <option>Schedule</option>
+                    <option>Schedule - HMO</option>
                     <option>Sharai Rehnumai Desk</option>
                     <option>Social Media</option>
                     <option>Special Persons Department</option>
@@ -145,38 +143,39 @@
 </div>
 
 <script>
-    // Yahan apna deploy kiya hua Google Script URL daalein
+    // YAHAN APNA NAYA DEPLOY KIYA HUA GOOGLE SCRIPT URL ZAROOR DAALEIN
     const scriptURL = "https://docs.google.com/spreadsheets/d/1-Hrs_jjDJ8AiJacKW4f9Mdd-A_QvCtbB-h7r0H5dDZg/edit?usp=sharing";
 
     function toggleFields() {
         const c = document.getElementById("chainType").value;
         const allFields = document.getElementById("allFields");
 
-        // Agar koi chain select nahi hai to form hide kar do
         if (c === "") {
             allFields.classList.add("hidden");
         } else {
-            // Agar chain select ho gayi to form show karo
             allFields.classList.remove("hidden");
             
-            // Central ya Department ke hisaab se fields dikhao
-            document.getElementById("centralFields").classList.toggle("hidden", c !== 'central');
+            // "nigran" aur "department" ke hisaab se logic update
+            document.getElementById("centralFields").classList.toggle("hidden", c !== 'nigran');
             document.getElementById("deptFields").classList.toggle("hidden", c !== 'department');
         }
     }
 
     async function fetchPin(pin) {
         try {
+            // API Call
             const res = await fetch(scriptURL + "?action=pincode&pin=" + pin);
             const d = await res.json();
             
-            if(d.district) {
+            if(d && d.district) {
+                // Auto Fill Logic
                 document.getElementById("district").value = d.district;
                 document.getElementById("division").value = d.division;
                 document.getElementById("state").value = d.state;
                 document.getElementById("region").value = d.region;
                 document.getElementById("pincode").setCustomValidity(""); 
             } else {
+                // Agar pincode sheet mein nahi hai
                 document.getElementById("district").value = "";
                 document.getElementById("division").value = "";
                 document.getElementById("state").value = "";
@@ -195,7 +194,8 @@
         btn.disabled = true; btn.innerText = "Submitting...";
         
         const data = {
-            chainType: document.getElementById("chainType").value,
+            // Yahan wapas wahi dikhega jo user select karega
+            chainType: document.getElementById("chainType").options[document.getElementById("chainType").selectedIndex].text,
             userName: document.getElementById("userName").value,
             contactNumber: document.getElementById("contactNumber").value,
             pincode: document.getElementById("pincode").value,
@@ -215,7 +215,7 @@
             alert(result.message);
             if(result.status === "Success") {
                 document.getElementById("dataForm").reset();
-                toggleFields(); // Form submit hone ke baad dobara fields hide kar dega
+                toggleFields(); 
             }
         } catch(err) {
             alert("Network Error. Please try again.");
