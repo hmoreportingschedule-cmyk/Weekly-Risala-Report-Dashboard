@@ -13,6 +13,7 @@
         .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; margin-top: 15px; cursor: pointer; font-weight: bold; font-size: 16px; }
         .hidden { display: none !important; }
         
+        /* New Dynamic Elements Styles */
         .header-image { width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; }
         .dynamic-subheading { text-align: center; color: white; background-color: var(--primary); padding: 10px; border-radius: 5px; font-weight: bold; margin-bottom: 15px; }
         .message-box { text-align: center; padding: 20px; font-size: 16px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; line-height: 1.5; }
@@ -21,12 +22,15 @@
 <body>
 <div class="form-container">
     
+    <!-- Loading Message -->
     <div id="loadingMessage" style="text-align: center; color: var(--primary); font-weight: bold; padding: 20px;">Checking Form Status... Please Wait.</div>
 
+    <!-- Link Off Message -->
     <div id="linkOffMessage" class="hidden message-box">
         Aap Ne Deri Kardi Hai Link Off Ho Chuki Hai Khair Koi Baat Nahi, Niyyat Farmalijiye Keh Next Time On Time Risala Padh Kar Link Men Report Submit Karege.
     </div>
 
+    <!-- Main Content Wrapper -->
     <div id="mainContent" class="hidden">
         
         <img id="dynamicThumbnail" src="" alt="Thumbnail" class="header-image hidden">
@@ -44,7 +48,9 @@
             <div id="allFields" class="hidden">
                 
                 <input type="text" id="userName" placeholder="Name (English Only)" pattern="^[a-zA-Z\s]+$" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" title="Sirf English letters allowed hain" required>
+
                 <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
+
                 <input type="text" id="pincode" placeholder="Pincode (6 Digits)" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length==6) fetchPin(this.value);" required>
 
                 <div id="centralFields" class="hidden">
@@ -139,7 +145,9 @@
                 <input type="text" id="division" placeholder="Division" readonly>
                 <input type="text" id="state" placeholder="State" readonly>
                 <input type="text" id="region" placeholder="Region" readonly>
+
                 <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" required>
+
                 <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button>
 
             </div> 
@@ -148,9 +156,10 @@
 </div>
 
 <script>
-    // YAHAN APNA SCRIPT URL DAALEIN
+    // YAHAN APNA NAYA DEPLOY KIYA HUA GOOGLE SCRIPT URL ZAROOR DAALEIN
     const scriptURL = "https://script.google.com/macros/s/AKfycbwTzDXQRrqc9eW6K8h0dOH0EjYe3ARH7rKS47eWYKzExTIpgyLRmGK4sCPhbwT1SVPh/exec";
     
+    // CUSTOM THEMES 
     const themes = {
         "picock": "#008080", "green": "#28a745", "gray": "#6c757d", 
         "blue": "#0056b3", "brown": "#795548", "maroon": "#800000", "purple": "#6f42c1"
@@ -162,13 +171,12 @@
         try {
             // Yahan API se Data fetch kar rahe hain
             const setRes = await fetch(scriptURL + "?action=settings");
-            const textData = await setRes.text(); // Pehle Text mein read karega taaki Error pakad sake
+            const textData = await setRes.text();
             
             let settings;
             try {
-                settings = JSON.parse(textData); // Agar sahi JSON hoga toh pass ho jayega
+                settings = JSON.parse(textData); 
             } catch(e) {
-                // AGAR GHALTI SE PURANA SCRIPT URL HOGA TOH YAHAN PAKDA JAYEGA
                 if (textData.includes("System Online")) {
                     alert("⚠️ DHYAN DEIN: Google Script par abhi bhi purana code run ho raha hai! Kripya Google Script mein jaakar 'Manage Deployments' > 'New Version' karke Naya URL HTML mein dalein.");
                 } else {
@@ -176,7 +184,7 @@
                 }
                 document.getElementById("loadingMessage").classList.add("hidden");
                 document.getElementById("mainContent").classList.remove("hidden");
-                return; // Code aage nahi jayega
+                return; 
             }
             
             document.getElementById("loadingMessage").classList.add("hidden");
@@ -219,12 +227,11 @@
                 document.getElementById("mainContent").classList.remove("hidden");
             }
 
-            // Fetch Background Pincodes Setup
+            // Fetch Background Pincodes
             const pinRes = await fetch(scriptURL + "?action=load_all");
             globalPinDatabase = await pinRes.json();
 
         } catch(e) {
-            alert("Network Problem. Form default mode mein khul raha hai.");
             document.getElementById("loadingMessage").classList.add("hidden");
             document.getElementById("mainContent").classList.remove("hidden");
         }
