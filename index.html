@@ -1,58 +1,68 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --primary: #008080; }
+        body { font-family: Arial, sans-serif; background-color: #e0f2f1; padding: 20px; display: flex; justify-content: center; }
+        .form-container { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 10px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); }
+        h2 { color: var(--primary); text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; margin-top: 25px; cursor: pointer; font-weight: bold; }
+        .hidden { display: none; }
+    </style>
+</head>
 <body>
-<form id="dataForm" onsubmit="submitForm(event)">
-    <!-- Chain Selection -->
-    <select id="chainType" required onchange="toggleFields()">
-        <option value="">-- Select Chain --</option>
-        <option value="central">Central</option>
-        <option value="department">Department</option>
-    </select>
+<div class="form-container">
+    <h2>Weekly Risala Report</h2>
+    <form id="dataForm" onsubmit="submitForm(event)">
+        <label>Chain Select Karein:</label>
+        <select id="chainType" onchange="toggleFields()" required>
+            <option value="">-- Select Chain --</option>
+            <option value="central">Central Chain</option>
+            <option value="department">Department Chain</option>
+        </select>
 
-    <!-- Name: Only English Text -->
-    <input type="text" id="userName" placeholder="Name" required 
-           pattern="^[A-Za-z ]+$" title="Only English alphabets allowed">
+        <label>Name (English Only):</label>
+        <input type="text" id="userName" pattern="^[A-Za-z ]+$" title="Only English alphabets allowed" required>
 
-    <!-- Mobile: Exactly 10 digits, starts with 6-9 -->
-    <input type="text" id="contactNumber" placeholder="Mobile Number" required 
-           pattern="^[6-9][0-9]{9}$" maxlength="10" 
-           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        <label>Mobile Number (10 Digits):</label>
+        <input type="text" id="contactNumber" maxlength="10" pattern="^[6-9][0-9]{9}$" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
 
-    <!-- Pincode: 6 digits, no zero start -->
-    <input type="text" id="pincode" placeholder="Pincode" required 
-           pattern="^[1-9][0-9]{5}$" maxlength="6" 
-           oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length==6) fetchPin(this.value)">
+        <label>Pincode (6 Digits):</label>
+        <input type="text" id="pincode" maxlength="6" pattern="^[1-9][0-9]{5}$" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length==6) fetchPin(this.value)" required>
 
-    <!-- Dynamic Fields -->
-    <div id="centralFields" style="display:none;">
-        <select id="nigranLevel"><option>Alaqa Nigran</option></select>
-    </div>
-    <div id="deptFields" style="display:none;">
-        <select id="zimmedarLevel"><option>City</option></select>
-        <select id="departmentList"><option>HR Department</option></select>
-    </div>
+        <div id="centralFields" class="hidden">
+            <label>Nigran Level:</label>
+            <select id="nigranLevel"><option>Alaqa Nigran</option></select>
+        </div>
+        <div id="deptFields" class="hidden">
+            <label>Zimmedar Level:</label>
+            <select id="zimmedarLevel"><option>City/Alaqa</option></select>
+            <label>Department:</label>
+            <select id="departmentList"><option>HR Department</option></select>
+        </div>
 
-    <!-- Readonly Location Fields -->
-    <input type="text" id="district" placeholder="District" readonly>
-    <input type="text" id="division" placeholder="Division" readonly>
-    <input type="text" id="state" placeholder="State" readonly>
-    <input type="text" id="region" placeholder="Region" readonly>
+        <label>District:</label> <input type="text" id="district" readonly>
+        <label>Division:</label> <input type="text" id="division" readonly>
+        <label>State:</label> <input type="text" id="state" readonly>
+        <label>Region:</label> <input type="text" id="region" readonly>
 
-    <!-- Weekly Risala Report: Max 4 digits, no zero start -->
-    <input type="text" id="risalaReport" placeholder="Weekly Risala Report" required 
-           pattern="^[1-9][0-9]{0,3}$" maxlength="4" 
-           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        <label>Weekly Risala Report (Max 4 Digits):</label>
+        <input type="text" id="risalaReport" maxlength="4" pattern="^[1-9][0-9]{0,3}$" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
 
-    <button type="submit">Submit Report</button>
-</form>
+        <button type="submit" class="btn-submit">Submit Report</button>
+    </form>
+</div>
 
 <script>
     const scriptURL = "PASTE_YOUR_WEB_APP_URL_HERE";
 
     function toggleFields() {
         const c = document.getElementById("chainType").value;
-        document.getElementById("centralFields").style.display = (c === 'central' ? 'block' : 'none');
-        document.getElementById("deptFields").style.display = (c === 'department' ? 'block' : 'none');
+        document.getElementById("centralFields").classList.toggle("hidden", c !== 'central');
+        document.getElementById("deptFields").classList.toggle("hidden", c !== 'department');
     }
 
     async function fetchPin(pin) {
@@ -63,7 +73,7 @@
             document.getElementById("division").value = d.division;
             document.getElementById("state").value = d.state;
             document.getElementById("region").value = d.region;
-        } else { alert("Invalid Pincode"); }
+        }
     }
 
     async function submitForm(e) {
@@ -83,7 +93,7 @@
             region: document.getElementById("region").value
         };
         await fetch(scriptURL, {method: "POST", body: JSON.stringify(data)});
-        alert("Submitted!");
+        alert("Report Submitted Successfully!");
     }
 </script>
 </body>
