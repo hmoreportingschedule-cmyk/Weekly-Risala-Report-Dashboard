@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Risala Report</title>
     
+    <!-- WhatsApp & Social Media Link Preview Tags (Permanent Setup) -->
     <meta property="og:title" content="Weekly Risala Report">
     <meta property="og:description" content="Har Hafte Risala Parh Ya Sunkar Murshid Ki Duaon Me Hissa Paane Ke Liye Report Submit Kijiye.">
     <meta property="og:image" content="https://weekly-risala-report.vercel.app/banner.jpg">
@@ -21,33 +22,13 @@
         
         .dynamic-subheading { text-align: center; color: white; background-color: var(--primary); padding: 10px; border-radius: 5px; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
         
-        /* Updated CSS for Professional Fields */
-        input, select { 
-            width: 100%; 
-            padding: 12px 15px; 
-            margin-top: 15px; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
-            box-sizing: border-box; 
-            font-size: 15px; 
-            color: #444; 
-            background-color: #fff;
-        }
-        input:focus, select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 128, 128, 0.2);
-        }
-        input[readonly] { background-color: var(--light-bg); color: var(--primary); font-weight: bold; cursor: not-allowed; }
-        
-        /* Form Text Details */
-        .info-text { font-size: 12px; color: #666; margin-top: 5px; padding-left: 5px; line-height: 1.4; }
-        
+        label { font-weight: bold; display: block; margin-top: 15px; color: #333; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 15px; }
+        input[readonly] { background-color: var(--light-bg); color: var(--primary); font-weight: bold; }
         .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; font-size: 16px; border-radius: 5px; margin-top: 25px; cursor: pointer; font-weight: bold; }
-        .btn-submit:hover { background-color: var(--hover); }
         .hidden { display: none !important; }
         
-        .message-box { text-align: center; padding: 20px; font-size: 18px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; line-height: 1.5; }
+        .message-box { text-align: center; padding: 20px; font-size: 18px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -57,48 +38,51 @@
     <div id="dynamicSubheading" class="dynamic-subheading"></div>
     <div id="loadingOverlay">Checking Form Status...</div>
     
-    <!-- Link Off and Success Messages -->
-    <div id="linkOffMessage" class="hidden message-box"></div>
+    <!-- Link Off Message -->
+    <div id="linkOffMessage" class="hidden message-box">Aap Ne Deri Kardi Hai Link Off Ho Chuki Hai Khair Koi Baat Nahi, Niyyat Farmalijiye Keh Next Time On Time Risala Padh Kar Link Men Report Submit Karege.</div>
     <div id="successMessage" class="hidden message-box">Allah Kareem Aap Ko Murshid Ki Dua Ka Faizan Nasib Farmaye<br>Aameen. جَزَاک اللہ خَیْرًا</div>
     
     <form id="dataForm" class="hidden" onsubmit="return submitForm(event)">
-        <!-- Updated Dropdown names -->
+        <label>Chain Select Karein:</label>
         <select id="chainType" onchange="showChainFields()" required>
-            <option value="" disabled selected>-- Select Chain --</option>
+            <option value="">-- Select Chain --</option>
+            <!-- 1) Update: Naam Change -->
             <option value="central">Nigran</option>
             <option value="department">Department</option>
         </select>
         
         <div id="all-fields" class="hidden">
-            <!-- Name Field -->
-            <input type="text" id="userName" placeholder="Name (English Only)" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" title="Sirf alphabets (text) hi allow hain" required>
+            <!-- 3) Update: Labels hataye gaye aur andar Placeholders lagaye gaye, aur spacing margin-top: 15px lagaya gaya -->
             
-            <!-- Contact Number Field -->
-            <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" minlength="10" maxlength="10" pattern="[1-9][0-9]{9}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" title="10 digit ka number darj karein jo 0 se shuru na ho" required>
+            <input type="text" id="userName" placeholder="Name (English Only)" style="margin-top: 15px;" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" title="Sirf alphabets (text) hi allow hain" required>
             
-            <!-- Pincode Field -->
-            <input type="text" id="pincode" placeholder="Pincode (6 Digits)" minlength="6" maxlength="6" pattern="[1-9][0-9]{5}" oninput="this.setCustomValidity(''); this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length === 6) fetchDistrict();" title="6 digit ka Pincode darj karein jo 0 se shuru na ho" required>
-            <div class="info-text">Jis Zimmedar Ki Jis District Men Zimmedari Hai Woh Disrict Ka Pincode Add Kare, HOD/RHM/Office Zimmedar Inki Rehaish Jis District Men Usi Ka Pincode Add Kare.</div>
+            <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" style="margin-top: 15px;" minlength="10" maxlength="10" pattern="[1-9][0-9]{9}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" title="10 digit ka number darj karein jo 0 se shuru na ho" required>
+            
+            <input type="text" id="pincode" placeholder="Pincode (6 Digits)" style="margin-top: 15px;" minlength="6" maxlength="6" pattern="[1-9][0-9]{5}" oninput="this.setCustomValidity(''); this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length === 6) fetchDistrict();" title="6 digit ka Pincode darj karein jo 0 se shuru na ho" required>
+            <div style="font-size: 12px; color: #555; margin-top: 5px; margin-bottom: 5px; line-height: 1.4;">
+                Jis Zimmedar Ki Jis District Men Zimmedari Hai Woh Disrict Ka Pincode Add Kare, HOD/RHM/Office Zimmedar Inki Rehaish Jis District Men Usi Ka Pincode Add Kare.
+            </div>
             
             <div id="central-fields" class="hidden">
-                <select id="nigranLevel"><option value="" disabled selected>Select Nigran Level</option><option>Alaqa Nigran</option><option>District/Circle Nigran</option><option>Division Nigran</option><option>Region Nigran</option><option>State Nigran</option><option>Zaili Nigran</option></select>
+                <select id="nigranLevel" style="margin-top: 15px;"><option value="">Select Nigran Level</option><option>Alaqa Nigran</option><option>District/Circle Nigran</option><option>Division Nigran</option><option>Region Nigran</option><option>State Nigran</option><option>Zaili Nigran</option></select>
             </div>
             
             <div id="department-fields" class="hidden">
-                <select id="zimmedarLevel"><option value="" disabled selected>Select Zimmedar Level</option><option>City/Alaqa</option><option>District/City/Circle</option><option>Division</option><option>Gaon/Zaili Halqa</option><option>Hind Satah (HOD)/Muawwin HOD</option><option>Moallim/Imaam/Moazzin</option><option>Office/Assistant Zimmedar</option><option>Region</option><option>Rukne Hind Mushawarat</option><option>State</option></select>
-                <select id="departmentList"><option value="" disabled selected>Select Department</option><option>12 Maah</option><option>Al Madinatul Ilmiya</option><option>Audit Department</option><option>Construction Department</option><option>Darul Ifta Ahle Sunnat</option><option>Darul Madinah English School</option><option>Darul Sunnah</option><option>Donation Box</option><option>Donation Cell</option><option>Education Department</option><option>Faizan Weekend Islamic Classes</option><option>Faizane Madina</option><option>FGN Channel</option><option>Finance Department</option><option>Gareeb Nawaz Online Academy</option><option>Gharelu Sadqa Box</option><option>GNRF (Plantation)</option><option>Haftawar Ijtema O Madani Muzakara</option><option>Hajj O Umrah</option><option>HMO</option><option>HR Department</option><option>Imamat Course</option><option>Imame Masajid</option><option>Islahe Aamaal</option><option>IT Department</option><option>Jamiatul Madina Boys</option><option>Jamiatul Madina Girls</option><option>Kafan Dafan</option><option>Khuddamul Masajid wal Madaris</option><option>Madani Courses</option><option>Madrasatul Madina Balighan</option><option>Madrasatul Madina Boys</option><option>Madrasatul Madina Girls</option><option>Majlise Rabita</option><option>Maktabatul Madina</option><option>Media Department</option><option>Model Jamia Tul Madina</option><option>Mohabbate Badhao</option><option>Muawanat Barae Islami Behne</option><option>Property Department</option><option>Professionals Department</option><option>Purchase Department</option><option>Qafila Department</option><option>Rabita Barae Tajiran/ Khususi Tajiran</option><option>Rabta Bil Ulama wal Mashaikh & Mazarate Auliya</option><option>Reporting Desk - HMO</option><option>Roohani Ilaj</option><option>Schedule</option><option>Sharai Rehnumai Desk</option><option>Social Media</option><option>Special Persons Department</option><option>TAD</option><option>Taqseeme Rasail</option><option>Tibbi Ilaj</option><option>Translation Department</option><option>Ushr wa Atraf Gaon</option></select>
+                <select id="zimmedarLevel" style="margin-top: 15px;"><option value="">Select Zimmedar Level</option><option>City/Alaqa</option><option>District/City/Circle</option><option>Division</option><option>Gaon/Zaili Halqa</option><option>Hind Satah (HOD)/Muawwin HOD</option><option>Moallim/Imaam/Moazzin</option><option>Office/Assistant Zimmedar</option><option>Region</option><option>Rukne Hind Mushawarat</option><option>State</option></select>
+                <select id="departmentList" style="margin-top: 15px;"><option value="">Select Department</option><option>12 Maah</option><option>Al Madinatul Ilmiya</option><option>Audit Department</option><option>Construction Department</option><option>Darul Ifta Ahle Sunnat</option><option>Darul Madinah English School</option><option>Darul Sunnah</option><option>Donation Box</option><option>Donation Cell</option><option>Education Department</option><option>Faizan Weekend Islamic Classes</option><option>Faizane Madina</option><option>FGN Channel</option><option>Finance Department</option><option>Gareeb Nawaz Online Academy</option><option>Gharelu Sadqa Box</option><option>GNRF (Plantation)</option><option>Haftawar Ijtema O Madani Muzakara</option><option>Hajj O Umrah</option><option>HMO</option><option>HR Department</option><option>Imamat Course</option><option>Imame Masajid</option><option>Islahe Aamaal</option><option>IT Department</option><option>Jamiatul Madina Boys</option><option>Jamiatul Madina Girls</option><option>Kafan Dafan</option><option>Khuddamul Masajid wal Madaris</option><option>Madani Courses</option><option>Madrasatul Madina Balighan</option><option>Madrasatul Madina Boys</option><option>Madrasatul Madina Girls</option><option>Majlise Rabita</option><option>Maktabatul Madina</option><option>Media Department</option><option>Model Jamia Tul Madina</option><option>Mohabbate Badhao</option><option>Muawanat Barae Islami Behne</option><option>Property Department</option><option>Professionals Department</option><option>Purchase Department</option><option>Qafila Department</option><option>Rabita Barae Tajiran/ Khususi Tajiran</option><option>Rabta Bil Ulama wal Mashaikh & Mazarate Auliya</option><option>Reporting Desk - HMO</option><option>Roohani Ilaj</option><option>Schedule</option><option>Sharai Rehnumai Desk</option><option>Social Media</option><option>Special Persons Department</option><option>TAD</option><option>Taqseeme Rasail</option><option>Tibbi Ilaj</option><option>Translation Department</option><option>Ushr wa Atraf Gaon</option></select>
             </div>
             
-            <!-- Location Fields -->
-            <input type="text" id="district" placeholder="District" readonly required>
-            <input type="text" id="division" placeholder="Division" readonly>
-            <input type="text" id="state" placeholder="State" readonly>
-            <input type="text" id="region" placeholder="Region" readonly>
-
-            <!-- Risala Report Field -->
-            <!-- Updated max digits to 4 matching image requirement -->
-            <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="[1-9][0-9]{0,3}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" title="Maximum 4 digits, 0 se shuru nahi ho sakta" required>
-            <div class="info-text">Aap ki & Aap Ki Koshish Se Is Hafte Kitno Ne Risala Padha Suna.</div>
+            <!-- Ordered as per screenshot: District, Division, State, Region -->
+            <input type="text" id="district" placeholder="District" style="margin-top: 15px;" readonly required>
+            <input type="text" id="division" placeholder="Division" style="margin-top: 15px;" readonly>
+            <input type="text" id="state" placeholder="State" style="margin-top: 15px;" readonly>
+            <input type="text" id="region" placeholder="Region" style="margin-top: 15px;" readonly>
+            
+            <!-- Update: Max 4 Digits Placeholder -->
+            <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" style="margin-top: 15px;" maxlength="4" pattern="[1-9][0-9]{0,3}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" title="Maximum 4 digits, 0 se shuru nahi ho sakta" required>
+            <div style="font-size: 12px; color: #555; margin-top: 5px; margin-bottom: 5px; line-height: 1.4;">
+                Aap ki & Aap Ki Koshish Se Is Hafte Kitno Ne Risala Padha Suna.
+            </div>
             
         </div>
         <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button>
@@ -119,7 +103,6 @@
         "Pink":    { primary: "#e83e8c", hover: "#c23373", bg: "#fcecf3", lightBg: "#fdf4f7" }
     };
     function applyTheme(t) { let s = themes[t] || themes["Peacock"]; document.documentElement.style.setProperty('--primary', s.primary); document.documentElement.style.setProperty('--hover', s.hover); document.documentElement.style.setProperty('--bg', s.bg); document.documentElement.style.setProperty('--light-bg', s.lightBg); }
-    
     window.onload = function() {
         fetch(scriptURL + "?checkStatus=true").then(r => r.json()).then(data => {
             document.getElementById("loadingOverlay").classList.add("hidden");
@@ -132,16 +115,15 @@
             document.getElementById("dynamicSubheading").innerHTML = data.subheading;
             applyTheme(data.theme);
             
-            // Dynamic Link Off Message Setting
+            // 2) Update: Sheet se naya message update karna (agar likha ho tab)
             if(data.linkOffMsg) {
                 document.getElementById("linkOffMessage").innerHTML = data.linkOffMsg;
             }
-
+            
             if(data.status === "OFF") document.getElementById("linkOffMessage").classList.remove("hidden");
             else document.getElementById("dataForm").classList.remove("hidden");
         });
     };
-    
     function showChainFields() { const c = document.getElementById("chainType").value; document.getElementById("all-fields").classList.remove("hidden"); document.getElementById("central-fields").classList.toggle("hidden", c !== "central"); document.getElementById("department-fields").classList.toggle("hidden", c !== "department"); }
     
     function fetchDistrict() { 
