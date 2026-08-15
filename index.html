@@ -8,7 +8,6 @@
     <!-- WhatsApp & Social Media Link Preview Tags (Permanent Setup) -->
     <meta property="og:title" content="Weekly Risala Report">
     <meta property="og:description" content="Har Hafte Risala Parh Ya Sunkar Murshid Ki Duaon Me Hissa Paane Ke Liye Report Submit Kijiye.">
-    <!-- Ab image link fix kar di gayi hai, sirf GitHub par photo replace karni hogi -->
     <meta property="og:image" content="https://weekly-risala-report-dashboard-izvja41bq-risala-report.vercel.app/banner.jpg">
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:url" content="https://weekly-risala-report-dashboard-izvja41bq-risala-report.vercel.app">
@@ -40,7 +39,7 @@
     <img id="dynamicThumbnail" src="" alt="Thumbnail" class="header-image">
     <h2 id="dynamicHeading">Loading...</h2>
     <div id="dynamicSubheading" class="dynamic-subheading"></div>
-    <div id="loadingOverlay">Checking Form Status...</div>
+    <div id="loadingOverlay" style="padding: 20px 0; font-size: 16px; color: var(--primary); font-weight: bold; text-align: center;">Checking Form Status... Please Wait.</div>
     
     <!-- Link Off Message -->
     <div id="linkOffMessage" class="hidden message-box"></div>
@@ -91,6 +90,7 @@
 </div>
 <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyNFSCIJ_8T2VzVX0L6GtKTQPYR2izYeqx2JVfbDz3l7gUgnZ8tfVIM1jqntDMfQOzO/exec";
+    
     const themes = {
         "Peacock": { primary: "#008080", hover: "#005959", bg: "#e0f2f1", lightBg: "#f0faf9" },
         "Blue":    { primary: "#0056b3", hover: "#003d82", bg: "#e6f2ff", lightBg: "#f0f7ff" },
@@ -103,18 +103,24 @@
         "Brown":   { primary: "#795548", hover: "#5d4037", bg: "#efebe9", lightBg: "#f5f3f1" },
         "Pink":    { primary: "#e83e8c", hover: "#c23373", bg: "#fcecf3", lightBg: "#fdf4f7" }
     };
-    function applyTheme(t) { let s = themes[t] || themes["Peacock"]; document.documentElement.style.setProperty('--primary', s.primary); document.documentElement.style.setProperty('--hover', s.hover); document.documentElement.style.setProperty('--bg', s.bg); document.documentElement.style.setProperty('--light-bg', s.lightBg); }
+
+    function applyTheme(t) { 
+        let s = themes[t] || themes["Peacock"]; 
+        document.documentElement.style.setProperty('--primary', s.primary); 
+        document.documentElement.style.setProperty('--hover', s.hover); 
+        document.documentElement.style.setProperty('--bg', s.bg); 
+        document.documentElement.style.setProperty('--light-bg', s.lightBg); 
+    }
     
-    window.onload = function() {
-        // MAINE SIRF YEH HISSA FIX KIYA HAI (Safe Loading System)
+    // YAHAN SABSE BADA FIX HAI: window.onload ki jagah DOMContentLoaded
+    document.addEventListener("DOMContentLoaded", function() {
         fetch(scriptURL + "?checkStatus=true")
-        .then(r => r.text()) // Naya: Text format me check karenge taaki error pakda ja sake
+        .then(response => response.text()) 
         .then(text => {
             try {
-                let data = JSON.parse(text); // Json me parse karenge
+                let data = JSON.parse(text); 
                 document.getElementById("loadingOverlay").classList.add("hidden");
                 
-                // Safe Thumbnail Parse
                 if(data.thumbnail) { 
                     try {
                         let img = document.getElementById("dynamicThumbnail");
@@ -122,15 +128,15 @@
                             let fId = data.thumbnail.split('/d/')[1].split('/')[0];
                             img.src = "https://lh3.googleusercontent.com/d/" + fId;
                         } else {
-                            img.src = data.thumbnail;
+                            img.src = data.thumbnail; 
                         }
                         img.style.display = "block"; 
-                    } catch(err) { console.log(err); }
+                    } catch(err) { console.log("Thumbnail Error:", err); }
                 }
                 
-                if(data.heading) document.getElementById("dynamicHeading").innerHTML = data.heading;
-                if(data.subheading) document.getElementById("dynamicSubheading").innerHTML = data.subheading;
-                if(data.theme) applyTheme(data.theme);
+                document.getElementById("dynamicHeading").innerHTML = data.heading || "Weekly Risala Report";
+                document.getElementById("dynamicSubheading").innerHTML = data.subheading || "";
+                applyTheme(data.theme || "Peacock");
                 
                 if(data.linkOffMsg) {
                     document.getElementById("linkOffMessage").innerHTML = data.linkOffMsg;
@@ -142,24 +148,28 @@
                     document.getElementById("dataForm").classList.remove("hidden");
                 }
             } catch(e) {
-                // Agar Google Script ki taraf se HTML error aaya toh yahan dikhega
-                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>Google App Script se data load nahi hua. Kripya ensure karein ki App Script me 'New Version' deploy kiya gaya hai.</div>";
+                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>Google App Script se data load nahi hua. Kripya ensure karein ki App Script me 'New Version' deploy kiya gaya hai aur 'Anyone' permission set hai.</div>";
             }
         })
         .catch(error => {
-            document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'>Network Error! Kripya connection check karke page refresh karein.</div>";
+            document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'>Network Error! Kripya internet connection check karke page refresh karein.</div>";
         });
-    };
+    });
     
-    function showChainFields() { const c = document.getElementById("chainType").value; document.getElementById("all-fields").classList.remove("hidden"); document.getElementById("central-fields").classList.toggle("hidden", c !== "central"); document.getElementById("department-fields").classList.toggle("hidden", c !== "department"); }
+    function showChainFields() { 
+        const c = document.getElementById("chainType").value; 
+        document.getElementById("all-fields").classList.remove("hidden"); 
+        document.getElementById("central-fields").classList.toggle("hidden", c !== "central"); 
+        document.getElementById("department-fields").classList.toggle("hidden", c !== "department"); 
+    }
     
     function fetchDistrict() { 
         let pInput = document.getElementById("pincode");
         fetch(scriptURL + "?pincode=" + pInput.value).then(r => r.json()).then(d => { 
-            document.getElementById("district").value = d.district; 
-            document.getElementById("division").value = d.division; 
-            document.getElementById("state").value = d.state; 
-            document.getElementById("region").value = d.region; 
+            document.getElementById("district").value = d.district || "Not Found"; 
+            document.getElementById("division").value = d.division || "Not Found"; 
+            document.getElementById("state").value = d.state || "Not Found"; 
+            document.getElementById("region").value = d.region || "Not Found"; 
             
             if (d.district === "Not Found" || d.district === "") {
                 pInput.setCustomValidity("Yeh Pincode record mein nahi hai. Kripya sahi Pincode add karein.");
@@ -167,6 +177,8 @@
             } else {
                 pInput.setCustomValidity("");
             }
+        }).catch(err => {
+            document.getElementById("district").value = "Error"; 
         }); 
     }
     
@@ -212,7 +224,7 @@
             return false;
         }
 
-        if (distVal === "" || distVal === "Not Found") {
+        if (distVal === "" || distVal === "Not Found" || distVal === "Error") {
             alert("Kripya sahi Pincode darj karein jo record mein maujood ho.");
             return false;
         }
@@ -225,9 +237,19 @@
         fetch(scriptURL, { 
             method: "POST", 
             body: JSON.stringify({ chainType: chainVal, userName: nameVal, contactNumber: contactVal, nigranLevel: document.getElementById("nigranLevel").value, zimmedarLevel: document.getElementById("zimmedarLevel").value, departmentList: document.getElementById("departmentList").value, risalaReport: risalaVal, pincode: pinVal, district: distVal, division: document.getElementById("division").value, state: document.getElementById("state").value, region: document.getElementById("region").value }) 
-        }).then(r => r.json()).then(d => { 
+        })
+        .then(r => r.json())
+        .then(d => { 
             document.getElementById("dataForm").classList.add("hidden"); 
+            document.getElementById("dynamicHeading").classList.add("hidden"); 
+            document.getElementById("dynamicSubheading").classList.add("hidden"); 
             document.getElementById("successMessage").classList.remove("hidden"); 
+        })
+        .catch(err => {
+            alert("Form submit karne me error aayi hai. Please dobara try karein.");
+            isSubmitting = false;
+            btn.disabled = false;
+            btn.innerText = "Submit Report";
         }); 
     }
 </script>
