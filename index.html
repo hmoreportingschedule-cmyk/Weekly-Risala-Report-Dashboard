@@ -106,42 +106,48 @@
     function applyTheme(t) { let s = themes[t] || themes["Peacock"]; document.documentElement.style.setProperty('--primary', s.primary); document.documentElement.style.setProperty('--hover', s.hover); document.documentElement.style.setProperty('--bg', s.bg); document.documentElement.style.setProperty('--light-bg', s.lightBg); }
     
     window.onload = function() {
+        // MAINE SIRF YEH HISSA FIX KIYA HAI (Safe Loading System)
         fetch(scriptURL + "?checkStatus=true")
-        .then(r => r.json())
-        .then(data => {
-            document.getElementById("loadingOverlay").classList.add("hidden");
-            
-            // --- FIX: Safe Thumbnail Parsing ---
-            if(data.thumbnail) { 
-                let img = document.getElementById("dynamicThumbnail");
-                if (data.thumbnail.includes('/d/')) {
-                    let fId = data.thumbnail.split('/d/')[1].split('/')[0];
-                    img.src = "https://lh3.googleusercontent.com/d/" + fId;
-                } else {
-                    img.src = data.thumbnail; // ImgBB ya direct link ke liye
+        .then(r => r.text()) // Naya: Text format me check karenge taaki error pakda ja sake
+        .then(text => {
+            try {
+                let data = JSON.parse(text); // Json me parse karenge
+                document.getElementById("loadingOverlay").classList.add("hidden");
+                
+                // Safe Thumbnail Parse
+                if(data.thumbnail) { 
+                    try {
+                        let img = document.getElementById("dynamicThumbnail");
+                        if (data.thumbnail.includes('/d/')) {
+                            let fId = data.thumbnail.split('/d/')[1].split('/')[0];
+                            img.src = "https://lh3.googleusercontent.com/d/" + fId;
+                        } else {
+                            img.src = data.thumbnail;
+                        }
+                        img.style.display = "block"; 
+                    } catch(err) { console.log(err); }
                 }
-                img.style.display = "block"; 
-            }
-            // -----------------------------------
-            
-            document.getElementById("dynamicHeading").innerHTML = data.heading;
-            document.getElementById("dynamicSubheading").innerHTML = data.subheading;
-            applyTheme(data.theme);
-            
-            if(data.linkOffMsg) {
-                document.getElementById("linkOffMessage").innerHTML = data.linkOffMsg;
-            }
-            
-            if(data.status === "OFF") {
-                document.getElementById("linkOffMessage").classList.remove("hidden");
-            } else {
-                document.getElementById("dataForm").classList.remove("hidden");
+                
+                if(data.heading) document.getElementById("dynamicHeading").innerHTML = data.heading;
+                if(data.subheading) document.getElementById("dynamicSubheading").innerHTML = data.subheading;
+                if(data.theme) applyTheme(data.theme);
+                
+                if(data.linkOffMsg) {
+                    document.getElementById("linkOffMessage").innerHTML = data.linkOffMsg;
+                }
+                
+                if(data.status === "OFF") {
+                    document.getElementById("linkOffMessage").classList.remove("hidden");
+                } else {
+                    document.getElementById("dataForm").classList.remove("hidden");
+                }
+            } catch(e) {
+                // Agar Google Script ki taraf se HTML error aaya toh yahan dikhega
+                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>Google App Script se data load nahi hua. Kripya ensure karein ki App Script me 'New Version' deploy kiya gaya hai.</div>";
             }
         })
         .catch(error => {
-            // FIX: Agar script fail ho toh loading ghumta na rahe
-            document.getElementById("loadingOverlay").innerHTML = "<span style='color:red;'>Error Loading Form. Please try again. (Make sure Google Script is deployed as New Version).</span>";
-            console.error(error);
+            document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'>Network Error! Kripya connection check karke page refresh karein.</div>";
         });
     };
     
