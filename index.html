@@ -104,14 +104,26 @@
         "Pink":    { primary: "#e83e8c", hover: "#c23373", bg: "#fcecf3", lightBg: "#fdf4f7" }
     };
     function applyTheme(t) { let s = themes[t] || themes["Peacock"]; document.documentElement.style.setProperty('--primary', s.primary); document.documentElement.style.setProperty('--hover', s.hover); document.documentElement.style.setProperty('--bg', s.bg); document.documentElement.style.setProperty('--light-bg', s.lightBg); }
+    
     window.onload = function() {
-        fetch(scriptURL + "?checkStatus=true").then(r => r.json()).then(data => {
+        fetch(scriptURL + "?checkStatus=true")
+        .then(r => r.json())
+        .then(data => {
             document.getElementById("loadingOverlay").classList.add("hidden");
+            
+            // --- FIX: Safe Thumbnail Parsing ---
             if(data.thumbnail) { 
                 let img = document.getElementById("dynamicThumbnail");
-                let fId = data.thumbnail.split('/d/')[1]?.split('/')[0];
-                if(fId) { img.src = "https://lh3.googleusercontent.com/d/" + fId; img.style.display = "block"; }
+                if (data.thumbnail.includes('/d/')) {
+                    let fId = data.thumbnail.split('/d/')[1].split('/')[0];
+                    img.src = "https://lh3.googleusercontent.com/d/" + fId;
+                } else {
+                    img.src = data.thumbnail; // ImgBB ya direct link ke liye
+                }
+                img.style.display = "block"; 
             }
+            // -----------------------------------
+            
             document.getElementById("dynamicHeading").innerHTML = data.heading;
             document.getElementById("dynamicSubheading").innerHTML = data.subheading;
             applyTheme(data.theme);
@@ -120,10 +132,19 @@
                 document.getElementById("linkOffMessage").innerHTML = data.linkOffMsg;
             }
             
-            if(data.status === "OFF") document.getElementById("linkOffMessage").classList.remove("hidden");
-            else document.getElementById("dataForm").classList.remove("hidden");
+            if(data.status === "OFF") {
+                document.getElementById("linkOffMessage").classList.remove("hidden");
+            } else {
+                document.getElementById("dataForm").classList.remove("hidden");
+            }
+        })
+        .catch(error => {
+            // FIX: Agar script fail ho toh loading ghumta na rahe
+            document.getElementById("loadingOverlay").innerHTML = "<span style='color:red;'>Error Loading Form. Please try again. (Make sure Google Script is deployed as New Version).</span>";
+            console.error(error);
         });
     };
+    
     function showChainFields() { const c = document.getElementById("chainType").value; document.getElementById("all-fields").classList.remove("hidden"); document.getElementById("central-fields").classList.toggle("hidden", c !== "central"); document.getElementById("department-fields").classList.toggle("hidden", c !== "department"); }
     
     function fetchDistrict() { 
@@ -143,16 +164,13 @@
         }); 
     }
     
-    // NAYA: Global lock flag taaki kisi bhi haal me double submission na ho
     let isSubmitting = false;
 
     function submitForm(e) { 
         e.preventDefault(); 
         
-        // 1. Agar pehle se submit ho raha hai, to agla click block kardo
         if (isSubmitting) return false;
         
-        // --- STRICT VALIDATION CHECKS ---
         let chainVal = document.getElementById("chainType").value;
         let nameVal = document.getElementById("userName").value.trim();
         let contactVal = document.getElementById("contactNumber").value.trim();
@@ -160,14 +178,12 @@
         let distVal = document.getElementById("district").value.trim();
         let risalaVal = document.getElementById("risalaReport").value.trim();
         
-        // 2. Strict English Language Check (Urdu/Hindi/Numbers ko block karne ke liye)
         let englishOnlyRegex = /^[A-Za-z\s]+$/;
         if (!englishOnlyRegex.test(nameVal)) {
             alert("Kripya apna Name strictly English alphabets (A-Z) mein hi likhein. Urdu ya Hindi allow nahi hai.");
             return false;
         }
         
-        // 3. Conditional Fields (Nigran Level ya Department Level) ka Strict Check
         if (chainVal === "central") {
             let nigranVal = document.getElementById("nigranLevel").value;
             if (!nigranVal || nigranVal === "Select Nigran Level") {
@@ -190,14 +206,11 @@
             return false;
         }
 
-        // 4. Pincode Not Found Check
         if (distVal === "" || distVal === "Not Found") {
             alert("Kripya sahi Pincode darj karein jo record mein maujood ho.");
             return false;
         }
-        // --- VALIDATION KHATAM ---
 
-        // Sab sahi hone par Submission Lock on karna
         isSubmitting = true;
         let btn = document.getElementById("submitBtn");
         btn.disabled = true;
