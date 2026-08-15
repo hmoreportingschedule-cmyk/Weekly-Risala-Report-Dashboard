@@ -24,10 +24,12 @@
         .dynamic-subheading { text-align: center; color: white; background-color: var(--primary); padding: 10px; border-radius: 5px; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
         
         label { font-weight: bold; display: block; margin-top: 15px; color: #333; }
-        /* Label hatne ke baad fields ke beech ka gap barqarar rakhne ke liye margin-top: 15px kiya gaya hai */
         input, select { width: 100%; padding: 10px; margin-top: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 15px; }
         input[readonly] { background-color: var(--light-bg); color: var(--primary); font-weight: bold; }
         .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; font-size: 16px; border-radius: 5px; margin-top: 25px; cursor: pointer; font-weight: bold; }
+        
+        .btn-submit:disabled { background-color: #7fbfbf; cursor: not-allowed; }
+        
         .hidden { display: none !important; }
         
         .message-box { text-align: center; padding: 20px; font-size: 18px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; }
@@ -45,7 +47,6 @@
     <div id="successMessage" class="hidden message-box">Allah Kareem Aap Ko Murshid Ki Dua Ka Faizan Nasib Farmaye<br>Aameen. جَزَاک اللہ خَیْرًا</div>
     
     <form id="dataForm" class="hidden" onsubmit="return submitForm(event)">
-        <!-- Labels Hatake placeholders aur select ki pehli option ko placeholder banaya gaya -->
         <select id="chainType" onchange="showChainFields()" required>
             <option value="" disabled selected>-- Select Chain --</option>
             <option value="central">Nigran</option>
@@ -74,13 +75,11 @@
                 <select id="departmentList"><option value="" disabled selected>Select Department</option><option>12 Maah</option><option>Al Madinatul Ilmiya</option><option>Audit Department</option><option>Construction Department</option><option>Darul Ifta Ahle Sunnat</option><option>Darul Madinah English School</option><option>Darul Sunnah</option><option>Donation Box</option><option>Donation Cell</option><option>Education Department</option><option>Faizan Weekend Islamic Classes</option><option>Faizane Madina</option><option>FGN Channel</option><option>Finance Department</option><option>Gareeb Nawaz Online Academy</option><option>Gharelu Sadqa Box</option><option>GNRF (Plantation)</option><option>Haftawar Ijtema O Madani Muzakara</option><option>Hajj O Umrah</option><option>HMO</option><option>HR Department</option><option>Imamat Course</option><option>Imame Masajid</option><option>Islahe Aamaal</option><option>IT Department</option><option>Jamiatul Madina Boys</option><option>Jamiatul Madina Girls</option><option>Kafan Dafan</option><option>Khuddamul Masajid wal Madaris</option><option>Madani Courses</option><option>Madrasatul Madina Balighan</option><option>Madrasatul Madina Boys</option><option>Madrasatul Madina Girls</option><option>Majlise Rabita</option><option>Maktabatul Madina</option><option>Media Department</option><option>Model Jamia Tul Madina</option><option>Mohabbate Badhao</option><option>Muawanat Barae Islami Behne</option><option>Property Department</option><option>Professionals Department</option><option>Purchase Department</option><option>Qafila Department</option><option>Rabita Barae Tajiran/ Khususi Tajiran</option><option>Rabta Bil Ulama wal Mashaikh & Mazarate Auliya</option><option>Reporting Desk - HMO</option><option>Roohani Ilaj</option><option>Schedule</option><option>Sharai Rehnumai Desk</option><option>Social Media</option><option>Special Persons Department</option><option>TAD</option><option>Taqseeme Rasail</option><option>Tibbi Ilaj</option><option>Translation Department</option><option>Ushr wa Atraf Gaon</option></select>
             </div>
             
-            <!-- Location Fields (Screenshot ke hisab se order: District, Division, State, Region) -->
             <input type="text" id="district" placeholder="District" readonly required>
             <input type="text" id="division" placeholder="Division" readonly>
             <input type="text" id="state" placeholder="State" readonly>
             <input type="text" id="region" placeholder="Region" readonly>
 
-            <!-- Risala Report Field (Screenshot ke mutabiq 4 Digits kar diya gaya hai) -->
             <input type="text" id="risalaReport" placeholder="Weekly Risala Report (Max 4 Digits)" maxlength="4" pattern="[1-9][0-9]{0,3}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" title="Maximum 4 digits, 0 se shuru nahi ho sakta" required>
             <div style="font-size: 12px; color: #555; margin-top: 5px; margin-bottom: 5px; line-height: 1.4;">
                 Aap ki & Aap Ki Koshish Se Is Hafte Kitno Ne Risala Padha Suna.
@@ -91,7 +90,7 @@
     </form>
 </div>
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbw4CJdIi24Hnywnn7txSnL6CZL2c9Zj9CVGm1HcaWE2skYMbjLNOk4uw2ORIjLJ28Qt/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyNFSCIJ_8T2VzVX0L6GtKTQPYR2izYeqx2JVfbDz3l7gUgnZ8tfVIM1jqntDMfQOzO/exec";
     const themes = {
         "Peacock": { primary: "#008080", hover: "#005959", bg: "#e0f2f1", lightBg: "#f0faf9" },
         "Blue":    { primary: "#0056b3", hover: "#003d82", bg: "#e6f2ff", lightBg: "#f0f7ff" },
@@ -117,7 +116,6 @@
             document.getElementById("dynamicSubheading").innerHTML = data.subheading;
             applyTheme(data.theme);
             
-            // Sheet (B7) se message fetch karna
             if(data.linkOffMsg) {
                 document.getElementById("linkOffMessage").innerHTML = data.linkOffMsg;
             }
@@ -145,7 +143,74 @@
         }); 
     }
     
-    function submitForm(e) { e.preventDefault(); fetch(scriptURL, { method: "POST", body: JSON.stringify({ chainType: document.getElementById("chainType").value, userName: document.getElementById("userName").value, contactNumber: document.getElementById("contactNumber").value, nigranLevel: document.getElementById("nigranLevel").value, zimmedarLevel: document.getElementById("zimmedarLevel").value, departmentList: document.getElementById("departmentList").value, risalaReport: document.getElementById("risalaReport").value, pincode: document.getElementById("pincode").value, district: document.getElementById("district").value, division: document.getElementById("division").value, state: document.getElementById("state").value, region: document.getElementById("region").value }) }).then(r => r.json()).then(d => { document.getElementById("dataForm").classList.add("hidden"); document.getElementById("successMessage").classList.remove("hidden"); }); }
+    // NAYA: Global lock flag taaki kisi bhi haal me double submission na ho
+    let isSubmitting = false;
+
+    function submitForm(e) { 
+        e.preventDefault(); 
+        
+        // 1. Agar pehle se submit ho raha hai, to agla click block kardo
+        if (isSubmitting) return false;
+        
+        // --- STRICT VALIDATION CHECKS ---
+        let chainVal = document.getElementById("chainType").value;
+        let nameVal = document.getElementById("userName").value.trim();
+        let contactVal = document.getElementById("contactNumber").value.trim();
+        let pinVal = document.getElementById("pincode").value.trim();
+        let distVal = document.getElementById("district").value.trim();
+        let risalaVal = document.getElementById("risalaReport").value.trim();
+        
+        // 2. Strict English Language Check (Urdu/Hindi/Numbers ko block karne ke liye)
+        let englishOnlyRegex = /^[A-Za-z\s]+$/;
+        if (!englishOnlyRegex.test(nameVal)) {
+            alert("Kripya apna Name strictly English alphabets (A-Z) mein hi likhein. Urdu ya Hindi allow nahi hai.");
+            return false;
+        }
+        
+        // 3. Conditional Fields (Nigran Level ya Department Level) ka Strict Check
+        if (chainVal === "central") {
+            let nigranVal = document.getElementById("nigranLevel").value;
+            if (!nigranVal || nigranVal === "Select Nigran Level") {
+                alert("Kripya Nigran Level select karein.");
+                return false;
+            }
+        } else if (chainVal === "department") {
+            let zimmedarVal = document.getElementById("zimmedarLevel").value;
+            let deptVal = document.getElementById("departmentList").value;
+            if (!zimmedarVal || zimmedarVal === "Select Zimmedar Level") {
+                alert("Kripya Zimmedar Level select karein.");
+                return false;
+            }
+            if (!deptVal || deptVal === "Select Department") {
+                alert("Kripya Department select karein.");
+                return false;
+            }
+        } else {
+            alert("Kripya Chain select karein.");
+            return false;
+        }
+
+        // 4. Pincode Not Found Check
+        if (distVal === "" || distVal === "Not Found") {
+            alert("Kripya sahi Pincode darj karein jo record mein maujood ho.");
+            return false;
+        }
+        // --- VALIDATION KHATAM ---
+
+        // Sab sahi hone par Submission Lock on karna
+        isSubmitting = true;
+        let btn = document.getElementById("submitBtn");
+        btn.disabled = true;
+        btn.innerText = "Submitting...";
+        
+        fetch(scriptURL, { 
+            method: "POST", 
+            body: JSON.stringify({ chainType: chainVal, userName: nameVal, contactNumber: contactVal, nigranLevel: document.getElementById("nigranLevel").value, zimmedarLevel: document.getElementById("zimmedarLevel").value, departmentList: document.getElementById("departmentList").value, risalaReport: risalaVal, pincode: pinVal, district: distVal, division: document.getElementById("division").value, state: document.getElementById("state").value, region: document.getElementById("region").value }) 
+        }).then(r => r.json()).then(d => { 
+            document.getElementById("dataForm").classList.add("hidden"); 
+            document.getElementById("successMessage").classList.remove("hidden"); 
+        }); 
+    }
 </script>
 </body>
 </html>
