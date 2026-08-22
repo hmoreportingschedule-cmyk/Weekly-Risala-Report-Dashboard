@@ -410,7 +410,7 @@
           .then(r => r.json())
           .then(d => {
               if (d.status !== 'Success') {
-                  const msg = d.message || d.error || 'Dashboard load nahi ho saka.';
+                  const msg = d.message || 'Dashboard load nahi ho saka.';
                   const isSession = /session|login required|invalid/i.test(msg);
                   if (isSession) {
                       sessionStorage.removeItem('risalaToken');
@@ -434,8 +434,7 @@
           })
           .catch(err => {
               console.error(err);
-              document.getElementById('dashMessage').style.display='block';
-              document.getElementById('dashMessage').textContent='Dashboard data load nahi ho saka: ' + (err && err.message ? err.message : 'Google Apps Script response JSON nahi mila.');
+              document.getElementById('dashMessage').textContent='Dashboard data load nahi ho saka: ' + (err && err.message ? err.message : 'API/Backend error.');
           });
     }
     function refreshDashboard() {
