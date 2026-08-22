@@ -1,38 +1,52 @@
-WEEKLY RISALA REPORT - SINGLE LINK OFFICE LOGIN SETUP
+WEEKLY RISALA REPORT - SINGLE LINK + OFFICE DASHBOARD
 
-1) GitHub/Vercel
-- Replace your current index.html with the included index.html.
-- Keep the same Vercel project and same URL.
-- Do NOT create a separate employee-login.html page. Office Login is built into index.html.
+FILES
+1. index.html  -> GitHub/Vercel frontend. Replace your current index.html.
+2. Code.gs     -> Google Apps Script. Replace the old Code.gs completely.
 
-2) Google Apps Script
-- Replace Code.gs with the included Code.gs.
-- Deploy > Manage deployments > Edit > New version > Web app.
-- Execute as: Me
-- Who has access: Anyone
-- Copy the deployed /exec URL and confirm it matches the API URL already present in index.html.
+GOOGLE SHEETS
+- User login tab name: User Id
+- Report tab name: Responses
+- Existing tabs PincodeMaster and Settings remain unchanged.
 
-3) Google Sheet
-Create/keep a tab named EXACTLY: User Id
-Headers in row 1:
-User_ID | Password | Name | State | Region | District | Department | Role | Status
+IMPORTANT DEPLOYMENT
+1. Open the Google Apps Script project connected to your report spreadsheet.
+2. Replace ALL Code.gs content with the new Code.gs.
+3. Deploy > Manage deployments.
+4. Edit the existing Web app deployment and choose New version.
+5. Execute as: Me.
+6. Who has access: Anyone.
+7. Deploy.
+8. Keep the same Web App URL if possible. If Google gives a new URL, update scriptURL in index.html.
+9. Replace index.html in GitHub and wait for Vercel deployment.
+10. Browser hard refresh: Ctrl+F5.
 
-Example:
-EMP001 | 12345 | Employee 1 | Maharashtra | Mumbai | Raigad | Dept 1 | District | Active
+USER ID TAB COLUMNS
+A User_ID
+B Password
+C Name
+D State
+E Region
+F District
+G Department
+H Role
+I Status
 
-The login is NOT hard-coded. Every login reads the current User Id sheet. If you change User_ID, Password, Status, State, Region, District, Department or Role in the sheet, the next login uses the changed values automatically.
+ROLES
+Admin = all reports
+State = matching State
+Region = matching Region + State when State is provided
+District = matching District + Region + State when provided
+Department = matching Department
 
-4) Roles
-Admin/All = all reports
-State = same State
-Region = same State + Region
-District = same State + Region + District
-Department = same Department
+RESPONSES
+The new Code.gs reads Responses headers dynamically and also uses the existing doPost column order as fallback:
+Timestamp, Chain Type, User Name, Contact Number, Nigran Level, Zimmedar Level, Department List, Risala Report, Pincode, District, Division, State, Region
 
-5) Public page
-- Public submission stays on the same home page.
-- There is NO top Submit Report button.
-- Only the Submit Report button inside the form remains at the bottom.
-- Office Login appears at the top right.
-
-Security note: this version compares the Password value from the Google Sheet directly because that is the requested setup. Do not share the sheet publicly. For stronger production security, passwords can later be moved to hashed authentication.
+DASHBOARD
+- Reports are loaded from Responses after login.
+- Filters: Search, State, Region, District.
+- Summary cards include total entries and report quantity.
+- Graphs: State, Region, Department, District.
+- Refresh Reports button is included.
+- Dashboard also shows source row count and visible row count.
