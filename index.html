@@ -58,22 +58,17 @@
         .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
         .stat { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); }
         .stat .n { font-size:30px; font-weight:bold; color:var(--primary); margin-top:6px; }
-        .filters { background:#fff; border-radius:12px; padding:18px; margin:18px 0; box-shadow:0 4px 16px rgba(0,0,0,.07); display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:12px; }
-        .filters input,.filters select { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; margin:0; }
-        .tablebox { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); overflow:auto; }
-        .employee-table { width:100%; border-collapse:collapse; min-width:950px; }
-        .employee-table th,.employee-table td { padding:9px; border-bottom:1px solid #eee; text-align:left; font-size:13px; }
-        .employee-table th { background:#f2f7f7; color:var(--primary); }
-        .dash-msg { padding:20px; text-align:center; color:#666; }
-
-        .chart-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:18px 0; }
-        .chart-card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.07); min-height:300px; }
-        .chart-title { font-weight:700; color:var(--primary); margin-bottom:10px; }
-        .chart-wrap { position:relative; height:260px; }
+        .filters { background:#fff; border-radius:12px; padding:14px; margin:18px 0; box-shadow:0 4px 16px rgba(0,0,0,.07); display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 1.2fr; gap:10px; }
+        .filters input,.filters select { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; margin:0; background:#fff; }
         .refresh-btn { border:0; background:var(--primary); color:#fff; padding:9px 13px; border-radius:6px; cursor:pointer; font-weight:700; }
         .dash-info { margin:10px 0; font-size:12px; color:#666; text-align:right; }
-        @media(max-width:800px){ .cards{grid-template-columns:repeat(2,1fr)} .filters{grid-template-columns:1fr 1fr} .employee-top{align-items:flex-start;gap:10px;flex-wrap:wrap} .chart-grid{grid-template-columns:1fr} }
-        @media(max-width:500px){ .cards,.filters{grid-template-columns:1fr} .employee-title{font-size:18px} .login-actions{flex-direction:column} }
+        .number-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:18px 0; }
+        .number-card { background:#fff; border-radius:12px; padding:22px 18px; min-height:110px; box-shadow:0 4px 16px rgba(0,0,0,.07); display:flex; flex-direction:column; justify-content:center; }
+        .number-label { color:var(--primary); font-weight:700; font-size:14px; }
+        .number-value { color:var(--primary); font-size:38px; line-height:1.1; font-weight:800; margin-top:10px; }
+        .dash-message-box { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 16px rgba(0,0,0,.07); text-align:center; color:#666; }
+        @media(max-width:1000px){ .cards{grid-template-columns:repeat(2,1fr)} .filters{grid-template-columns:1.5fr 1fr 1fr 1fr} .number-grid{grid-template-columns:repeat(2,1fr)} }
+        @media(max-width:650px){ .cards,.filters,.number-grid{grid-template-columns:1fr} .employee-top{align-items:flex-start;gap:10px;flex-wrap:wrap} .employee-title{font-size:18px} .login-actions{flex-direction:column} }
 </style>
 </head>
 <body>
@@ -144,20 +139,25 @@
   <div class="employee-wrap">
     <div class="welcome"><b>Employee Dashboard</b><div id="scope" style="margin-top:7px;color:#666"></div><div style="margin-top:12px"><button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh Reports</button></div></div>
     <div id="stats" class="cards"></div>
+
     <div class="filters">
       <input id="search" placeholder="Search..." oninput="renderDashboard()">
-      <select id="dashState" onchange="renderDashboard()"><option value="">All State</option></select>
       <select id="dashRegion" onchange="renderDashboard()"><option value="">All Region</option></select>
+      <select id="dashState" onchange="renderDashboard()"><option value="">All State</option></select>
       <select id="dashDistrict" onchange="renderDashboard()"><option value="">All District</option></select>
+      <select id="dashChain" onchange="renderDashboard()"><option value="">All Chain</option></select>
+      <select id="dashDepartment" onchange="renderDashboard()"><option value="">All Department</option></select>
     </div>
-    <div id="chartGrid" class="chart-grid">
-      <div class="chart-card"><div class="chart-title">Reports by State</div><div class="chart-wrap"><canvas id="stateChart"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">Reports by Region</div><div class="chart-wrap"><canvas id="regionChart"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">Reports by Department</div><div class="chart-wrap"><canvas id="departmentChart"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">Reports by District</div><div class="chart-wrap"><canvas id="districtChart"></canvas></div></div>
+
+    <div id="numberDashboard" class="number-grid">
+      <div class="number-card"><div class="number-label">Reports by State</div><div id="numState" class="number-value">0</div></div>
+      <div class="number-card"><div class="number-label">Reports by Region</div><div id="numRegion" class="number-value">0</div></div>
+      <div class="number-card"><div class="number-label">Reports by Department</div><div id="numDepartment" class="number-value">0</div></div>
+      <div class="number-card"><div class="number-label">Reports by District</div><div id="numDistrict" class="number-value">0</div></div>
     </div>
+
     <div id="dashInfo" class="dash-info"></div>
-    <div class="tablebox"><div id="dashMessage" class="dash-msg">Loading reports...</div><table id="dashTable" class="employee-table" style="display:none"><thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Chain</th><th>Level</th><th>Department</th><th>Report</th><th>District</th><th>Division</th><th>State</th><th>Region</th></tr></thead><tbody id="dashBody"></tbody></table></div>
+    <div id="dashMessage" class="dash-message-box">Loading reports...</div>
   </div>
 </div>
 
@@ -178,7 +178,6 @@
     </form>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyNFSCIJ_8T2VzVX0L6GtKTQPYR2izYeqx2JVfbDz3l7gUgnZ8tfVIM1jqntDMfQOzO/exec";
     
@@ -401,11 +400,10 @@
         document.querySelector('.topbar').style.display = 'flex';
         window.scrollTo(0,0);
     }
-    let chartRefs = {};
     function loadDashboard(token) {
         document.getElementById('dashMessage').style.display='block';
         document.getElementById('dashMessage').textContent='Loading reports...';
-        document.getElementById('dashTable').style.display='none';
+
         fetch(scriptURL + '?action=dashboard&token=' + encodeURIComponent(token) + '&_=' + Date.now(), {cache:'no-store'})
           .then(r => r.json())
           .then(d => {
@@ -426,6 +424,7 @@
                   }
                   return;
               }
+
               officeRows = Array.isArray(d.rows) ? d.rows : [];
               window.dashboardSourceRows = Number(d.totalRows || 0);
               window.dashboardDebug = d.debug || {};
@@ -434,68 +433,120 @@
           })
           .catch(err => {
               console.error(err);
+              document.getElementById('dashMessage').style.display='block';
               document.getElementById('dashMessage').textContent='Dashboard data load nahi ho saka: ' + (err && err.message ? err.message : 'API/Backend error.');
           });
     }
+
     function refreshDashboard() {
         const token = sessionStorage.getItem('risalaToken');
         if (token) loadDashboard(token);
     }
-    function uniqDash(key) { return [...new Set(officeRows.map(x => String(x[key] || '').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b)); }
+
+    function uniqDash(key) {
+        return [...new Set(
+            officeRows.map(x => String(x[key] || '').trim()).filter(Boolean)
+        )].sort((a,b)=>a.localeCompare(b));
+    }
+
     function fillDash(id, arr, firstText) {
         const s=document.getElementById(id);
         const current=s.value;
-        s.innerHTML='<option value="">'+firstText+'</option>'+arr.map(x=>'<option value="'+escapeHtml(x)+'">'+escapeHtml(x)+'</option>').join('');
+        s.innerHTML='<option value="">'+firstText+'</option>'+
+          arr.map(x=>'<option value="'+escapeHtml(x)+'">'+escapeHtml(x)+'</option>').join('');
         if(arr.includes(current)) s.value=current;
     }
+
     function populateDashboardFilters() {
-        fillDash('dashState', uniqDash('state'), 'All State');
+        // Requested order:
+        // Search | Region | State | District | Chain | Department
         fillDash('dashRegion', uniqDash('region'), 'All Region');
+        fillDash('dashState', uniqDash('state'), 'All State');
         fillDash('dashDistrict', uniqDash('district'), 'All District');
+        fillDash('dashChain', uniqDash('chain'), 'All Chain');
+        fillDash('dashDepartment', uniqDash('department'), 'All Department');
     }
-    function escapeHtml(x) { return String(x == null ? '' : x).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-    function groupCount(rows,key) {
-        const map={};
-        rows.forEach(x=>{
-            const k=String(x[key]||'').trim()||'Unknown';
+
+    function escapeHtml(x) {
+        return String(x == null ? '' : x).replace(/[&<>"']/g, m =>
+          ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])
+        );
+    }
+
+    function reportNumber(rows) {
+        return rows.reduce((sum,x)=>{
             const n=Number(String(x.report||'').replace(/,/g,''));
-            map[k]=(map[k]||0)+(isNaN(n)?0:n);
-        });
-        return Object.keys(map).sort((a,b)=>map[b]-map[a]).map(k=>({label:k,count:map[k]}));
+            return sum+(isNaN(n)?0:n);
+        },0);
     }
-    function destroyChart(name){ if(chartRefs[name]) { chartRefs[name].destroy(); chartRefs[name]=null; } }
-    function drawBarChart(canvasId, refName, title, rows, key) {
-        if(typeof Chart === 'undefined') return;
-        destroyChart(refName);
-        const grouped=groupCount(rows,key);
-        const canvas=document.getElementById(canvasId);
-        if(!canvas) return;
-        chartRefs[refName]=new Chart(canvas.getContext('2d'), {
-            type:'bar',
-            data:{labels:grouped.map(x=>x.label),datasets:[{label:'Report Quantity',data:grouped.map(x=>x.count),borderWidth:1}]},
-            options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:true}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}
-        });
+
+    function uniqueCount(rows,key) {
+        return new Set(rows.map(x=>String(x[key]||'').trim()).filter(Boolean)).size;
     }
-    function renderCharts(rows) {
-        drawBarChart('stateChart','state','Reports by State',rows,'state');
-        drawBarChart('regionChart','region','Reports by Region',rows,'region');
-        drawBarChart('departmentChart','department','Reports by Department',rows,'department');
-        drawBarChart('districtChart','district','Reports by District',rows,'district');
-    }
+
     function renderDashboard() {
         const q=document.getElementById('search').value.toLowerCase().trim();
-        const st=document.getElementById('dashState').value, rg=document.getElementById('dashRegion').value, di=document.getElementById('dashDistrict').value;
-        const a=officeRows.filter(x => (!st||sameClient(x.state,st)) && (!rg||sameClient(x.region,rg)) && (!di||sameClient(x.district,di)) && (!q||JSON.stringify(x).toLowerCase().includes(q)));
-        const reportSum=a.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0);
-        document.getElementById('stats').innerHTML=[['Total Entries',a.length],['Report Quantity',reportSum],['Districts',new Set(a.map(x=>x.district).filter(Boolean)).size],['Departments',new Set(a.map(x=>x.department).filter(Boolean)).size]].map(x=>'<div class="stat"><div>'+x[0]+'</div><div class="n">'+x[1]+'</div></div>').join('');
-        document.getElementById('dashBody').innerHTML=a.map(x=>'<tr><td>'+escapeHtml(x.date)+'</td><td>'+escapeHtml(x.name)+'</td><td>'+escapeHtml(x.contact)+'</td><td>'+escapeHtml(x.chain)+'</td><td>'+escapeHtml(x.level)+'</td><td>'+escapeHtml(x.department)+'</td><td>'+escapeHtml(x.report)+'</td><td>'+escapeHtml(x.district)+'</td><td>'+escapeHtml(x.division)+'</td><td>'+escapeHtml(x.state)+'</td><td>'+escapeHtml(x.region)+'</td></tr>').join('');
-        document.getElementById('dashTable').style.display=a.length?'table':'none';
-        document.getElementById('dashMessage').style.display=a.length?'none':'block';
-        if(!a.length) document.getElementById('dashMessage').textContent=officeRows.length ? 'Reports available hain, lekin current filter/search se koi match nahi mila.' : 'Responses sheet se koi report read nahi hui.';
-        document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+a.length+' • Report quantity: '+reportSum;
-        renderCharts(a);
+        const rg=document.getElementById('dashRegion').value;
+        const st=document.getElementById('dashState').value;
+        const di=document.getElementById('dashDistrict').value;
+        const ch=document.getElementById('dashChain').value;
+        const dp=document.getElementById('dashDepartment').value;
+
+        const a=officeRows.filter(x =>
+            (!rg || sameClient(x.region,rg)) &&
+            (!st || sameClient(x.state,st)) &&
+            (!di || sameClient(x.district,di)) &&
+            (!ch || sameClient(x.chain,ch)) &&
+            (!dp || sameClient(x.department,dp)) &&
+            (!q || JSON.stringify(x).toLowerCase().includes(q))
+        );
+
+        const reportSum = reportNumber(a);
+
+        // Main dashboard digits
+        document.getElementById('stats').innerHTML = [
+            ['Total Entries', a.length],
+            ['Report Quantity', reportSum],
+            ['States', uniqueCount(a,'state')],
+            ['Regions', uniqueCount(a,'region')],
+            ['Districts', uniqueCount(a,'district')],
+            ['Departments', uniqueCount(a,'department')],
+            ['Chains', uniqueCount(a,'chain')],
+            ['Divisions', uniqueCount(a,'division')]
+        ].map(x =>
+            '<div class="stat"><div>'+escapeHtml(x[0])+'</div><div class="n">'+x[1]+'</div></div>'
+        ).join('');
+
+        // Four former graph boxes are now plain numeric dashboard cards.
+        document.getElementById('numState').textContent = reportSum;
+        document.getElementById('numRegion').textContent = reportSum;
+        document.getElementById('numDepartment').textContent = reportSum;
+        document.getElementById('numDistrict').textContent = reportSum;
+
+        document.getElementById('dashInfo').textContent =
+          'Responses rows: '+(window.dashboardSourceRows||0)+
+          ' • Visible entries: '+a.length+
+          ' • Report quantity: '+reportSum;
+
+        document.getElementById('dashMessage').style.display = a.length ? 'none' : 'block';
+        if(!a.length) {
+            document.getElementById('dashMessage').textContent =
+              officeRows.length
+                ? 'Reports available hain, lekin current filter/search se koi match nahi mila.'
+                : 'Responses sheet se koi report read nahi hui.';
+        }
+
+        // Intentionally NO row-data table: user requested that report rows should not be displayed.
     }
-    function sameClient(a,b){return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();}
+
+    function sameClient(a,b){
+        const normalize = v => String(v||'')
+          .trim()
+          .toLowerCase()
+          .replace(/\s+(region|state|division|district)$/i,'')
+          .trim();
+        return normalize(a) === normalize(b);
+    }
 
     // If an employee already has a valid browser session, reopen dashboard on same link.
     document.addEventListener('DOMContentLoaded', function(){
