@@ -65,7 +65,14 @@
         .employee-table th,.employee-table td { padding:9px; border-bottom:1px solid #eee; text-align:left; font-size:13px; }
         .employee-table th { background:#f2f7f7; color:var(--primary); }
         .dash-msg { padding:20px; text-align:center; color:#666; }
-        @media(max-width:800px){ .cards{grid-template-columns:repeat(2,1fr)} .filters{grid-template-columns:1fr 1fr} .employee-top{align-items:flex-start;gap:10px;flex-wrap:wrap} }
+
+        .chart-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:18px 0; }
+        .chart-card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.07); min-height:300px; }
+        .chart-title { font-weight:700; color:var(--primary); margin-bottom:10px; }
+        .chart-wrap { position:relative; height:260px; }
+        .refresh-btn { border:0; background:var(--primary); color:#fff; padding:9px 13px; border-radius:6px; cursor:pointer; font-weight:700; }
+        .dash-info { margin:10px 0; font-size:12px; color:#666; text-align:right; }
+        @media(max-width:800px){ .cards{grid-template-columns:repeat(2,1fr)} .filters{grid-template-columns:1fr 1fr} .employee-top{align-items:flex-start;gap:10px;flex-wrap:wrap} .chart-grid{grid-template-columns:1fr} }
         @media(max-width:500px){ .cards,.filters{grid-template-columns:1fr} .employee-title{font-size:18px} .login-actions{flex-direction:column} }
 </style>
 </head>
@@ -135,7 +142,7 @@
     <div><button class="logout-btn" type="button" onclick="officeLogout()">Logout</button></div>
   </div>
   <div class="employee-wrap">
-    <div class="welcome"><b>Employee Dashboard</b><div id="scope" style="margin-top:7px;color:#666"></div></div>
+    <div class="welcome"><b>Employee Dashboard</b><div id="scope" style="margin-top:7px;color:#666"></div><div style="margin-top:12px"><button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh Reports</button></div></div>
     <div id="stats" class="cards"></div>
     <div class="filters">
       <input id="search" placeholder="Search..." oninput="renderDashboard()">
@@ -143,6 +150,13 @@
       <select id="dashRegion" onchange="renderDashboard()"><option value="">All Region</option></select>
       <select id="dashDistrict" onchange="renderDashboard()"><option value="">All District</option></select>
     </div>
+    <div id="chartGrid" class="chart-grid">
+      <div class="chart-card"><div class="chart-title">Reports by State</div><div class="chart-wrap"><canvas id="stateChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Reports by Region</div><div class="chart-wrap"><canvas id="regionChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Reports by Department</div><div class="chart-wrap"><canvas id="departmentChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Reports by District</div><div class="chart-wrap"><canvas id="districtChart"></canvas></div></div>
+    </div>
+    <div id="dashInfo" class="dash-info"></div>
     <div class="tablebox"><div id="dashMessage" class="dash-msg">Loading reports...</div><table id="dashTable" class="employee-table" style="display:none"><thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Chain</th><th>Level</th><th>Department</th><th>Report</th><th>District</th><th>Division</th><th>State</th><th>Region</th></tr></thead><tbody id="dashBody"></tbody></table></div>
   </div>
 </div>
@@ -164,6 +178,7 @@
     </form>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyNFSCIJ_8T2VzVX0L6GtKTQPYR2izYeqx2JVfbDz3l7gUgnZ8tfVIM1jqntDMfQOzO/exec";
     
@@ -386,11 +401,12 @@
         document.querySelector('.topbar').style.display = 'flex';
         window.scrollTo(0,0);
     }
+    let chartRefs = {};
     function loadDashboard(token) {
         document.getElementById('dashMessage').style.display='block';
         document.getElementById('dashMessage').textContent='Loading reports...';
         document.getElementById('dashTable').style.display='none';
-        fetch(scriptURL + '?action=dashboard&token=' + encodeURIComponent(token))
+        fetch(scriptURL + '?action=dashboard&token=' + encodeURIComponent(token) + '&_=' + Date.now(), {cache:'no-store'})
           .then(r => r.json())
           .then(d => {
               if (d.status !== 'Success') {
@@ -402,16 +418,27 @@
                   openOfficeLogin();
                   return;
               }
-              officeRows = d.rows || [];
+              officeRows = Array.isArray(d.rows) ? d.rows : [];
+              window.dashboardSourceRows = Number(d.totalRows || 0);
+              window.dashboardDebug = d.debug || {};
               populateDashboardFilters();
               renderDashboard();
           })
-          .catch(() => { document.getElementById('dashMessage').textContent='Dashboard data load nahi ho saka.'; });
+          .catch(err => {
+              console.error(err);
+              document.getElementById('dashMessage').textContent='Dashboard data load nahi ho saka. Google Apps Script deployment check karein.';
+          });
     }
-    function uniqDash(key) { return [...new Set(officeRows.map(x => x[key]).filter(Boolean))].sort(); }
+    function refreshDashboard() {
+        const token = sessionStorage.getItem('risalaToken');
+        if (token) loadDashboard(token);
+    }
+    function uniqDash(key) { return [...new Set(officeRows.map(x => String(x[key] || '').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b)); }
     function fillDash(id, arr, firstText) {
         const s=document.getElementById(id);
+        const current=s.value;
         s.innerHTML='<option value="">'+firstText+'</option>'+arr.map(x=>'<option value="'+escapeHtml(x)+'">'+escapeHtml(x)+'</option>').join('');
+        if(arr.includes(current)) s.value=current;
     }
     function populateDashboardFilters() {
         fillDash('dashState', uniqDash('state'), 'All State');
@@ -419,16 +446,44 @@
         fillDash('dashDistrict', uniqDash('district'), 'All District');
     }
     function escapeHtml(x) { return String(x == null ? '' : x).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function groupCount(rows,key) {
+        const map={};
+        rows.forEach(x=>{const k=String(x[key]||'').trim()||'Unknown'; map[k]=(map[k]||0)+1;});
+        return Object.keys(map).sort((a,b)=>map[b]-map[a]).map(k=>({label:k,count:map[k]}));
+    }
+    function destroyChart(name){ if(chartRefs[name]) { chartRefs[name].destroy(); chartRefs[name]=null; } }
+    function drawBarChart(canvasId, refName, title, rows, key) {
+        if(typeof Chart === 'undefined') return;
+        destroyChart(refName);
+        const grouped=groupCount(rows,key);
+        const canvas=document.getElementById(canvasId);
+        if(!canvas) return;
+        chartRefs[refName]=new Chart(canvas.getContext('2d'), {
+            type:'bar',
+            data:{labels:grouped.map(x=>x.label),datasets:[{label:'Reports',data:grouped.map(x=>x.count),borderWidth:1}]},
+            options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:true}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}
+        });
+    }
+    function renderCharts(rows) {
+        drawBarChart('stateChart','state','Reports by State',rows,'state');
+        drawBarChart('regionChart','region','Reports by Region',rows,'region');
+        drawBarChart('departmentChart','department','Reports by Department',rows,'department');
+        drawBarChart('districtChart','district','Reports by District',rows,'district');
+    }
     function renderDashboard() {
         const q=document.getElementById('search').value.toLowerCase().trim();
         const st=document.getElementById('dashState').value, rg=document.getElementById('dashRegion').value, di=document.getElementById('dashDistrict').value;
-        const a=officeRows.filter(x => (!st||x.state===st) && (!rg||x.region===rg) && (!di||x.district===di) && (!q||JSON.stringify(x).toLowerCase().includes(q)));
-        document.getElementById('stats').innerHTML=[['Total Reports',a.length],['States',new Set(a.map(x=>x.state).filter(Boolean)).size],['Districts',new Set(a.map(x=>x.district).filter(Boolean)).size],['Departments',new Set(a.map(x=>x.department).filter(Boolean)).size]].map(x=>'<div class="stat"><div>'+x[0]+'</div><div class="n">'+x[1]+'</div></div>').join('');
+        const a=officeRows.filter(x => (!st||sameClient(x.state,st)) && (!rg||sameClient(x.region,rg)) && (!di||sameClient(x.district,di)) && (!q||JSON.stringify(x).toLowerCase().includes(q)));
+        const reportSum=a.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0);
+        document.getElementById('stats').innerHTML=[['Total Entries',a.length],['Report Quantity',reportSum],['Districts',new Set(a.map(x=>x.district).filter(Boolean)).size],['Departments',new Set(a.map(x=>x.department).filter(Boolean)).size]].map(x=>'<div class="stat"><div>'+x[0]+'</div><div class="n">'+x[1]+'</div></div>').join('');
         document.getElementById('dashBody').innerHTML=a.map(x=>'<tr><td>'+escapeHtml(x.date)+'</td><td>'+escapeHtml(x.name)+'</td><td>'+escapeHtml(x.contact)+'</td><td>'+escapeHtml(x.chain)+'</td><td>'+escapeHtml(x.level)+'</td><td>'+escapeHtml(x.department)+'</td><td>'+escapeHtml(x.report)+'</td><td>'+escapeHtml(x.district)+'</td><td>'+escapeHtml(x.division)+'</td><td>'+escapeHtml(x.state)+'</td><td>'+escapeHtml(x.region)+'</td></tr>').join('');
         document.getElementById('dashTable').style.display=a.length?'table':'none';
         document.getElementById('dashMessage').style.display=a.length?'none':'block';
-        if(!a.length) document.getElementById('dashMessage').textContent='No reports found.';
+        if(!a.length) document.getElementById('dashMessage').textContent=officeRows.length ? 'Reports available hain, lekin current filter/search se koi match nahi mila.' : 'Responses sheet se koi report read nahi hui.';
+        document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+a.length+' • Report quantity: '+reportSum;
+        renderCharts(a);
     }
+    function sameClient(a,b){return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();}
 
     // If an employee already has a valid browser session, reopen dashboard on same link.
     document.addEventListener('DOMContentLoaded', function(){
