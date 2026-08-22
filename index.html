@@ -410,12 +410,20 @@
           .then(r => r.json())
           .then(d => {
               if (d.status !== 'Success') {
-                  sessionStorage.clear();
-                  document.getElementById('employeeView').style.display='none';
-                  document.getElementById('mainWrapper').style.display='';
-                  document.querySelector('.topbar').style.display='flex';
-                  alert(d.message || 'Session expire ho gayi hai. Dobara login karein.');
-                  openOfficeLogin();
+                  const msg = d.message || 'Dashboard load nahi ho saka.';
+                  const isSession = /session|login required|invalid/i.test(msg);
+                  if (isSession) {
+                      sessionStorage.removeItem('risalaToken');
+                      sessionStorage.removeItem('risalaUser');
+                      document.getElementById('employeeView').style.display='none';
+                      document.getElementById('mainWrapper').style.display='';
+                      document.querySelector('.topbar').style.display='flex';
+                      alert(msg + ' Dobara login karein.');
+                      openOfficeLogin();
+                  } else {
+                      document.getElementById('dashMessage').style.display='block';
+                      document.getElementById('dashMessage').textContent=msg;
+                  }
                   return;
               }
               officeRows = Array.isArray(d.rows) ? d.rows : [];
@@ -448,7 +456,11 @@
     function escapeHtml(x) { return String(x == null ? '' : x).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
     function groupCount(rows,key) {
         const map={};
-        rows.forEach(x=>{const k=String(x[key]||'').trim()||'Unknown'; map[k]=(map[k]||0)+1;});
+        rows.forEach(x=>{
+            const k=String(x[key]||'').trim()||'Unknown';
+            const n=Number(String(x.report||'').replace(/,/g,''));
+            map[k]=(map[k]||0)+(isNaN(n)?0:n);
+        });
         return Object.keys(map).sort((a,b)=>map[b]-map[a]).map(k=>({label:k,count:map[k]}));
     }
     function destroyChart(name){ if(chartRefs[name]) { chartRefs[name].destroy(); chartRefs[name]=null; } }
@@ -460,7 +472,7 @@
         if(!canvas) return;
         chartRefs[refName]=new Chart(canvas.getContext('2d'), {
             type:'bar',
-            data:{labels:grouped.map(x=>x.label),datasets:[{label:'Reports',data:grouped.map(x=>x.count),borderWidth:1}]},
+            data:{labels:grouped.map(x=>x.label),datasets:[{label:'Report Quantity',data:grouped.map(x=>x.count),borderWidth:1}]},
             options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:true}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}
         });
     }
