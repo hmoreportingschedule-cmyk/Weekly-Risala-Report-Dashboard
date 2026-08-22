@@ -1,33 +1,39 @@
-FINAL SETUP - WEEKLY RISALA REPORT
+WEEKLY RISALA REPORT - FINAL DASHBOARD FIX
 
 Google Spreadsheet ID:
 1eJs7TlbCbs4QcX6qdeZJhsuybcgzPr30JGb9BPtzvxI
 
-Required tabs:
+Sheets:
 - User Id
 - Responses
-- Setting
 - PincodeMaster
+- Setting / Settings (existing project setup)
 
-Responses actual columns:
-G = Department
-H = Risala Report
-J = District Name
-K = Division Name
-L = State Name
-M = Region Name
+IMPORTANT:
+1. Replace the entire Code.gs in Apps Script with this Code.gs.
+2. Save.
+3. Deploy > Manage deployments > Edit > New version > Deploy.
+4. Web app access must be Anyone.
+5. Replace GitHub index.html with this index.html.
+6. Redeploy Vercel / wait for deployment, then Ctrl+F5.
+7. Login again.
 
-IMPORTANT FIX:
-The previous Code.gs was missing the valAt_() function. That caused the dashboard request to fail while login still worked. This final Code.gs includes valAt_() and explicit actual header mapping.
+Why this fixes the current problem:
+- Web App now uses SpreadsheetApp.openById() instead of getActiveSpreadsheet().
+- Added the missing valAt_() function used by the dashboard.
+- Responses mapping is detected from headers with the existing fallbacks:
+  Department = G
+  Risala Report = H
+  District Name = J
+  Division Name = K
+  State Name = L
+  Region Name = M
+- Location matching accepts labels such as Delhi and Delhi Region.
+- Added ?action=testResponses diagnostics.
 
-DEPLOY:
-1. Open Apps Script connected to the spreadsheet/project.
-2. Replace ALL existing Code.gs with the Code.gs in this package.
-3. Save.
-4. Deploy > Manage deployments > Edit > New version > Deploy.
-5. Web app: Execute as Me, Who has access: Anyone.
-6. Keep the same /exec URL in index.html.
-7. Replace GitHub index.html with this package's index.html.
-8. Redeploy Vercel and hard refresh with Ctrl+F5.
+TEST:
+Open the Apps Script Web App URL with:
+?action=testResponses
 
-Do not rename User Id or Responses.
+Expected:
+{"status":"Success","responsesRows":...}
