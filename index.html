@@ -67,8 +67,26 @@
         .number-label { color:var(--primary); font-weight:700; font-size:14px; }
         .number-value { color:var(--primary); font-size:38px; line-height:1.1; font-weight:800; margin-top:10px; }
         .dash-message-box { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 16px rgba(0,0,0,.07); text-align:center; color:#666; }
+        .pivot-report { background:#fff; border-radius:12px; padding:16px; margin:18px 0; box-shadow:0 4px 16px rgba(0,0,0,.07); }
+        .pivot-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; }
+        .pivot-title { font-size:18px; font-weight:800; color:var(--primary); }
+        .pivot-subtitle { margin-top:4px; font-size:12px; color:#666; }
+        .pivot-close { border:0; background:#eee; color:#333; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:700; }
+        .pivot-grid { display:grid; grid-template-columns:1.6fr 1fr; gap:14px; }
+        .pivot-card { border:1px solid #d8e0e2; border-radius:8px; overflow:hidden; background:#fff; }
+        .pivot-card-title { padding:10px 12px; background:#eef4f6; color:var(--primary); font-weight:800; border-bottom:1px solid #d8e0e2; }
+        .pivot-scroll { overflow:auto; max-height:520px; }
+        .pivot-table { width:100%; border-collapse:collapse; min-width:560px; font-size:12px; }
+        .pivot-table th, .pivot-table td { border-bottom:1px solid #e1e6e8; border-right:1px solid #edf0f1; padding:7px 8px; text-align:right; white-space:nowrap; }
+        .pivot-table th:first-child, .pivot-table td:first-child { text-align:left; }
+        .pivot-table thead th { position:sticky; top:0; z-index:2; background:#dfe8ee; color:#1d3340; font-weight:800; }
+        .pivot-table .total-row td { background:#e1e7ed; font-weight:800; border-top:1px solid #8d9ba5; }
+        .pivot-table .grand-row td { background:#d5dde4; font-weight:900; border-top:2px solid #56646e; }
+        .pivot-table .group-row td { background:#eef2f5; font-weight:800; text-align:left; }
+        .pivot-table .muted { color:#777; }
+
         @media(max-width:1000px){ .cards{grid-template-columns:repeat(2,1fr)} .filters{grid-template-columns:1.5fr 1fr 1fr 1fr} .number-grid{grid-template-columns:repeat(2,1fr)} }
-        @media(max-width:650px){ .cards,.filters,.number-grid{grid-template-columns:1fr} .employee-top{align-items:flex-start;gap:10px;flex-wrap:wrap} .employee-title{font-size:18px} .login-actions{flex-direction:column} }
+        @media(max-width:900px){ .pivot-grid{grid-template-columns:1fr} } @media(max-width:650px){ .cards,.filters,.number-grid{grid-template-columns:1fr} .employee-top{align-items:flex-start;gap:10px;flex-wrap:wrap} .employee-title{font-size:18px} .login-actions{flex-direction:column} .pivot-head{align-items:flex-start;flex-direction:column} }
 </style>
 </head>
 <body>
@@ -157,7 +175,34 @@
     </div>
 
     <div id="dashInfo" class="dash-info"></div>
-    <div id="dashMessage" class="dash-message-box">Loading reports...</div>
+
+    <div id="pivotReport" class="pivot-report" style="display:none;">
+      <div class="pivot-head">
+        <div>
+          <div class="pivot-title">Report Summary</div>
+          <div id="pivotSubtitle" class="pivot-subtitle"></div>
+        </div>
+        <button type="button" class="pivot-close" onclick="clearPivotFilters()">Clear Filters</button>
+      </div>
+
+      <div class="pivot-grid">
+        <div class="pivot-card">
+          <div class="pivot-card-title">Department / Region Summary</div>
+          <div class="pivot-scroll">
+            <table class="pivot-table" id="departmentRegionTable"></table>
+          </div>
+        </div>
+
+        <div class="pivot-card">
+          <div class="pivot-card-title">Region / State Summary</div>
+          <div class="pivot-scroll">
+            <table class="pivot-table" id="regionStateTable"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="dashMessage" class="dash-message-box">Dropdown select karne par summarized report yahan dikhegi.</div>
   </div>
 </div>
 
@@ -503,7 +548,6 @@
 
         const reportSum = reportNumber(a);
 
-        // Main dashboard digits
         document.getElementById('stats').innerHTML = [
             ['Total Entries', a.length],
             ['Report Quantity', reportSum],
@@ -517,7 +561,6 @@
             '<div class="stat"><div>'+escapeHtml(x[0])+'</div><div class="n">'+x[1]+'</div></div>'
         ).join('');
 
-        // Four former graph boxes are now plain numeric dashboard cards.
         document.getElementById('numState').textContent = reportSum;
         document.getElementById('numRegion').textContent = reportSum;
         document.getElementById('numDepartment').textContent = reportSum;
@@ -528,6 +571,18 @@
           ' • Visible entries: '+a.length+
           ' • Report quantity: '+reportSum;
 
+        const hasSelection = !!(q || rg || st || di || ch || dp);
+
+        if (hasSelection && a.length) {
+            document.getElementById('pivotReport').style.display='block';
+            document.getElementById('pivotSubtitle').textContent =
+              buildFilterSubtitle(rg,st,di,ch,dp,q);
+            buildDepartmentRegionPivot(a);
+            buildRegionStatePivot(a);
+        } else {
+            document.getElementById('pivotReport').style.display='none';
+        }
+
         document.getElementById('dashMessage').style.display = a.length ? 'none' : 'block';
         if(!a.length) {
             document.getElementById('dashMessage').textContent =
@@ -535,8 +590,112 @@
                 ? 'Reports available hain, lekin current filter/search se koi match nahi mila.'
                 : 'Responses sheet se koi report read nahi hui.';
         }
+    }
 
-        // Intentionally NO row-data table: user requested that report rows should not be displayed.
+    function buildFilterSubtitle(rg,st,di,ch,dp,q) {
+        const parts=[];
+        if(q) parts.push('Search: '+q);
+        if(rg) parts.push('Region: '+rg);
+        if(st) parts.push('State: '+st);
+        if(di) parts.push('District: '+di);
+        if(ch) parts.push('Chain: '+ch);
+        if(dp) parts.push('Department: '+dp);
+        return parts.join('  •  ');
+    }
+
+    function groupSum(rows, key) {
+        const out={};
+        rows.forEach(x=>{
+            const k=String(x[key]||'').trim() || 'Blank';
+            const n=Number(String(x.report||'').replace(/,/g,''));
+            out[k]=(out[k]||0)+(isNaN(n)?0:n);
+        });
+        return out;
+    }
+
+    function sortedKeys(obj) {
+        return Object.keys(obj).sort((a,b)=>a.localeCompare(b));
+    }
+
+    function buildDepartmentRegionPivot(rows) {
+        const regions = sortedKeys(groupSum(rows,'region'));
+        const departments = sortedKeys(groupSum(rows,'department'));
+        const matrix={};
+        departments.forEach(d=>matrix[d]={});
+        rows.forEach(x=>{
+            const d=String(x.department||'').trim() || 'Blank';
+            const r=String(x.region||'').trim() || 'Blank';
+            const n=Number(String(x.report||'').replace(/,/g,''));
+            const v=isNaN(n)?0:n;
+            if(!matrix[d]) matrix[d]={};
+            matrix[d][r]=(matrix[d][r]||0)+v;
+        });
+
+        let html='<thead><tr><th>SUM of Risala Report</th>';
+        regions.forEach(r=>html+='<th>'+escapeHtml(r)+'</th>');
+        html+='<th>Grand Total</th></tr></thead><tbody>';
+
+        let grand=0;
+        const colTotals={};
+        departments.forEach(d=>{
+            let rowTotal=0;
+            html+='<tr><td>'+escapeHtml(d)+'</td>';
+            regions.forEach(r=>{
+                const v=matrix[d][r]||0;
+                rowTotal+=v;
+                colTotals[r]=(colTotals[r]||0)+v;
+                html+='<td>'+formatNumber(v)+'</td>';
+            });
+            grand+=rowTotal;
+            html+='<td><b>'+formatNumber(rowTotal)+'</b></td></tr>';
+        });
+
+        html+='<tr class="grand-row"><td>Grand Total</td>';
+        regions.forEach(r=>html+='<td>'+formatNumber(colTotals[r]||0)+'</td>');
+        html+='<td>'+formatNumber(grand)+'</td></tr></tbody>';
+
+        document.getElementById('departmentRegionTable').innerHTML=html;
+    }
+
+    function buildRegionStatePivot(rows) {
+        const tree={};
+        rows.forEach(x=>{
+            const region=String(x.region||'').trim() || 'Blank';
+            const state=String(x.state||'').trim() || 'Blank';
+            const n=Number(String(x.report||'').replace(/,/g,''));
+            const v=isNaN(n)?0:n;
+            if(!tree[region]) tree[region]={};
+            tree[region][state]=(tree[region][state]||0)+v;
+        });
+
+        let html='<thead><tr><th>Region Name</th><th>State Name</th><th>SUM of Risala Report</th></tr></thead><tbody>';
+        let grand=0;
+
+        sortedKeys(tree).forEach(region=>{
+            let regionTotal=0;
+            sortedKeys(tree[region]).forEach(state=>{
+                const v=tree[region][state]||0;
+                regionTotal+=v;
+                html+='<tr><td>'+escapeHtml(region)+'</td><td>'+escapeHtml(state)+'</td><td>'+formatNumber(v)+'</td></tr>';
+            });
+            grand+=regionTotal;
+            html+='<tr class="total-row"><td colspan="2">'+escapeHtml(region)+' Total</td><td>'+formatNumber(regionTotal)+'</td></tr>';
+        });
+
+        html+='<tr class="grand-row"><td colspan="2">Grand Total</td><td>'+formatNumber(grand)+'</td></tr></tbody>';
+        document.getElementById('regionStateTable').innerHTML=html;
+    }
+
+    function formatNumber(n) {
+        return Number(n||0).toLocaleString('en-IN');
+    }
+
+    function clearPivotFilters() {
+        document.getElementById('search').value='';
+        ['dashRegion','dashState','dashDistrict','dashChain','dashDepartment'].forEach(id=>{
+            document.getElementById(id).value='';
+        });
+        renderDashboard();
     }
 
     function sameClient(a,b){
