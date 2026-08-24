@@ -1,39 +1,23 @@
-WEEKLY RISALA REPORT - FINAL DASHBOARD FIX
+WEEKLY RISALA REPORT — PIVOT STYLE UPDATE
 
-Google Spreadsheet ID:
+Current dashboard look is preserved.
+
+When a dropdown/search filter is selected:
+- A Pivot-style "Department / Region Summary" appears.
+- A "Region / State Summary" appears.
+- Grand Total and group totals are shown.
+- Raw row data (Name, Contact, etc.) is never displayed.
+- The existing User Id login and Responses access remain unchanged.
+
+Filters:
+Search | All Region | All State | All District | All Chain | All Department
+
+Google Sheet:
 1eJs7TlbCbs4QcX6qdeZJhsuybcgzPr30JGb9BPtzvxI
 
-Sheets:
-- User Id
-- Responses
-- PincodeMaster
-- Setting / Settings (existing project setup)
-
-IMPORTANT:
-1. Replace the entire Code.gs in Apps Script with this Code.gs.
-2. Save.
-3. Deploy > Manage deployments > Edit > New version > Deploy.
-4. Web app access must be Anyone.
-5. Replace GitHub index.html with this index.html.
-6. Redeploy Vercel / wait for deployment, then Ctrl+F5.
-7. Login again.
-
-Why this fixes the current problem:
-- Web App now uses SpreadsheetApp.openById() instead of getActiveSpreadsheet().
-- Added the missing valAt_() function used by the dashboard.
-- Responses mapping is detected from headers with the existing fallbacks:
-  Department = G
-  Risala Report = H
-  District Name = J
-  Division Name = K
-  State Name = L
-  Region Name = M
-- Location matching accepts labels such as Delhi and Delhi Region.
-- Added ?action=testResponses diagnostics.
-
-TEST:
-Open the Apps Script Web App URL with:
-?action=testResponses
-
-Expected:
-{"status":"Success","responsesRows":...}
+Deploy:
+1. Replace GitHub index.html with this index.html.
+2. Keep the working Code.gs, or replace it with the included Code.gs.
+3. Deploy Apps Script as a new version if Code.gs is replaced.
+4. Redeploy Vercel.
+5. Hard refresh (Ctrl+F5).
