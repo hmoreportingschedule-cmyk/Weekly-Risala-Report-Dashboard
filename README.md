@@ -1,18 +1,22 @@
-WEEKLY RISALA REPORT — COUNTRY ROLE FIX
+WEEKLY RISALA REPORT - FINAL REPORT CONNECTION FIX
 
-Problem fixed:
-The current Responses sheet has no Country column (A:M ends at Region). The previous code never put country into each response row, so a user with Role=Country received 0 visible rows.
+IMPORTANT FIX:
+Code.gs now connects directly to Spreadsheet ID:
+1eJs7TlbCbs4QcX6qdeZJhsuybcgzPr30JGb9BPtzvxI
 
-Fix:
-- If Responses has a Country column, it is used.
-- If Responses has no Country column, existing Indian reports are treated as Country=India.
-- User Id Country=India + Role=Country will now see the reports.
-- State/Region/District/Department/Chain/Division roles remain supported.
-- Multiple roles remain supported, e.g. Country,Department.
+This fixes the dashboard showing:
+Responses rows: 0
+Visible entries: 0
+Report quantity: 0
+when the Responses sheet actually contains data.
 
-Deploy:
-1. Replace Code.gs in Apps Script.
+Steps:
+1. Google Apps Script: replace the entire Code.gs with this Code.gs.
 2. Save.
 3. Deploy > Manage deployments > Edit > New version > Deploy.
-4. Replace index.html on GitHub only if needed; the current index is included for completeness.
-5. Redeploy Vercel and Ctrl+F5.
+4. Keep access as Anyone.
+5. Keep the same /exec URL if possible.
+6. Open Vercel dashboard and press Ctrl+F5.
+
+Do NOT change User Id or Responses sheet names.
+Country role: User Id Country=India, Role=Country.
