@@ -1,53 +1,18 @@
-WEEKLY RISALA REPORT - MULTI ROLE UPDATE
+WEEKLY RISALA REPORT — COUNTRY ROLE FIX
 
-Existing working system preserved.
+Problem fixed:
+The current Responses sheet has no Country column (A:M ends at Region). The previous code never put country into each response row, so a user with Role=Country received 0 visible rows.
 
-USER ID SHEET
-Sheet name: User Id
-Columns:
-User_ID | Password | Name | State | Region | District | Country | Department | Role | Status
+Fix:
+- If Responses has a Country column, it is used.
+- If Responses has no Country column, existing Indian reports are treated as Country=India.
+- User Id Country=India + Role=Country will now see the reports.
+- State/Region/District/Department/Chain/Division roles remain supported.
+- Multiple roles remain supported, e.g. Country,Department.
 
-ROLE VALUES
-Country
-State
-Region
-District
-Department
-Chain
-Division
-
-MULTIPLE ROLE VALUES
-Country,Department
-State,Department
-Region,Department
-District,Department
-Country,State
-
-Multiple roles are AND conditions.
-Example:
-Role = Country,Department
-Country = India
-Department = HMO
-=> user sees only India + HMO reports.
-
-IMPORTANT RESPONSE COUNTRY
-The dashboard reads Country from Responses if a Country column exists.
-If Responses has no Country column, existing Indian reports are treated as Country = India.
-
-DEPLOYMENT
-1. Apps Script: replace Code.gs completely.
+Deploy:
+1. Replace Code.gs in Apps Script.
 2. Save.
-3. Deploy > Manage deployments > Edit > New version > Web app.
-4. Execute as Me, access Anyone.
-5. Keep the same /exec URL in index.html (already set to the user's current URL).
-6. GitHub: replace index.html completely.
-7. Vercel redeploy.
-8. Ctrl+F5 and login again.
-
-DASHBOARD
-- No raw employee row data.
-- No charts.
-- Dashboard uses digit cards.
-- Filters: Search, Region, State, District, Chain, Department.
-- Pivot-style summary appears after a filter/search is selected.
-- Summary includes totals and Grand Total.
+3. Deploy > Manage deployments > Edit > New version > Deploy.
+4. Replace index.html on GitHub only if needed; the current index is included for completeness.
+5. Redeploy Vercel and Ctrl+F5.
