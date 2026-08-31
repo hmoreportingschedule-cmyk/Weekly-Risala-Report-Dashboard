@@ -1,23 +1,53 @@
-WEEKLY RISALA REPORT — PIVOT STYLE UPDATE
+WEEKLY RISALA REPORT - MULTI ROLE UPDATE
 
-Current dashboard look is preserved.
+Existing working system preserved.
 
-When a dropdown/search filter is selected:
-- A Pivot-style "Department / Region Summary" appears.
-- A "Region / State Summary" appears.
-- Grand Total and group totals are shown.
-- Raw row data (Name, Contact, etc.) is never displayed.
-- The existing User Id login and Responses access remain unchanged.
+USER ID SHEET
+Sheet name: User Id
+Columns:
+User_ID | Password | Name | State | Region | District | Country | Department | Role | Status
 
-Filters:
-Search | All Region | All State | All District | All Chain | All Department
+ROLE VALUES
+Country
+State
+Region
+District
+Department
+Chain
+Division
 
-Google Sheet:
-1eJs7TlbCbs4QcX6qdeZJhsuybcgzPr30JGb9BPtzvxI
+MULTIPLE ROLE VALUES
+Country,Department
+State,Department
+Region,Department
+District,Department
+Country,State
 
-Deploy:
-1. Replace GitHub index.html with this index.html.
-2. Keep the working Code.gs, or replace it with the included Code.gs.
-3. Deploy Apps Script as a new version if Code.gs is replaced.
-4. Redeploy Vercel.
-5. Hard refresh (Ctrl+F5).
+Multiple roles are AND conditions.
+Example:
+Role = Country,Department
+Country = India
+Department = HMO
+=> user sees only India + HMO reports.
+
+IMPORTANT RESPONSE COUNTRY
+The dashboard reads Country from Responses if a Country column exists.
+If Responses has no Country column, existing Indian reports are treated as Country = India.
+
+DEPLOYMENT
+1. Apps Script: replace Code.gs completely.
+2. Save.
+3. Deploy > Manage deployments > Edit > New version > Web app.
+4. Execute as Me, access Anyone.
+5. Keep the same /exec URL in index.html (already set to the user's current URL).
+6. GitHub: replace index.html completely.
+7. Vercel redeploy.
+8. Ctrl+F5 and login again.
+
+DASHBOARD
+- No raw employee row data.
+- No charts.
+- Dashboard uses digit cards.
+- Filters: Search, Region, State, District, Chain, Department.
+- Pivot-style summary appears after a filter/search is selected.
+- Summary includes totals and Grand Total.
