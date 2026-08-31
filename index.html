@@ -384,6 +384,44 @@
           .catch(() => { err.textContent = 'Login server se connection nahi ho raha.'; err.style.display='block'; })
           .finally(() => { btn.disabled=false; btn.textContent='Login'; });
     }
+    function loadDashboard(token) {
+        const msg = document.getElementById('dashMessage');
+        if (msg) { msg.classList.remove('hidden'); msg.textContent = 'Reports load ho rahi hain...'; }
+        const url = scriptURL + '?action=dashboard&token=' + encodeURIComponent(token) + '&_=' + Date.now();
+        fetch(url, { cache: 'no-store' })
+          .then(r => r.json())
+          .then(d => {
+              if (!d || d.status !== 'Success') {
+                  if (d && d.message && /session|login/i.test(d.message)) {
+                      sessionStorage.removeItem('risalaToken');
+                      sessionStorage.removeItem('risalaUser');
+                      alert(d.message);
+                      openOfficeLogin();
+                      return;
+                  }
+                  throw new Error((d && d.message) || 'Dashboard data load nahi hui.');
+              }
+              officeRows = Array.isArray(d.rows) ? d.rows : [];
+              window.dashboardSourceRows = Number(d.totalRows || 0);
+              window.dashboardReportTotal = Number(d.reportTotal || 0);
+              if (d.user) {
+                  officeUser = d.user;
+                  sessionStorage.setItem('risalaUser', JSON.stringify(d.user));
+                  document.getElementById('who').textContent = (d.user.name || d.user.userId || 'Employee') + ' • ' + (d.user.role || 'Viewer');
+                  document.getElementById('scope').textContent = 'Access: ' + [d.user.country, d.user.state, d.user.region, d.user.district, d.user.department].filter(Boolean).join(' / ');
+              }
+              populateDashboardFilters();
+              renderDashboard();
+              if (msg && officeRows.length) msg.classList.add('hidden');
+          })
+          .catch(err => {
+              console.error('Dashboard load error:', err);
+              window.dashboardSourceRows = 0;
+              officeRows = [];
+              if (msg) { msg.classList.remove('hidden'); msg.textContent = 'Dashboard data load nahi ho saka: ' + err.message; }
+              document.getElementById('dashInfo').textContent = 'Responses rows: 0 • Visible entries: 0 • Report quantity: 0';
+          });
+    }
     function showEmployeeDashboard() {
         try { officeUser = JSON.parse(sessionStorage.getItem('risalaUser') || '{}'); } catch(e) { officeUser = {}; }
         const token = sessionStorage.getItem('risalaToken');
