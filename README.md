@@ -1,23 +1,18 @@
-WEEKLY RISALA REPORT - CASCADING FILTER UPDATE
+WEEKLY RISALA REPORT - CASCADING FILTERS + EXCEL DOWNLOAD
 
-This package keeps the working dashboard/report logic and adds dependent dashboard filters:
+Updated:
+1. Search + Region + State + Division + District cascading filters.
+2. Dashboard report data and charts remain access-controlled by logged-in user.
+3. Added "Download Excel" button.
+4. Excel export contains ONLY the rows currently visible after the user's access scope, filters and search.
+5. Download includes Reports sheet and Summary sheet with active filters.
 
-Search (smaller) -> Region -> State -> Division -> District
+INSTALL:
+- Replace Code.gs in Apps Script.
+- Replace index.html in Apps Script.
+- Save.
+- Deploy > Manage deployments > Edit > New version > Deploy.
+- Refresh dashboard with Ctrl+F5.
 
-Behavior:
-1. Region selected: State/Division/District options are limited to that Region.
-2. State selected: Division/District options are limited to that State inside the selected Region.
-3. Division selected: District options are limited to that Division inside the selected Region/State.
-4. Changing a higher-level filter resets the lower filters.
-5. Search continues to work together with all filters.
-6. Existing server-side role access remains in Code.gs.
-
-Files:
-- Code.gs
-- index.html
-
-IMPORTANT:
-- Replace the Apps Script Code.gs with this Code.gs.
-- Replace the HTML file content with this index.html.
-- Deploy a NEW VERSION of the Apps Script Web App (or Manage deployments -> Edit -> New version).
-- Use the updated /exec URL in the Vercel/frontend if the deployment URL changed.
+NOTE:
+Excel generation uses SheetJS from the official CDN in index.html, so the browser needs internet access when loading the dashboard.
