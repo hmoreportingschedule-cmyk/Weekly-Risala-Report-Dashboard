@@ -72,6 +72,11 @@
         .chart-wrap { position:relative; height:260px; }
         .refresh-btn { border:0; background:var(--primary); color:#fff; padding:9px 13px; border-radius:6px; cursor:pointer; font-weight:700; }
         .dash-info { margin:10px 0; font-size:12px; color:#666; text-align:right; }
+        
+        .page-btn { padding: 6px 12px; border: 1px solid var(--primary); background: #fff; color: var(--primary); cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .page-btn.active { background: var(--primary); color: #fff; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #f9f9f9; border-color: #ccc; color: #ccc; }
+
         @media(max-width:800px){ .cards{grid-template-columns:repeat(2,1fr)} .filters{grid-template-columns:1fr 1fr} .employee-top{align-items:flex-start;gap:10px;flex-wrap:wrap} .chart-grid{grid-template-columns:1fr} }
         @media(max-width:500px){ .cards,.filters{grid-template-columns:1fr} .employee-title{font-size:18px} .login-actions{flex-direction:column} }
 </style>
@@ -140,10 +145,13 @@
 <div id="employeeView" class="employee-view">
   <div class="employee-top">
     <div><div class="employee-title">Weekly Risala Report - Office Dashboard</div><div id="who" class="employee-user"></div></div>
-    <div><button class="logout-btn" type="button" onclick="officeLogout()">Logout</button></div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div id="liveDateTime" style="font-weight: bold; color: var(--primary); font-size: 14px;"></div>
+        <button class="logout-btn" type="button" onclick="officeLogout()">Logout</button>
+    </div>
   </div>
   <div class="employee-wrap">
-    <div class="welcome"><b>Employee Dashboard</b><div id="scope" style="margin-top:7px;color:#666"></div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh Reports</button><button class="refresh-btn" type="button" onclick="downloadExcel()" style="background:#198754">Download Excel</button></div></div>
+    <div class="welcome"><div id="scope" style="color:#666"></div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh Reports</button><button class="refresh-btn" type="button" onclick="downloadExcel()" style="background:#198754">Download Excel</button></div></div>
     <div id="stats" class="cards"></div>
     <div class="filters">
       <input id="search" placeholder="Search..." oninput="renderDashboard()">
@@ -154,13 +162,17 @@
       <select id="dashChain" onchange="onChainChange()"><option value="">All Chain</option></select>
     </div>
     <div id="chartGrid" class="chart-grid">
-      <div class="chart-card"><div class="chart-title">Reports by State</div><div class="chart-wrap"><canvas id="stateChart"></canvas></div></div>
       <div class="chart-card"><div class="chart-title">Reports by Region</div><div class="chart-wrap"><canvas id="regionChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Reports by State</div><div class="chart-wrap"><canvas id="stateChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Reports by Division</div><div class="chart-wrap"><canvas id="divisionChart"></canvas></div></div>
       <div class="chart-card"><div class="chart-title">Reports by Department</div><div class="chart-wrap"><canvas id="departmentChart"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">Reports by District</div><div class="chart-wrap"><canvas id="districtChart"></canvas></div></div>
     </div>
     <div id="dashInfo" class="dash-info"></div>
-    <div class="tablebox"><div id="dashMessage" class="dash-msg">Loading reports...</div><table id="dashTable" class="employee-table" style="display:none"><thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Chain</th><th>Level</th><th>Department</th><th>Report</th><th>District</th><th>Division</th><th>State</th><th>Region</th></tr></thead><tbody id="dashBody"></tbody></table></div>
+    <div class="tablebox">
+      <div id="dashMessage" class="dash-msg">Loading reports...</div>
+      <table id="dashTable" class="employee-table" style="display:none"><thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Chain</th><th>Level</th><th>Department</th><th>Report</th><th>District</th><th>Division</th><th>State</th><th>Region</th></tr></thead><tbody id="dashBody"></tbody></table>
+      <div id="paginationControls" style="display: flex; justify-content: center; gap: 5px; margin-top: 15px;"></div>
+    </div>
   </div>
 </div>
 
@@ -185,6 +197,16 @@
 <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyNFSCIJ_8T2VzVX0L6GtKTQPYR2izYeqx2JVfbDz3l7gUgnZ8tfVIM1jqntDMfQOzO/exec";
     
+    // Live Clock Function
+    function updateClock() {
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const dt = document.getElementById('liveDateTime');
+        if(dt) dt.textContent = `Date: ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()}, Time: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    }
+    setInterval(updateClock, 1000);
+    document.addEventListener("DOMContentLoaded", updateClock);
+
     const themes = {
         "Peacock": { primary: "#008080", hover: "#005959", bg: "#e0f2f1", lightBg: "#f0faf9" },
         "Blue":    { primary: "#0056b3", hover: "#003d82", bg: "#e6f2ff", lightBg: "#f0f7ff" },
@@ -351,6 +373,8 @@
     // ===== OFFICE LOGIN + DASHBOARD (same Vercel link) =====
     let officeUser = {};
     let officeRows = [];
+    let currentFilteredRows = [];
+    let currentPage = 1;
 
     function openOfficeLogin() {
         document.getElementById('loginOverlay').classList.remove('hidden');
@@ -398,7 +422,7 @@
     function officeLogout() {
         sessionStorage.removeItem('risalaToken');
         sessionStorage.removeItem('risalaUser');
-        officeRows = []; officeUser = {};
+        officeRows = []; officeUser = {}; currentFilteredRows = [];
         document.getElementById('employeeView').style.display = 'none';
         document.getElementById('mainWrapper').style.display = '';
         document.querySelector('.topbar').style.display = 'flex';
@@ -533,11 +557,48 @@
         });
     }
     function renderCharts(rows) {
-        drawBarChart('stateChart','state','Reports by State',rows,'state');
         drawBarChart('regionChart','region','Reports by Region',rows,'region');
+        drawBarChart('stateChart','state','Reports by State',rows,'state');
+        drawBarChart('divisionChart','division','Reports by Division',rows,'division');
         drawBarChart('departmentChart','department','Reports by Department',rows,'department');
-        drawBarChart('districtChart','district','Reports by District',rows,'district');
     }
+    
+    function renderTablePage(page) {
+        currentPage = page;
+        const rowsPerPage = 10;
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const pagedRows = currentFilteredRows.slice(start, end);
+
+        document.getElementById('dashBody').innerHTML=pagedRows.map(x=>'<tr><td>'+escapeHtml(x.date)+'</td><td>'+escapeHtml(x.name)+'</td><td>'+escapeHtml(x.contact)+'</td><td>'+escapeHtml(x.chain)+'</td><td>'+escapeHtml(x.level)+'</td><td>'+escapeHtml(x.department)+'</td><td>'+escapeHtml(x.report)+'</td><td>'+escapeHtml(x.district)+'</td><td>'+escapeHtml(x.division)+'</td><td>'+escapeHtml(x.state)+'</td><td>'+escapeHtml(x.region)+'</td></tr>').join('');
+
+        renderPagination();
+    }
+
+    function renderPagination() {
+        const rowsPerPage = 10;
+        const totalPages = Math.ceil(currentFilteredRows.length / rowsPerPage);
+        let html = '';
+        if (totalPages > 1) {
+            html += `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="renderTablePage(${Math.max(1, currentPage - 1)})">Prev</button>`;
+            
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+            
+            if (endPage - startPage < 4) {
+                if (startPage === 1) endPage = Math.min(totalPages, startPage + 4);
+                else if (endPage === totalPages) startPage = Math.max(1, endPage - 4);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="renderTablePage(${i})">${i}</button>`;
+            }
+            
+            html += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="renderTablePage(${Math.min(totalPages, currentPage + 1)})">Next</button>`;
+        }
+        document.getElementById('paginationControls').innerHTML = html;
+    }
+    
     function renderDashboard() {
         const q=document.getElementById('search').value.toLowerCase().trim();
         const rg=document.getElementById('dashRegion').value;
@@ -545,7 +606,7 @@
         const dv=document.getElementById('dashDivision').value;
         const di=document.getElementById('dashDistrict').value;
         const ch=document.getElementById('dashChain').value;
-        const a=officeRows.filter(x =>
+        currentFilteredRows=officeRows.filter(x =>
             (!rg||sameClient(x.region,rg)) &&
             (!st||sameClient(x.state,st)) &&
             (!dv||sameClient(x.division,dv)) &&
@@ -553,14 +614,25 @@
             (!ch||sameClient(x.chain,ch)) &&
             (!q||JSON.stringify(x).toLowerCase().includes(q))
         );
-        const reportSum=a.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0);
-        document.getElementById('stats').innerHTML=[['Total Entries',a.length],['Report Quantity',reportSum],['Districts',new Set(a.map(x=>x.district).filter(Boolean)).size],['Departments',new Set(a.map(x=>x.department).filter(Boolean)).size]].map(x=>'<div class="stat"><div>'+x[0]+'</div><div class="n">'+x[1]+'</div></div>').join('');
-        document.getElementById('dashBody').innerHTML=a.map(x=>'<tr><td>'+escapeHtml(x.date)+'</td><td>'+escapeHtml(x.name)+'</td><td>'+escapeHtml(x.contact)+'</td><td>'+escapeHtml(x.chain)+'</td><td>'+escapeHtml(x.level)+'</td><td>'+escapeHtml(x.department)+'</td><td>'+escapeHtml(x.report)+'</td><td>'+escapeHtml(x.district)+'</td><td>'+escapeHtml(x.division)+'</td><td>'+escapeHtml(x.state)+'</td><td>'+escapeHtml(x.region)+'</td></tr>').join('');
-        document.getElementById('dashTable').style.display=a.length?'table':'none';
-        document.getElementById('dashMessage').style.display=a.length?'none':'block';
-        if(!a.length) document.getElementById('dashMessage').textContent=officeRows.length ? 'Reports available hain, lekin current filter/search se koi match nahi mila.' : 'Responses sheet se koi report read nahi hui.';
-        document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+a.length+' • Report quantity: '+reportSum;
-        renderCharts(a);
+        currentPage = 1;
+        
+        const reportSum=currentFilteredRows.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0);
+        document.getElementById('stats').innerHTML=[['Total Entries',currentFilteredRows.length],['Report Quantity',reportSum],['Districts',new Set(currentFilteredRows.map(x=>x.district).filter(Boolean)).size],['Departments',new Set(currentFilteredRows.map(x=>x.department).filter(Boolean)).size]].map(x=>'<div class="stat"><div>'+x[0]+'</div><div class="n">'+x[1]+'</div></div>').join('');
+        
+        if(currentFilteredRows.length){
+            document.getElementById('dashTable').style.display='table';
+            document.getElementById('dashMessage').style.display='none';
+            renderTablePage(1);
+        } else {
+            document.getElementById('dashTable').style.display='none';
+            document.getElementById('dashMessage').style.display='block';
+            document.getElementById('dashMessage').textContent=officeRows.length ? 'Reports available hain, lekin current filter/search se koi match nahi mila.' : 'Responses sheet se koi report read nahi hui.';
+            document.getElementById('dashBody').innerHTML='';
+            document.getElementById('paginationControls').innerHTML='';
+        }
+        
+        document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+currentFilteredRows.length+' • Report quantity: '+reportSum;
+        renderCharts(currentFilteredRows);
     }
     function getFilteredDashboardRows() {
         const q=document.getElementById('search').value.toLowerCase().trim();
