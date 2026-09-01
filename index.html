@@ -1,2752 +1,1435 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
 
-<meta charset="UTF-8">
+  <base target="_top">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
 
-<title>Weekly Risala Report</title>
+  <title>Weekly Risala Report - Office Dashboard</title>
 
-<style>
 
-:root{
-  --primary:#008080;
-  --hover:#005959;
-  --bg:#e0f2f1;
-  --light-bg:#f0faf9;
-}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-*{
-  box-sizing:border-box;
-}
 
-body{
-  margin:0;
-  padding:20px;
-  background:var(--bg);
-  font-family:Arial,sans-serif;
-}
+  <style>
 
-.site-shell{
-  width:100%;
-  max-width:1200px;
-  margin:auto;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-.topbar,
-.employee-top,
-.welcome,
-.stat,
-.filters,
-.chart-card,
-.tablebox{
-  background:#fff;
-  border-radius:12px;
-  box-shadow:0 4px 16px rgba(0,0,0,.08);
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #e8f7f7;
+      color: #111;
+    }
 
-.topbar{
-  min-height:60px;
-  padding:12px 18px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:18px;
-}
+    .container {
+      width: 96%;
+      max-width: 1200px;
+      margin: 10px auto 30px;
+    }
 
-.brand{
-  color:var(--primary);
-  font-size:21px;
-  font-weight:bold;
-}
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 3px 12px rgba(0,0,0,.08);
+    }
 
-.office-btn,
-.refresh-btn{
-  border:0;
-  background:var(--primary);
-  color:#fff;
-  padding:10px 14px;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:bold;
-}
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.office-btn:hover,
-.refresh-btn:hover{
-  background:var(--hover);
-}
+    h1 {
+      margin: 0;
+      color: #008b8b;
+      font-size: 22px;
+    }
 
-.form-container{
-  background:#fff;
-  width:100%;
-  max-width:600px;
-  margin:auto;
-  padding:25px;
-  border-radius:12px;
-  box-shadow:0 5px 18px rgba(0,0,0,.08);
-}
+    h2 {
+      margin: 0 0 5px;
+      font-size: 16px;
+    }
 
-.form-container input,
-.form-container select{
-  width:100%;
-  padding:11px;
-  margin-top:12px;
-  border:1px solid #ccc;
-  border-radius:6px;
-}
+    .sub {
+      color: #666;
+      margin-top: 4px;
+    }
 
-.btn-submit{
-  background:var(--primary);
-  color:#fff;
-  border:0;
-  width:100%;
-  padding:13px;
-  margin-top:20px;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:bold;
-}
+    button {
+      border: none;
+      background: #008b8b;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-right: 5px;
+    }
 
-.hidden{
-  display:none!important;
-}
+    button:hover {
+      opacity: .9;
+    }
 
-.login-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
+    .logout {
+      background: #dc3545;
+    }
 
-.login-card{
-  width:100%;
-  max-width:420px;
-  background:#fff;
-  padding:28px;
-  border-radius:14px;
-}
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
 
-.login-card input{
-  width:100%;
-  padding:11px;
-  margin:7px 0 15px;
-  border:1px solid #ccc;
-  border-radius:6px;
-}
+    .stat {
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 3px 12px rgba(0,0,0,.07);
+    }
 
-.login-actions{
-  display:flex;
-  gap:10px;
-}
+    .stat-title {
+      font-size: 14px;
+    }
 
-.login-actions button{
-  flex:1;
-}
+    .stat-number {
+      color: #008b8b;
+      font-size: 27px;
+      font-weight: bold;
+      margin-top: 6px;
+    }
 
-.btn-secondary{
-  border:0;
-  padding:12px;
-  border-radius:6px;
-  cursor:pointer;
-}
 
-.login-error{
-  display:none;
-  margin-top:12px;
-  background:#fde8e8;
-  color:#b42318;
-  padding:10px;
-  border-radius:7px;
-  text-align:center;
-}
+    .filters {
+      display: grid;
+      grid-template-columns: 1.5fr repeat(6, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
 
-.employee-view{
-  display:none;
-  width:100%;
-}
+    input,
+    select {
+      width: 100%;
+      height: 42px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 0 10px;
+      background: white;
+      font-size: 14px;
+    }
 
-.employee-top{
-  padding:15px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
 
-.employee-title{
-  font-size:21px;
-  font-weight:bold;
-  color:var(--primary);
-}
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
 
-.employee-user{
-  color:#555;
-  margin-top:4px;
-}
+    .chart-card {
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+      height: 340px;
+      box-shadow: 0 3px 12px rgba(0,0,0,.07);
+    }
 
-.logout-btn{
-  border:0;
-  background:#dc3545;
-  color:#fff;
-  padding:9px 13px;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:bold;
-}
+    .chart-title {
+      color: #008b8b;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
 
-.employee-wrap{
-  margin-top:20px;
-}
+    .chart-wrap {
+      height: 285px;
+      position: relative;
+    }
 
-.welcome{
-  padding:18px;
-  margin-bottom:18px;
-}
 
-.cards{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-}
+    .table-wrap {
+      overflow-x: auto;
+    }
 
-.stat{
-  padding:18px;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
 
-.stat .n{
-  color:var(--primary);
-  font-size:30px;
-  font-weight:bold;
-  margin-top:6px;
-}
+    th {
+      background: #d9eeee;
+      color: #006f6f;
+      text-align: left;
+      padding: 8px;
+      white-space: nowrap;
+    }
 
-.filters{
-  padding:14px;
-  margin:18px 0;
-  display:grid;
-  grid-template-columns:1.5fr repeat(6,1fr);
-  gap:10px;
-}
+    td {
+      padding: 7px;
+      border-bottom: 1px solid #eee;
+      white-space: nowrap;
+    }
 
-.filters input,
-.filters select{
-  width:100%;
-  padding:10px;
-  border:1px solid #ccc;
-  border-radius:6px;
-  margin:0;
-  background:#fff;
-}
 
-.chart-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
-}
+    .status-line {
+      text-align: right;
+      font-size: 12px;
+      color: #666;
+      margin: 8px 0;
+    }
 
-.chart-card{
-  padding:16px;
-  min-height:300px;
-}
 
-.chart-title{
-  font-weight:bold;
-  color:var(--primary);
-  margin-bottom:10px;
-}
+    .login-box {
+      max-width: 400px;
+      margin: 80px auto;
+    }
 
-.chart-wrap{
-  position:relative;
-  height:260px;
-}
+    .login-box h1 {
+      margin-bottom: 20px;
+    }
 
-.dash-info{
-  margin:10px 0;
-  font-size:12px;
-  color:#666;
-  text-align:right;
-}
+    .login-box input {
+      margin-bottom: 10px;
+    }
 
-.tablebox{
-  padding:18px;
-  margin-top:18px;
-  overflow:auto;
-}
+    .login-box button {
+      width: 100%;
+    }
 
-.employee-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:1100px;
-}
+    .error {
+      color: #dc3545;
+      margin-top: 10px;
+      font-size: 13px;
+    }
 
-.employee-table th,
-.employee-table td{
-  padding:9px;
-  border-bottom:1px solid #eee;
-  text-align:left;
-  font-size:13px;
-}
+    .loading {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-size: 20px;
+      font-weight: bold;
+      color: #008b8b;
+    }
 
-.employee-table th{
-  background:#f2f7f7;
-  color:var(--primary);
-}
+    .hidden {
+      display: none !important;
+    }
 
-.dash-msg{
-  padding:20px;
-  text-align:center;
-  color:#666;
-}
 
-@media(max-width:900px){
+    @media(max-width: 900px) {
 
-  .cards{
-    grid-template-columns:repeat(2,1fr);
-  }
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
 
-  .filters{
-    grid-template-columns:1fr 1fr;
-  }
+      .filters {
+        grid-template-columns: 1fr 1fr;
+      }
 
-  .chart-grid{
-    grid-template-columns:1fr;
-  }
+      .charts {
+        grid-template-columns: 1fr;
+      }
+    }
 
-}
 
-@media(max-width:550px){
+    @media(max-width: 600px) {
 
-  .cards,
-  .filters{
-    grid-template-columns:1fr;
-  }
+      .container {
+        width: 94%;
+      }
 
-}
+      .stats {
+        grid-template-columns: 1fr;
+      }
 
-</style>
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .top {
+        align-items: flex-start;
+      }
+
+      h1 {
+        font-size: 18px;
+      }
+    }
+
+  </style>
 
 </head>
 
+
 <body>
 
-<div class="site-shell">
 
-<div class="topbar">
-
-<div class="brand">
-Weekly Risala Report
-</div>
-
-<button class="office-btn"
-        onclick="openOfficeLogin()">
-Office Login
-</button>
-
+<div id="loading"
+     class="loading">
+  Loading...
 </div>
 
 
-<!-- =====================================================
-     MAIN FORM
-===================================================== -->
+<!-- LOGIN -->
 
-<div id="mainWrapper">
+<div id="loginPage"
+     class="container">
 
-<div class="form-container">
+  <div class="card login-box">
 
-<h2 id="dynamicHeading">
-Weekly Risala Report
-</h2>
+    <h1>
+      Weekly Risala Report
+    </h1>
 
-<div id="dynamicSubheading"></div>
+    <input
+      type="text"
+      id="loginUser"
+      placeholder="User ID">
 
-<div id="loadingOverlay">
-Checking Form Status... Please Wait.
-</div>
+    <input
+      type="password"
+      id="loginPassword"
+      placeholder="Password">
 
-<div id="linkOffMessage"
-     class="hidden"></div>
+    <button onclick="login()">
+      Login
+    </button>
 
-<div id="successMessage"
-     class="hidden">
-Allah Kareem Aap Ko Murshid Ki Dua Ka Faizan Nasib Farmaye
-</div>
+    <div id="loginError"
+         class="error"></div>
 
-
-<form id="dataForm"
-      class="hidden"
-      onsubmit="return submitForm(event)">
-
-<select id="chainType"
-        onchange="showChainFields()"
-        required>
-
-<option value=""
-        disabled
-        selected>
--- Select Chain --
-</option>
-
-<option value="central">
-Nigran
-</option>
-
-<option value="department">
-Department
-</option>
-
-</select>
-
-
-<div id="all-fields"
-     class="hidden">
-
-<input id="userName"
-       placeholder="Name (English Only)"
-       required>
-
-<input id="contactNumber"
-       placeholder="Mobile Number (10 Digits)"
-       maxlength="10"
-       required>
-
-<input id="pincode"
-       placeholder="Pincode (6 Digits)"
-       maxlength="6"
-       required
-       oninput="checkPincode()">
-
-
-<div id="central-fields"
-     class="hidden">
-
-<select id="nigranLevel">
-
-<option value="">
-Select Nigran Level
-</option>
-
-<option>Alaqa Nigran</option>
-<option>District/Circle Nigran</option>
-<option>Division Nigran</option>
-<option>Region Nigran</option>
-<option>State Nigran</option>
-<option>Zaili Nigran</option>
-
-</select>
+  </div>
 
 </div>
 
 
-<div id="department-fields"
-     class="hidden">
+<!-- DASHBOARD -->
 
-<select id="zimmedarLevel">
+<div id="dashboardPage"
+     class="container hidden">
 
-<option value="">
-Select Zimmedar Level
-</option>
 
-<option>City/Alaqa</option>
-<option>District/City/Circle</option>
-<option>Division</option>
-<option>Gaon/Zaili Halqa</option>
-<option>Hind Satah (HOD)/Muawwin HOD</option>
-<option>Moallim/Imaam/Moazzin</option>
-<option>Office/Assistant Zimmedar</option>
-<option>Region</option>
-<option>Rukne Hind Mushawarat</option>
-<option>State</option>
+  <!-- HEADER -->
 
-</select>
+  <div class="card top">
 
+    <div>
 
-<select id="departmentList">
+      <h1>
+        Weekly Risala Report - Office Dashboard
+      </h1>
 
-<option value="">
-Select Department
-</option>
+      <div id="userTitle"
+           class="sub">
+      </div>
 
-<option>12 Maah</option>
-<option>Education Department</option>
-<option>Finance Department</option>
-<option>Haftawar Ijtema O Madani Muzakara</option>
-<option>HMO</option>
-<option>IT Department</option>
-<option>Madrasatul Madina Boys</option>
-<option>Madrasatul Madina Girls</option>
-<option>Media Department</option>
-<option>Reporting Desk - HMO</option>
-<option>Social Media</option>
-<option>Ushr wa Atraf Gaon</option>
+    </div>
 
-</select>
+    <button
+      class="logout"
+      onclick="logout()">
+      Logout
+    </button>
 
-</div>
+  </div>
 
 
-<input id="district"
-       placeholder="District"
-       readonly>
+  <!-- USER ACCESS -->
 
-<input id="division"
-       placeholder="Division"
-       readonly>
+  <div class="card">
 
-<input id="state"
-       placeholder="State"
-       readonly>
+    <h2>
+      Employee Dashboard
+    </h2>
 
-<input id="region"
-       placeholder="Region"
-       readonly>
+    <div id="accessText"
+         class="sub">
+    </div>
 
-<input id="risalaReport"
-       placeholder="Weekly Risala Report"
-       maxlength="4"
-       required>
+    <div style="margin-top:12px;">
 
-</div>
+      <button onclick="loadDashboard()">
+        Refresh Reports
+      </button>
 
-<button id="submitBtn"
-        class="btn-submit"
-        type="submit">
-Submit Report
-</button>
+      <button onclick="downloadExcel()">
+        Download Excel
+      </button>
 
-</form>
+    </div>
 
-</div>
+  </div>
 
-</div>
 
+  <!-- STATS -->
 
-<!-- =====================================================
-     EMPLOYEE DASHBOARD
-===================================================== -->
+  <div class="stats">
 
-<div id="employeeView"
-     class="employee-view">
+    <div class="stat">
 
+      <div class="stat-title">
+        Total Entries
+      </div>
 
-<div class="employee-top">
+      <div
+        id="totalEntries"
+        class="stat-number">
+        0
+      </div>
 
-<div>
+    </div>
 
-<div class="employee-title">
-Weekly Risala Report - Office Dashboard
-</div>
 
-<div id="who"
-     class="employee-user">
-</div>
+    <div class="stat">
 
-</div>
+      <div class="stat-title">
+        Report Quantity
+      </div>
 
+      <div
+        id="reportQuantity"
+        class="stat-number">
+        0
+      </div>
 
-<button class="logout-btn"
-        onclick="officeLogout()">
-Logout
-</button>
+    </div>
 
-</div>
 
+    <div class="stat">
 
-<div class="employee-wrap">
+      <div class="stat-title">
+        Districts
+      </div>
 
+      <div
+        id="districts"
+        class="stat-number">
+        0
+      </div>
 
-<div class="welcome">
+    </div>
 
-<b>Employee Dashboard</b>
 
-<div id="scope"
-     style="margin-top:7px;color:#666">
-Access: Loading...
-</div>
+    <div class="stat">
 
-<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <div class="stat-title">
+        Departments
+      </div>
 
-<button class="refresh-btn"
-        onclick="refreshDashboard()">
-Refresh Reports
-</button>
+      <div
+        id="departments"
+        class="stat-number">
+        0
+      </div>
 
-<button class="refresh-btn"
-        onclick="downloadExcel()">
-Download Excel
-</button>
+    </div>
 
-</div>
+  </div>
 
-</div>
 
+  <!-- FILTERS -->
 
-<div id="stats"
-     class="cards">
-</div>
+  <div class="card">
 
+    <div class="filters">
 
-<!-- FILTERS -->
+      <input
+        id="search"
+        placeholder="Search..."
+        oninput="filterChanged()">
 
-<div class="filters">
 
-<input id="search"
-       placeholder="Search..."
-       oninput="renderDashboard()">
+      <select
+        id="region"
+        onchange="filterChanged()">
+        <option value="">
+          All Region
+        </option>
+      </select>
 
 
-<select id="dashRegion"
-        onchange="onRegionChange()">
+      <select
+        id="state"
+        onchange="filterChanged()">
+        <option value="">
+          All State
+        </option>
+      </select>
 
-<option value="">
-All Region
-</option>
 
-</select>
+      <select
+        id="division"
+        onchange="filterChanged()">
+        <option value="">
+          All Division
+        </option>
+      </select>
 
 
-<select id="dashState"
-        onchange="onStateChange()">
+      <select
+        id="district"
+        onchange="filterChanged()">
+        <option value="">
+          All District
+        </option>
+      </select>
 
-<option value="">
-All State
-</option>
 
-</select>
+      <select
+        id="chain"
+        onchange="filterChanged()">
+        <option value="">
+          All Chain
+        </option>
+      </select>
 
 
-<select id="dashDivision"
-        onchange="onDivisionChange()">
+      <select
+        id="department"
+        onchange="filterChanged()">
+        <option value="">
+          All Department
+        </option>
+      </select>
 
-<option value="">
-All Division
-</option>
+    </div>
 
-</select>
+  </div>
 
 
-<select id="dashDistrict"
-        onchange="onDistrictChange()">
+  <!-- CHARTS -->
 
-<option value="">
-All District
-</option>
+  <div class="charts">
 
-</select>
 
+    <div class="chart-card">
 
-<select id="dashChain"
-        onchange="renderDashboard()">
+      <div class="chart-title">
+        Reports by State
+      </div>
 
-<option value="">
-All Chain
-</option>
+      <div class="chart-wrap">
+        <canvas id="stateChart"></canvas>
+      </div>
 
-</select>
+    </div>
 
 
-<select id="dashDepartment"
-        onchange="renderDashboard()">
+    <div class="chart-card">
 
-<option value="">
-All Department
-</option>
+      <div class="chart-title">
+        Reports by Region
+      </div>
 
-</select>
+      <div class="chart-wrap">
+        <canvas id="regionChart"></canvas>
+      </div>
 
-</div>
+    </div>
 
 
-<!-- CHARTS -->
+    <div class="chart-card">
 
-<div class="chart-grid">
+      <div class="chart-title">
+        Reports by Department
+      </div>
 
-<div class="chart-card">
+      <div class="chart-wrap">
+        <canvas id="departmentChart"></canvas>
+      </div>
 
-<div class="chart-title">
-Reports by State
-</div>
+    </div>
 
-<div class="chart-wrap">
 
-<canvas id="stateChart"></canvas>
+    <div class="chart-card">
 
-</div>
+      <div class="chart-title">
+        Reports by District
+      </div>
 
-</div>
+      <div class="chart-wrap">
+        <canvas id="districtChart"></canvas>
+      </div>
 
+    </div>
 
-<div class="chart-card">
+  </div>
 
-<div class="chart-title">
-Reports by Region
-</div>
 
-<div class="chart-wrap">
+  <!-- STATUS -->
 
-<canvas id="regionChart"></canvas>
+  <div
+    id="statusLine"
+    class="status-line">
+    Responses rows: 0 • Visible rows: 0 • Report quantity: 0
+  </div>
 
-</div>
 
-</div>
+  <!-- TABLE -->
 
+  <div class="card">
 
-<div class="chart-card">
+    <div
+      id="emptyMessage"
+      style="text-align:center;color:#666;padding:25px;">
+      Responses sheet se koi report read nahi hui.
+    </div>
 
-<div class="chart-title">
-Reports by Department
-</div>
 
-<div class="chart-wrap">
+    <div
+      id="tableContainer"
+      class="table-wrap hidden">
 
-<canvas id="departmentChart"></canvas>
+      <table>
 
-</div>
+        <thead>
 
-</div>
+          <tr>
 
+            <th>Date</th>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Chain</th>
+            <th>Nigran Level</th>
+            <th>Zimmedar Level</th>
+            <th>Department</th>
+            <th>Report</th>
+            <th>Pincode</th>
+            <th>District</th>
+            <th>Division</th>
+            <th>State</th>
+            <th>Region</th>
+            <th>Country</th>
 
-<div class="chart-card">
+          </tr>
 
-<div class="chart-title">
-Reports by District
-</div>
+        </thead>
 
-<div class="chart-wrap">
+        <tbody id="tableBody">
+        </tbody>
 
-<canvas id="districtChart"></canvas>
+      </table>
 
-</div>
+    </div>
 
-</div>
-
-</div>
-
-
-<div id="dashInfo"
-     class="dash-info">
-</div>
-
-
-<!-- TABLE -->
-
-<div class="tablebox">
-
-<div id="dashMessage"
-     class="dash-msg">
-Loading reports...
-</div>
-
-
-<table id="dashTable"
-       class="employee-table"
-       style="display:none">
-
-<thead>
-
-<tr>
-
-<th>Date</th>
-<th>Name</th>
-<th>Contact</th>
-<th>Chain</th>
-<th>Level</th>
-<th>Department</th>
-<th>Report</th>
-<th>Pincode</th>
-<th>District</th>
-<th>Division</th>
-<th>State</th>
-<th>Region</th>
-<th>Country</th>
-
-</tr>
-
-</thead>
-
-<tbody id="dashBody">
-</tbody>
-
-</table>
-
-</div>
+  </div>
 
 
 </div>
-
-</div>
-
-
-<!-- =====================================================
-     LOGIN
-===================================================== -->
-
-<div id="loginOverlay"
-     class="login-overlay hidden">
-
-<div class="login-card">
-
-<h2>Office Login</h2>
-
-<p>
-Weekly Risala Report Dashboard
-</p>
-
-
-<form onsubmit="officeLogin(event)">
-
-<label>
-User ID
-</label>
-
-<input id="officeUserId"
-       autocomplete="username"
-       required>
-
-
-<label>
-Password
-</label>
-
-<input id="officePassword"
-       type="password"
-       autocomplete="current-password"
-       required>
-
-
-<div class="login-actions">
-
-<button id="officeLoginBtn"
-        class="btn-submit"
-        type="submit">
-Login
-</button>
-
-<button type="button"
-        class="btn-secondary"
-        onclick="closeOfficeLogin()">
-Cancel
-</button>
-
-</div>
-
-
-<div id="loginError"
-     class="login-error">
-</div>
-
-</form>
-
-</div>
-
-</div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
 <script>
 
-/* =====================================================
-   SCRIPT URL
-===================================================== */
 
-const scriptURL =
-"https://script.google.com/macros/s/AKfycbyNFSCIJ_8T2VzVX0L6GtKTQPYR2izYeqx2JVfbDz3l7gUgnZ8tfVIM1jqntDMfQOzO/exec";
+let currentUser = null;
 
-
-/* =====================================================
-   THEME
-===================================================== */
-
-const themes = {
-
-Peacock:{
-primary:"#008080",
-hover:"#005959",
-bg:"#e0f2f1"
-},
-
-Blue:{
-primary:"#0056b3",
-hover:"#003d82",
-bg:"#e6f2ff"
-},
-
-Green:{
-primary:"#28a745",
-hover:"#1e7e34",
-bg:"#e8f5e9"
-}
-
+let charts = {
+  state: null,
+  region: null,
+  department: null,
+  district: null
 };
 
+let lastResult = null;
 
-function applyTheme(name){
 
-const t =
-themes[name] ||
-themes.Peacock;
+/* ================================
+   LOGIN
+================================ */
 
-document.documentElement
-.style
-.setProperty(
-'--primary',
-t.primary
-);
+function login() {
 
-document.documentElement
-.style
-.setProperty(
-'--hover',
-t.hover
-);
+  const user =
+    document.getElementById('loginUser')
+      .value
+      .trim();
 
-document.documentElement
-.style
-.setProperty(
-'--bg',
-t.bg
-);
+  const password =
+    document.getElementById('loginPassword')
+      .value;
 
+  if (!user || !password) {
+
+    document.getElementById('loginError')
+      .textContent =
+      'User ID aur Password enter karein.';
+
+    return;
+  }
+
+
+  showLoading(true);
+
+
+  google.script.run
+    .withSuccessHandler(function(result) {
+
+      showLoading(false);
+
+
+      if (!result || !result.success) {
+
+        document.getElementById('loginError')
+          .textContent =
+          result?.message ||
+          'Login failed.';
+
+        return;
+      }
+
+
+      currentUser = result.user;
+
+
+      document.getElementById('loginPage')
+        .classList
+        .add('hidden');
+
+
+      document.getElementById('dashboardPage')
+        .classList
+        .remove('hidden');
+
+
+      document.getElementById('userTitle')
+        .textContent =
+        (currentUser.name || currentUser.userId) +
+        ' • ' +
+        (currentUser.role || '');
+
+
+      document.getElementById('accessText')
+        .textContent =
+        buildAccessText();
+
+
+      loadDashboard();
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      showLoading(false);
+
+      document.getElementById('loginError')
+        .textContent =
+        error.message ||
+        'Server error.';
+
+    })
+
+    .loginUser(user, password);
 }
 
 
-/* =====================================================
-   STATUS
-===================================================== */
+/* ================================
+   ACCESS TEXT
+================================ */
 
-document.addEventListener(
-"DOMContentLoaded",
-function(){
+function buildAccessText() {
 
-fetch(
-scriptURL +
-"?checkStatus=true&_=" +
-Date.now(),
-{
-cache:"no-store"
-}
-)
+  const parts = [];
 
-.then(r=>r.json())
+  if (currentUser.country) {
+    parts.push('Country: ' + currentUser.country);
+  }
 
-.then(d=>{
+  if (currentUser.region) {
+    parts.push('Region: ' + currentUser.region);
+  }
 
-document
-.getElementById("loadingOverlay")
-.classList
-.add("hidden");
+  if (currentUser.state) {
+    parts.push('State: ' + currentUser.state);
+  }
 
-document
-.getElementById("dynamicHeading")
-.innerHTML =
-d.heading ||
-"Weekly Risala Report";
+  if (currentUser.district) {
+    parts.push('District: ' + currentUser.district);
+  }
 
-document
-.getElementById("dynamicSubheading")
-.innerHTML =
-d.subheading || "";
+  if (currentUser.department) {
+    parts.push('Department: ' + currentUser.department);
+  }
 
-applyTheme(
-d.theme || "Peacock"
-);
+  if (
+    currentUser.chainTypes &&
+    currentUser.chainTypes.length
+  ) {
 
-if(d.status === "OFF"){
+    parts.push(
+      'Chain: ' +
+      currentUser.chainTypes.join(', ')
+    );
 
-document
-.getElementById("linkOffMessage")
-.innerHTML =
-d.linkOffMsg ||
-"Link Off";
+  }
 
-document
-.getElementById("linkOffMessage")
-.classList
-.remove("hidden");
+  if (currentUser.role) {
+    parts.unshift(
+      'Role: ' + currentUser.role
+    );
+  }
 
-}else{
-
-document
-.getElementById("dataForm")
-.classList
-.remove("hidden");
-
-}
-
-})
-
-.catch(err=>{
-
-document
-.getElementById("loadingOverlay")
-.innerHTML =
-"Backend connection error.";
-
-});
-
-});
-
-
-/* =====================================================
-   FORM
-===================================================== */
-
-function showChainFields(){
-
-const c =
-document
-.getElementById("chainType")
-.value;
-
-document
-.getElementById("all-fields")
-.classList
-.remove("hidden");
-
-document
-.getElementById("central-fields")
-.classList
-.toggle(
-"hidden",
-c !== "central"
-);
-
-document
-.getElementById("department-fields")
-.classList
-.toggle(
-"hidden",
-c !== "department"
-);
-
+  return 'Access: ' + parts.join(' / ');
 }
 
 
-function checkPincode(){
-
-const p =
-document
-.getElementById("pincode")
-.value
-.trim();
-
-if(p.length === 6){
-
-fetch(
-scriptURL +
-"?pincode=" +
-encodeURIComponent(p) +
-"&_=" +
-Date.now()
-)
-
-.then(r=>r.json())
-
-.then(d=>{
-
-document.getElementById("district").value =
-d.district || "";
-
-document.getElementById("division").value =
-d.division || "";
-
-document.getElementById("state").value =
-d.state || "";
-
-document.getElementById("region").value =
-d.region || "";
-
-});
-
-}
-
-}
-
-
-function submitForm(e){
-
-e.preventDefault();
-
-const data = {
-
-chainType:
-document.getElementById("chainType").value,
-
-userName:
-document.getElementById("userName").value.trim(),
-
-contactNumber:
-document.getElementById("contactNumber").value.trim(),
-
-nigranLevel:
-document.getElementById("nigranLevel").value,
-
-zimmedarLevel:
-document.getElementById("zimmedarLevel").value,
-
-departmentList:
-document.getElementById("departmentList").value,
-
-risalaReport:
-document.getElementById("risalaReport").value.trim(),
-
-pincode:
-document.getElementById("pincode").value.trim(),
-
-district:
-document.getElementById("district").value,
-
-division:
-document.getElementById("division").value,
-
-state:
-document.getElementById("state").value,
-
-region:
-document.getElementById("region").value,
-
-country:"India"
-
-};
-
-
-fetch(
-scriptURL,
-{
-method:"POST",
-body:JSON.stringify(data)
-}
-)
-
-.then(r=>r.json())
-
-.then(d=>{
-
-if(d.status !== "Success"){
-
-alert(
-d.message ||
-"Submit error"
-);
-
-return;
-
-}
-
-document
-.getElementById("dataForm")
-.classList
-.add("hidden");
-
-document
-.getElementById("successMessage")
-.classList
-.remove("hidden");
-
-})
-
-.catch(err=>{
-
-alert(
-"Report submit karne mein error aayi."
-);
-
-});
-
-return false;
-
-}
-
-
-/* =====================================================
-   OFFICE LOGIN
-===================================================== */
-
-let officeUser = {};
-let officeRows = [];
-let chartRefs = {};
-
-
-function openOfficeLogin(){
-
-document
-.getElementById("loginOverlay")
-.classList
-.remove("hidden");
-
-document
-.getElementById("officeUserId")
-.focus();
-
-}
-
-
-function closeOfficeLogin(){
-
-document
-.getElementById("loginOverlay")
-.classList
-.add("hidden");
-
-document
-.getElementById("loginError")
-.style
-.display =
-"none";
-
-}
-
-
-function officeLogin(e){
-
-e.preventDefault();
-
-const userId =
-document
-.getElementById("officeUserId")
-.value
-.trim();
-
-const password =
-document
-.getElementById("officePassword")
-.value;
-
-const btn =
-document
-.getElementById("officeLoginBtn");
-
-const err =
-document
-.getElementById("loginError");
-
-btn.disabled = true;
-
-btn.textContent =
-"Checking...";
-
-err.style.display =
-"none";
-
-
-fetch(
-scriptURL +
-"?action=login" +
-"&userId=" +
-encodeURIComponent(userId) +
-"&password=" +
-encodeURIComponent(password) +
-"&_=" +
-Date.now(),
-{
-cache:"no-store"
-}
-)
-
-.then(r=>r.json())
-
-.then(d=>{
-
-if(d.status === "Success"){
-
-officeUser =
-d.user || {};
-
-sessionStorage.setItem(
-"risalaToken",
-d.token
-);
-
-sessionStorage.setItem(
-"risalaUser",
-JSON.stringify(officeUser)
-);
-
-closeOfficeLogin();
-
-showEmployeeDashboard();
-
-}else{
-
-err.textContent =
-d.message ||
-"Invalid User ID ya Password.";
-
-err.style.display =
-"block";
-
-}
-
-})
-
-.catch(err=>{
-
-err.textContent =
-"Login server se connection nahi ho raha.";
-
-err.style.display =
-"block";
-
-})
-
-.finally(()=>{
-
-btn.disabled = false;
-
-btn.textContent =
-"Login";
-
-});
-
-}
-
-
-/* =====================================================
-   SHOW DASHBOARD
-===================================================== */
-
-function showEmployeeDashboard(){
-
-try{
-
-officeUser =
-JSON.parse(
-sessionStorage.getItem(
-"risalaUser"
-) || "{}"
-);
-
-}catch(e){
-
-officeUser = {};
-
-}
-
-const token =
-sessionStorage.getItem(
-"risalaToken"
-);
-
-if(!token){
-
-openOfficeLogin();
-
-return;
-
-}
-
-document
-.getElementById("mainWrapper")
-.style
-.display =
-"none";
-
-document
-.querySelector(".topbar")
-.style
-.display =
-"none";
-
-document
-.getElementById("employeeView")
-.style
-.display =
-"block";
-
-document
-.getElementById("who")
-.textContent =
-(
-officeUser.name ||
-officeUser.userId ||
-"Employee"
-) +
-" • " +
-(
-officeUser.role ||
-"Viewer"
-);
-
-setScopeText();
-
-loadDashboard(token);
-
-}
-
-
-/* =====================================================
-   SCOPE TEXT
-===================================================== */
-
-function setScopeText(){
-
-const parts = [];
-
-if(officeUser.country)
-parts.push(officeUser.country);
-
-if(officeUser.region)
-parts.push(officeUser.region);
-
-if(officeUser.state)
-parts.push(officeUser.state);
-
-if(officeUser.division)
-parts.push(officeUser.division);
-
-if(officeUser.district)
-parts.push(officeUser.district);
-
-if(officeUser.department)
-parts.push(officeUser.department);
-
-if(officeUser.chain)
-parts.push(
-"Chain: " +
-officeUser.chain
-);
-
-document
-.getElementById("scope")
-.textContent =
-"Access: " +
-(
-parts.length
-? parts.join(" / ")
-: "No assignment found"
-);
-
-}
-
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
-function officeLogout(){
-
-sessionStorage.removeItem(
-"risalaToken"
-);
-
-sessionStorage.removeItem(
-"risalaUser"
-);
-
-officeRows = [];
-
-officeUser = {};
-
-document
-.getElementById("employeeView")
-.style
-.display =
-"none";
-
-document
-.getElementById("mainWrapper")
-.style
-.display =
-"block";
-
-document
-.querySelector(".topbar")
-.style
-.display =
-"flex";
-
-location.reload();
-
-}
-
-
-/* =====================================================
+/* ================================
    LOAD DASHBOARD
-===================================================== */
+================================ */
 
-function loadDashboard(token){
+function loadDashboard() {
 
-document
-.getElementById("dashMessage")
-.style
-.display =
-"block";
-
-document
-.getElementById("dashMessage")
-.textContent =
-"Loading reports...";
+  if (!currentUser) {
+    return;
+  }
 
 
-fetch(
-scriptURL +
-"?action=dashboard" +
-"&token=" +
-encodeURIComponent(token) +
-"&_=" +
-Date.now(),
-{
-cache:"no-store"
-}
-)
-
-.then(r=>r.json())
-
-.then(d=>{
-
-console.log(
-"Dashboard Response:",
-d
-);
-
-if(d.status !== "Success"){
-
-document
-.getElementById("dashMessage")
-.textContent =
-d.message ||
-"Dashboard load nahi hua.";
-
-return;
-
-}
+  showLoading(true);
 
 
-officeRows =
-Array.isArray(d.rows)
-? d.rows
-: [];
-
-window.dashboardSourceRows =
-Number(
-d.totalRows || 0
-);
-
-window.dashboardDebug =
-d.debug || {};
+  const filters = getFilters();
 
 
-if(d.user){
+  google.script.run
 
-officeUser =
-d.user;
+    .withSuccessHandler(function(result) {
 
-sessionStorage.setItem(
-"risalaUser",
-JSON.stringify(
-officeUser
-)
-);
+      showLoading(false);
 
-setScopeText();
+      if (!result || !result.success) {
 
+        alert(
+          result?.message ||
+          'Data load nahi ho saka.'
+        );
+
+        return;
+      }
+
+
+      lastResult = result;
+
+
+      renderDashboard(result);
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      showLoading(false);
+
+      alert(
+        error.message ||
+        'Dashboard data error.'
+      );
+
+    })
+
+    .getDashboardData(
+      currentUser,
+      filters
+    );
 }
 
 
-populateDashboardFilters();
+/* ================================
+   FILTERS
+================================ */
 
-renderDashboard();
+function getFilters() {
 
-})
+  return {
 
-.catch(err=>{
+    search:
+      document.getElementById('search')
+        .value,
 
-console.error(
-"Dashboard Error:",
-err
-);
+    region:
+      document.getElementById('region')
+        .value,
 
-document
-.getElementById("dashMessage")
-.textContent =
-"Dashboard data load nahi hua. Browser console mein error check karein.";
+    state:
+      document.getElementById('state')
+        .value,
 
-});
+    division:
+      document.getElementById('division')
+        .value,
 
+    district:
+      document.getElementById('district')
+        .value,
+
+    chain:
+      document.getElementById('chain')
+        .value,
+
+    department:
+      document.getElementById('department')
+        .value
+  };
 }
 
 
-/* =====================================================
-   REFRESH
-===================================================== */
+let filterTimer = null;
 
-function refreshDashboard(){
 
-const token =
-sessionStorage.getItem(
-"risalaToken"
-);
+function filterChanged() {
 
-if(token){
+  clearTimeout(filterTimer);
 
-loadDashboard(token);
 
-}
-
+  filterTimer = setTimeout(
+    function() {
+      loadDashboard();
+    },
+    250
+  );
 }
 
 
-/* =====================================================
-   FILTER HELPERS
-===================================================== */
+/* ================================
+   RENDER
+================================ */
 
-function sameClient(a,b){
+function renderDashboard(result) {
 
-return String(a || '')
-.trim()
-.toLowerCase() ===
-String(b || '')
-.trim()
-.toLowerCase();
 
+  document.getElementById('totalEntries')
+    .textContent =
+    formatNumber(result.visibleRows);
+
+
+  document.getElementById('reportQuantity')
+    .textContent =
+    formatNumber(result.reportQuantity);
+
+
+  document.getElementById('districts')
+    .textContent =
+    formatNumber(result.districts);
+
+
+  document.getElementById('departments')
+    .textContent =
+    formatNumber(result.departments);
+
+
+  document.getElementById('statusLine')
+    .textContent =
+    'Responses rows: ' +
+    formatNumber(result.totalRows) +
+
+    ' • Visible rows: ' +
+    formatNumber(result.visibleRows) +
+
+    ' • Report quantity: ' +
+    formatNumber(result.reportQuantity);
+
+
+  /*
+   * Important:
+   * Filters are rebuilt from currently accessible data.
+   */
+
+  populateSelect(
+    'region',
+    result.options.regions,
+    'All Region'
+  );
+
+
+  populateSelect(
+    'state',
+    result.options.states,
+    'All State'
+  );
+
+
+  populateSelect(
+    'division',
+    result.options.divisions,
+    'All Division'
+  );
+
+
+  populateSelect(
+    'district',
+    result.options.districts,
+    'All District'
+  );
+
+
+  populateSelect(
+    'chain',
+    result.options.chains,
+    'All Chain'
+  );
+
+
+  populateSelect(
+    'department',
+    result.options.departments,
+    'All Department'
+  );
+
+
+  /*
+   * Charts
+   */
+
+  renderChart(
+    'state',
+    'stateChart',
+    result.charts.byState
+  );
+
+
+  renderChart(
+    'region',
+    'regionChart',
+    result.charts.byRegion
+  );
+
+
+  renderChart(
+    'department',
+    'departmentChart',
+    result.charts.byDepartment
+  );
+
+
+  renderChart(
+    'district',
+    'districtChart',
+    result.charts.byDistrict
+  );
+
+
+  /*
+   * Table
+   */
+
+  renderTable(result.rows);
 }
 
 
-function uniqDash(
-key,
-rows
-){
+/* ================================
+   SELECT
+================================ */
 
-return [
-...new Set(
-(rows || officeRows)
-.map(
-x =>
-String(
-x[key] || ''
-)
-.trim()
-)
-.filter(Boolean)
-)
-].sort(
-(a,b)=>
-a.localeCompare(b)
-);
+function populateSelect(
+  id,
+  values,
+  firstText
+) {
 
+  const select =
+    document.getElementById(id);
+
+  const oldValue = select.value;
+
+
+  select.innerHTML = '';
+
+
+  const first =
+    document.createElement('option');
+
+  first.value = '';
+
+  first.textContent = firstText;
+
+  select.appendChild(first);
+
+
+  (values || []).forEach(function(value) {
+
+    const option =
+      document.createElement('option');
+
+    option.value = value;
+
+    option.textContent = value;
+
+    select.appendChild(option);
+
+  });
+
+
+  /*
+   * Agar previous value available ho
+   * to maintain karein.
+   */
+
+  if (
+    oldValue &&
+    values.indexOf(oldValue) !== -1
+  ) {
+
+    select.value = oldValue;
+
+  } else {
+
+    select.value = '';
+
+  }
 }
 
 
-function fillDash(
-id,
-arr,
-firstText,
-keepValue
-){
+/* ================================
+   CHART
+================================ */
 
-const s =
-document.getElementById(id);
+function renderChart(
+  type,
+  canvasId,
+  data
+) {
 
-const current =
-keepValue !== undefined
-? keepValue
-: s.value;
+  if (charts[type]) {
 
-s.innerHTML =
-'<option value="">'
-+
-firstText
-+
-'</option>' +
+    charts[type].destroy();
 
-arr.map(
-x =>
-'<option value="' +
-escapeHtml(x) +
-'">' +
-escapeHtml(x) +
-'</option>'
-).join('');
+    charts[type] = null;
+  }
 
-const found =
-arr.find(
-x =>
-sameClient(
-x,
-current
-)
-);
 
-s.value =
-found || '';
+  const canvas =
+    document.getElementById(canvasId);
 
+
+  const labels =
+    (data || []).map(x => x.label);
+
+
+  const values =
+    (data || []).map(x => x.value);
+
+
+  charts[type] =
+    new Chart(
+      canvas.getContext('2d'),
+      {
+
+        type: 'bar',
+
+        data: {
+
+          labels: labels,
+
+          datasets: [
+
+            {
+              label: 'Reports',
+              data: values
+            }
+
+          ]
+
+        },
+
+        options: {
+
+          responsive: true,
+
+          maintainAspectRatio: false,
+
+          plugins: {
+
+            legend: {
+              display: false
+            }
+
+          },
+
+          scales: {
+
+            y: {
+              beginAtZero: true
+            }
+
+          }
+
+        }
+
+      }
+    );
 }
 
 
-/* =====================================================
-   CASCADING FILTERS
-===================================================== */
+/* ================================
+   TABLE
+================================ */
 
-function populateDashboardFilters(){
+function renderTable(rows) {
 
-fillDash(
-"dashRegion",
-uniqDash(
-"region"
-),
-"All Region"
-);
+  const tbody =
+    document.getElementById('tableBody');
 
-const region =
-document
-.getElementById(
-"dashRegion"
-)
-.value;
+  const tableContainer =
+    document.getElementById('tableContainer');
 
-const regionRows =
-region
-? officeRows.filter(
-x =>
-sameClient(
-x.region,
-region
-)
-)
-: officeRows;
+  const emptyMessage =
+    document.getElementById('emptyMessage');
 
-fillDash(
-"dashState",
-uniqDash(
-"state",
-regionRows
-),
-"All State"
-);
 
-const state =
-document
-.getElementById(
-"dashState"
-)
-.value;
+  tbody.innerHTML = '';
 
-const stateRows =
-state
-? regionRows.filter(
-x =>
-sameClient(
-x.state,
-state
-)
-)
-: regionRows;
 
-fillDash(
-"dashDivision",
-uniqDash(
-"division",
-stateRows
-),
-"All Division"
-);
+  if (!rows || !rows.length) {
 
-const division =
-document
-.getElementById(
-"dashDivision"
-)
-.value;
+    tableContainer
+      .classList
+      .add('hidden');
 
-const divisionRows =
-division
-? stateRows.filter(
-x =>
-sameClient(
-x.division,
-division
-)
-)
-: stateRows;
+    emptyMessage
+      .classList
+      .remove('hidden');
 
-fillDash(
-"dashDistrict",
-uniqDash(
-"district",
-divisionRows
-),
-"All District"
-);
+    emptyMessage.textContent =
+      'Is filter/access ke hisaab se koi report nahi mili.';
 
-fillDash(
-"dashChain",
-uniqDash(
-"chain"
-),
-"All Chain"
-);
+    return;
+  }
 
-fillDash(
-"dashDepartment",
-uniqDash(
-"department"
-),
-"All Department"
-);
 
+  tableContainer
+    .classList
+    .remove('hidden');
+
+  emptyMessage
+    .classList
+    .add('hidden');
+
+
+  /*
+   * Latest first
+   */
+
+  rows.forEach(function(row) {
+
+    const tr =
+      document.createElement('tr');
+
+
+    addCell(tr, row.dateTime);
+
+    addCell(tr, row.name);
+
+    addCell(tr, row.contact);
+
+    addCell(tr, row.chainType);
+
+    addCell(tr, row.nigranLevel);
+
+    addCell(tr, row.zimmedarLevel);
+
+    addCell(tr, row.department);
+
+    addCell(tr, row.report);
+
+    addCell(tr, row.pincode);
+
+    addCell(tr, row.district);
+
+    addCell(tr, row.division);
+
+    addCell(tr, row.state);
+
+    addCell(tr, row.region);
+
+    addCell(tr, row.country);
+
+
+    tbody.appendChild(tr);
+
+  });
 }
 
 
-function onRegionChange(){
+function addCell(tr, value) {
 
-const region =
-document
-.getElementById(
-"dashRegion"
-)
-.value;
+  const td =
+    document.createElement('td');
 
-const rows =
-region
-? officeRows.filter(
-x =>
-sameClient(
-x.region,
-region
-)
-)
-: officeRows;
+  td.textContent =
+    value == null ? '' : value;
 
-fillDash(
-"dashState",
-uniqDash(
-"state",
-rows
-),
-"All State"
-);
-
-fillDash(
-"dashDivision",
-[],
-"All Division"
-);
-
-fillDash(
-"dashDistrict",
-[],
-"All District"
-);
-
-updateDependentFilters();
-
-renderDashboard();
-
+  tr.appendChild(td);
 }
 
 
-function onStateChange(){
+/* ================================
+   EXCEL
+================================ */
 
-updateDependentFilters();
+function downloadExcel() {
 
-renderDashboard();
+  if (!currentUser) {
+    return;
+  }
 
+
+  showLoading(true);
+
+
+  google.script.run
+
+    .withSuccessHandler(function(result) {
+
+      showLoading(false);
+
+
+      if (!result || !result.success) {
+
+        alert(
+          result?.message ||
+          'Excel create nahi hui.'
+        );
+
+        return;
+      }
+
+
+      const binary =
+        atob(result.data);
+
+
+      const bytes =
+        new Uint8Array(
+          binary.length
+        );
+
+
+      for (
+        let i = 0;
+        i < binary.length;
+        i++
+      ) {
+
+        bytes[i] =
+          binary.charCodeAt(i);
+
+      }
+
+
+      const blob =
+        new Blob(
+          [bytes],
+          {
+            type:
+              result.mimeType
+          }
+        );
+
+
+      const url =
+        URL.createObjectURL(blob);
+
+
+      const a =
+        document.createElement('a');
+
+      a.href = url;
+
+      a.download =
+        result.fileName;
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      a.remove();
+
+      URL.revokeObjectURL(url);
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      showLoading(false);
+
+      alert(
+        error.message ||
+        'Excel download error.'
+      );
+
+    })
+
+    .createExcelFile(
+      currentUser,
+      getFilters()
+    );
 }
 
 
-function onDivisionChange(){
+/* ================================
+   LOGOUT
+================================ */
 
-updateDependentFilters();
+function logout() {
 
-renderDashboard();
+  currentUser = null;
 
+  lastResult = null;
+
+
+  document.getElementById('dashboardPage')
+    .classList
+    .add('hidden');
+
+
+  document.getElementById('loginPage')
+    .classList
+    .remove('hidden');
+
+
+  document.getElementById('loginUser')
+    .value = '';
+
+  document.getElementById('loginPassword')
+    .value = '';
+
+  document.getElementById('loginError')
+    .textContent = '';
 }
 
 
-function onDistrictChange(){
+/* ================================
+   LOADING
+================================ */
 
-renderDashboard();
+function showLoading(show) {
 
+  document.getElementById('loading')
+    .style.display =
+    show ? 'flex' : 'none';
 }
 
 
-function updateDependentFilters(){
+/* ================================
+   NUMBER
+================================ */
 
-const region =
-document
-.getElementById(
-"dashRegion"
-)
-.value;
+function formatNumber(value) {
 
-const state =
-document
-.getElementById(
-"dashState"
-)
-.value;
-
-const division =
-document
-.getElementById(
-"dashDivision"
-)
-.value;
-
-let rows =
-officeRows.slice();
-
-if(region){
-
-rows =
-rows.filter(
-x =>
-sameClient(
-x.region,
-region
-)
-);
-
+  return Number(value || 0)
+    .toLocaleString('en-IN');
 }
 
-fillDash(
-"dashState",
-uniqDash(
-"state",
-rows
-),
-"All State",
-state
-);
-
-const selectedState =
-document
-.getElementById(
-"dashState"
-)
-.value;
-
-let divRows =
-rows;
-
-if(selectedState){
-
-divRows =
-divRows.filter(
-x =>
-sameClient(
-x.state,
-selectedState
-)
-);
-
-}
-
-fillDash(
-"dashDivision",
-uniqDash(
-"division",
-divRows
-),
-"All Division",
-division
-);
-
-const selectedDivision =
-document
-.getElementById(
-"dashDivision"
-)
-.value;
-
-let distRows =
-divRows;
-
-if(selectedDivision){
-
-distRows =
-distRows.filter(
-x =>
-sameClient(
-x.division,
-selectedDivision
-)
-);
-
-}
-
-fillDash(
-"dashDistrict",
-uniqDash(
-"district",
-distRows
-),
-"All District"
-);
-
-}
-
-
-/* =====================================================
-   ESCAPE
-===================================================== */
-
-function escapeHtml(x){
-
-return String(
-x == null ? '' : x
-)
-.replace(
-/[&<>"']/g,
-m =>
-({
-'&':'&amp;',
-'<':'&lt;',
-'>':'&gt;',
-'"':'&quot;',
-"'":'&#39;'
-}[m])
-);
-
-}
-
-
-/* =====================================================
-   CHARTS
-===================================================== */
-
-function groupCount(
-rows,
-key
-){
-
-const map = {};
-
-rows.forEach(x=>{
-
-const k =
-String(
-x[key] || ''
-)
-.trim() ||
-"Unknown";
-
-const n =
-Number(
-String(
-x.report || ''
-)
-.replace(/,/g,'')
-);
-
-map[k] =
-(map[k] || 0) +
-(
-isNaN(n)
-? 0
-: n
-);
-
-});
-
-return Object
-.keys(map)
-.sort(
-(a,b)=>
-map[b] -
-map[a]
-)
-.map(
-k => ({
-label:k,
-count:map[k]
-})
-);
-
-}
-
-
-function destroyChart(name){
-
-if(chartRefs[name]){
-
-chartRefs[name].destroy();
-
-chartRefs[name] = null;
-
-}
-
-}
-
-
-function drawBarChart(
-canvasId,
-refName,
-rows,
-key
-){
-
-if(
-typeof Chart ===
-"undefined"
-){
-
-return;
-
-}
-
-destroyChart(refName);
-
-const grouped =
-groupCount(
-rows,
-key
-);
-
-const canvas =
-document.getElementById(
-canvasId
-);
-
-if(!canvas) return;
-
-chartRefs[refName] =
-new Chart(
-canvas.getContext("2d"),
-{
-
-type:"bar",
-
-data:{
-
-labels:
-grouped.map(
-x=>x.label
-),
-
-datasets:[{
-
-label:
-"Report Quantity",
-
-data:
-grouped.map(
-x=>x.count
-),
-
-borderWidth:1
-
-}]
-
-},
-
-options:{
-
-responsive:true,
-
-maintainAspectRatio:false,
-
-plugins:{
-legend:{
-display:false
-}
-},
-
-scales:{
-y:{
-beginAtZero:true,
-ticks:{
-precision:0
-}
-}
-}
-
-}
-
-}
-);
-
-}
-
-
-function renderCharts(rows){
-
-drawBarChart(
-"stateChart",
-"state",
-rows,
-"state"
-);
-
-drawBarChart(
-"regionChart",
-"region",
-rows,
-"region"
-);
-
-drawBarChart(
-"departmentChart",
-"department",
-rows,
-"department"
-);
-
-drawBarChart(
-"districtChart",
-"district",
-rows,
-"district"
-);
-
-}
-
-
-/* =====================================================
-   RENDER DASHBOARD
-===================================================== */
-
-function renderDashboard(){
-
-const q =
-document
-.getElementById("search")
-.value
-.trim()
-.toLowerCase();
-
-const region =
-document
-.getElementById("dashRegion")
-.value;
-
-const state =
-document
-.getElementById("dashState")
-.value;
-
-const division =
-document
-.getElementById("dashDivision")
-.value;
-
-const district =
-document
-.getElementById("dashDistrict")
-.value;
-
-const chain =
-document
-.getElementById("dashChain")
-.value;
-
-const department =
-document
-.getElementById("dashDepartment")
-.value;
-
-
-const rows =
-officeRows.filter(x=>{
-
-if(
-region &&
-!sameClient(
-x.region,
-region
-)
-)
-return false;
-
-if(
-state &&
-!sameClient(
-x.state,
-state
-)
-)
-return false;
-
-if(
-division &&
-!sameClient(
-x.division,
-division
-)
-)
-return false;
-
-if(
-district &&
-!sameClient(
-x.district,
-district
-)
-)
-return false;
-
-if(
-chain &&
-!chainFilterMatch(
-x.chain,
-chain
-)
-)
-return false;
-
-if(
-department &&
-!sameClient(
-x.department,
-department
-)
-)
-return false;
-
-if(
-q &&
-!JSON.stringify(x)
-.toLowerCase()
-.includes(q)
-)
-return false;
-
-return true;
-
-});
-
-
-const reportSum =
-rows.reduce(
-(sum,x)=>{
-
-const n =
-Number(
-String(
-x.report || ''
-)
-.replace(/,/g,'')
-);
-
-return sum +
-(
-isNaN(n)
-? 0
-: n
-);
-
-},
-0
-);
-
-
-/* CARDS */
-
-const cards = [
-
-[
-"Total Entries",
-rows.length
-],
-
-[
-"Report Quantity",
-reportSum
-],
-
-[
-"Districts",
-new Set(
-rows
-.map(
-x=>x.district
-)
-.filter(Boolean)
-).size
-],
-
-[
-"Departments",
-new Set(
-rows
-.map(
-x=>x.department
-)
-.filter(Boolean)
-).size
-]
-
-];
-
-
-document
-.getElementById("stats")
-.innerHTML =
-cards.map(
-x =>
-'<div class="stat">' +
-'<div>' +
-x[0] +
-'</div>' +
-'<div class="n">' +
-x[1] +
-'</div>' +
-'</div>'
-).join('');
-
-
-/* TABLE */
-
-document
-.getElementById("dashBody")
-.innerHTML =
-rows.map(
-x =>
-'<tr>' +
-
-'<td>' +
-escapeHtml(x.date) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.name) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.contact) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.chain) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.level) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.department) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.report) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.pincode) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.district) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.division) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.state) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.region) +
-'</td>' +
-
-'<td>' +
-escapeHtml(x.country) +
-'</td>' +
-
-'</tr>'
-).join('');
-
-
-document
-.getElementById("dashTable")
-.style
-.display =
-rows.length
-? "table"
-: "none";
-
-
-document
-.getElementById("dashMessage")
-.style
-.display =
-rows.length
-? "none"
-: "block";
-
-
-if(!rows.length){
-
-document
-.getElementById("dashMessage")
-.textContent =
-officeRows.length
-?
-"Reports available hain, lekin current filter/search se koi match nahi mila."
-:
-"Responses sheet se koi report read nahi hui.";
-
-}
-
-
-document
-.getElementById("dashInfo")
-.textContent =
-"Responses rows: " +
-(
-window.dashboardSourceRows ||
-0
-) +
-" • Visible rows: " +
-rows.length +
-" • Report quantity: " +
-reportSum;
-
-
-renderCharts(rows);
-
-}
-
-
-/* =====================================================
-   CHAIN FILTER
-===================================================== */
-
-function chainFilterMatch(
-rowChain,
-selected
-){
-
-const row =
-String(
-rowChain || ''
-)
-.trim()
-.toLowerCase();
-
-const sel =
-String(
-selected || ''
-)
-.trim()
-.toLowerCase();
-
-if(!sel)
-return true;
-
-if(
-sel === "all" ||
-sel === "all chain"
-)
-return true;
-
-return row === sel;
-
-}
-
-
-/* =====================================================
-   EXCEL DOWNLOAD
-===================================================== */
-
-function downloadExcel(){
-
-const token =
-sessionStorage.getItem(
-"risalaToken"
-);
-
-if(!token){
-
-alert(
-"Pehle login karein."
-);
-
-return;
-
-}
-
-
-const filters = {
-
-search:
-document
-.getElementById("search")
-.value || '',
-
-region:
-document
-.getElementById("dashRegion")
-.value || '',
-
-state:
-document
-.getElementById("dashState")
-.value || '',
-
-division:
-document
-.getElementById("dashDivision")
-.value || '',
-
-district:
-document
-.getElementById("dashDistrict")
-.value || '',
-
-chain:
-document
-.getElementById("dashChain")
-.value || '',
-
-department:
-document
-.getElementById("dashDepartment")
-.value || ''
-
-};
-
-
-fetch(
-scriptURL +
-"?action=downloadExcel" +
-"&token=" +
-encodeURIComponent(token) +
-"&filters=" +
-encodeURIComponent(
-JSON.stringify(filters)
-) +
-"&_=" +
-Date.now(),
-{
-cache:"no-store"
-}
-)
-
-.then(r=>r.json())
-
-.then(d=>{
-
-if(
-d.status !==
-"Success"
-){
-
-throw new Error(
-d.message ||
-"Excel create nahi ho saka."
-);
-
-}
-
-
-const binary =
-atob(d.data);
-
-const bytes =
-new Uint8Array(
-binary.length
-);
-
-for(
-let i=0;
-i<binary.length;
-i++
-){
-
-bytes[i] =
-binary.charCodeAt(i);
-
-}
-
-
-const blob =
-new Blob(
-[bytes],
-{
-type:
-d.mimeType ||
-"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-}
-);
-
-
-const url =
-URL.createObjectURL(
-blob
-);
-
-const a =
-document.createElement(
-"a"
-);
-
-a.href = url;
-
-a.download =
-d.fileName ||
-"Weekly_Risala_Report.xlsx";
-
-document
-.body
-.appendChild(a);
-
-a.click();
-
-a.remove();
-
-URL.revokeObjectURL(url);
-
-})
-
-.catch(err=>{
-
-alert(
-err.message ||
-"Excel download mein error aayi."
-);
-
-});
-
-}
-
-
-/* =====================================================
-   OLD SESSION OPEN
-===================================================== */
-
-document.addEventListener(
-"DOMContentLoaded",
-function(){
-
-const token =
-sessionStorage.getItem(
-"risalaToken"
-);
-
-if(token){
-
-try{
-
-officeUser =
-JSON.parse(
-sessionStorage.getItem(
-"risalaUser"
-) || "{}"
-);
-
-}catch(e){
-
-officeUser = {};
-
-}
-
-showEmployeeDashboard();
-
-}
-
-});
 
 </script>
 
+
 </body>
+
 </html>
