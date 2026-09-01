@@ -58,7 +58,7 @@
         .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
         .stat { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); }
         .stat .n { font-size:30px; font-weight:bold; color:var(--primary); margin-top:6px; }
-        .filters { background:#fff; border-radius:12px; padding:18px; margin:18px 0; box-shadow:0 4px 16px rgba(0,0,0,.07); display:grid; grid-template-columns:1.55fr 1fr 1fr 1fr 1fr; gap:12px; }
+        .filters { background:#fff; border-radius:12px; padding:18px; margin:18px 0; box-shadow:0 4px 16px rgba(0,0,0,.07); display:grid; grid-template-columns:1.25fr repeat(5,1fr); gap:12px; }
         .filters input,.filters select { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; margin:0; }
         .tablebox { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); overflow:auto; }
         .employee-table { width:100%; border-collapse:collapse; min-width:950px; }
@@ -151,6 +151,7 @@
       <select id="dashState" onchange="onStateChange()"><option value="">All State</option></select>
       <select id="dashDivision" onchange="onDivisionChange()"><option value="">All Division</option></select>
       <select id="dashDistrict" onchange="onDistrictChange()"><option value="">All District</option></select>
+      <select id="dashChain" onchange="onChainChange()"><option value="">All Chain</option></select>
     </div>
     <div id="chartGrid" class="chart-grid">
       <div class="chart-card"><div class="chart-title">Reports by State</div><div class="chart-wrap"><canvas id="stateChart"></canvas></div></div>
@@ -391,7 +392,7 @@
         document.querySelector('.topbar').style.display = 'none';
         document.getElementById('employeeView').style.display = 'block';
         document.getElementById('who').textContent = (officeUser.name || officeUser.userId || 'Employee') + ' • ' + (officeUser.role || 'Viewer');
-        document.getElementById('scope').textContent = 'Access: ' + [officeUser.state, officeUser.region, officeUser.district, officeUser.department].filter(Boolean).join(' / ');
+        document.getElementById('scope').textContent = 'Access: ' + [officeUser.country, officeUser.region, officeUser.state, officeUser.division, officeUser.district, officeUser.chain, officeUser.department].filter(Boolean).join(' / ');
         loadDashboard(token);
     }
     function officeLogout() {
@@ -464,6 +465,8 @@
         const region = resetAll ? '' : (document.getElementById('dashRegion').value || '');
         const state = resetAll ? '' : (document.getElementById('dashState').value || '');
         const division = resetAll ? '' : (document.getElementById('dashDivision').value || '');
+        const district = resetAll ? '' : (document.getElementById('dashDistrict').value || '');
+        const chain = resetAll ? '' : (document.getElementById('dashChain').value || '');
 
         fillDash('dashRegion', uniqValues(officeRows,'region'), 'All Region', region);
 
@@ -474,7 +477,10 @@
         fillDash('dashDivision', uniqValues(stateRows,'division'), 'All Division', division);
 
         const divisionRows = rowsForHierarchy(region, state, division);
-        fillDash('dashDistrict', uniqValues(divisionRows,'district'), 'All District', '');
+        fillDash('dashDistrict', uniqValues(divisionRows,'district'), 'All District', district);
+
+        // Chain is an independent filter and is also pre-limited by the logged-in user's Chain Type.
+        fillDash('dashChain', uniqValues(officeRows,'chain'), 'All Chain', chain);
     }
     function onRegionChange() {
         const region = document.getElementById('dashRegion').value;
@@ -498,6 +504,9 @@
         renderDashboard();
     }
     function onDistrictChange() {
+        renderDashboard();
+    }
+    function onChainChange() {
         renderDashboard();
     }
     function escapeHtml(x) { return String(x == null ? '' : x).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -535,11 +544,13 @@
         const st=document.getElementById('dashState').value;
         const dv=document.getElementById('dashDivision').value;
         const di=document.getElementById('dashDistrict').value;
+        const ch=document.getElementById('dashChain').value;
         const a=officeRows.filter(x =>
             (!rg||sameClient(x.region,rg)) &&
             (!st||sameClient(x.state,st)) &&
             (!dv||sameClient(x.division,dv)) &&
             (!di||sameClient(x.district,di)) &&
+            (!ch||sameClient(x.chain,ch)) &&
             (!q||JSON.stringify(x).toLowerCase().includes(q))
         );
         const reportSum=a.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0);
@@ -557,11 +568,13 @@
         const st=document.getElementById('dashState').value;
         const dv=document.getElementById('dashDivision').value;
         const di=document.getElementById('dashDistrict').value;
+        const ch=document.getElementById('dashChain').value;
         return officeRows.filter(x =>
             (!rg||sameClient(x.region,rg)) &&
             (!st||sameClient(x.state,st)) &&
             (!dv||sameClient(x.division,dv)) &&
             (!di||sameClient(x.district,di)) &&
+            (!ch||sameClient(x.chain,ch)) &&
             (!q||JSON.stringify(x).toLowerCase().includes(q))
         );
     }
@@ -611,6 +624,7 @@
             ['State Filter', document.getElementById('dashState').value || 'All State'],
             ['Division Filter', document.getElementById('dashDivision').value || 'All Division'],
             ['District Filter', document.getElementById('dashDistrict').value || 'All District'],
+            ['Chain Filter', document.getElementById('dashChain').value || 'All Chain'],
             ['Search', document.getElementById('search').value || '']
         ];
         const sws = XLSX.utils.aoa_to_sheet(summary);
