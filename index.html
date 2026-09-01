@@ -58,7 +58,7 @@
         .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
         .stat { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); }
         .stat .n { font-size:30px; font-weight:bold; color:var(--primary); margin-top:6px; }
-        .filters { background:#fff; border-radius:12px; padding:18px; margin:18px 0; box-shadow:0 4px 16px rgba(0,0,0,.07); display:grid; grid-template-columns:1.55fr 1fr 1fr 1fr 1fr; gap:12px; }
+        .filters { background:#fff; border-radius:12px; padding:18px; margin:18px 0; box-shadow:0 4px 16px rgba(0,0,0,.07); display:grid; grid-template-columns:1.35fr 1fr 1fr 1fr 1fr 1fr 1fr; gap:10px; }
         .filters input,.filters select { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; margin:0; }
         .tablebox { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); overflow:auto; }
         .employee-table { width:100%; border-collapse:collapse; min-width:950px; }
@@ -72,10 +72,19 @@
         .chart-wrap { position:relative; height:260px; }
         .refresh-btn { border:0; background:var(--primary); color:#fff; padding:9px 13px; border-radius:6px; cursor:pointer; font-weight:700; }
         .dash-info { margin:10px 0; font-size:12px; color:#666; text-align:right; }
+        .dashboard-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+        .download-btn { border:0; background:#198754; color:#fff; padding:9px 13px; border-radius:6px; cursor:pointer; font-weight:700; }
+        .download-btn:hover { background:#146c43; }
+        .download-btn:disabled { opacity:.65; cursor:not-allowed; }
+        .pagination { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 0 0; flex-wrap:wrap; }
+        .pagination button { border:1px solid #ccc; background:#fff; padding:7px 11px; border-radius:6px; cursor:pointer; }
+        .pagination button:disabled { opacity:.45; cursor:not-allowed; }
+        .page-size { padding:7px 10px !important; margin:0 !important; width:auto !important; }
+        .export-status { font-size:12px; color:#666; margin-top:8px; }
+        @media(max-width:1000px){ .filters{grid-template-columns:1.5fr 1fr 1fr 1fr} }
         @media(max-width:800px){ .cards{grid-template-columns:repeat(2,1fr)} .filters{grid-template-columns:1fr 1fr} .employee-top{align-items:flex-start;gap:10px;flex-wrap:wrap} .chart-grid{grid-template-columns:1fr} }
         @media(max-width:500px){ .cards,.filters{grid-template-columns:1fr} .employee-title{font-size:18px} .login-actions{flex-direction:column} }
 </style>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="site-shell">
@@ -143,14 +152,16 @@
     <div><button class="logout-btn" type="button" onclick="officeLogout()">Logout</button></div>
   </div>
   <div class="employee-wrap">
-    <div class="welcome"><b>Employee Dashboard</b><div id="scope" style="margin-top:7px;color:#666"></div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh Reports</button><button class="refresh-btn" type="button" onclick="downloadExcel()" style="background:#198754">Download Excel</button></div></div>
+    <div class="welcome"><b>Employee Dashboard</b><div id="scope" style="margin-top:7px;color:#666"></div><div class="dashboard-actions"><button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh Reports</button><button id="downloadExcelBtn" class="download-btn" type="button" onclick="downloadExcel()">Download Excel</button></div><div id="exportStatus" class="export-status"></div></div>
     <div id="stats" class="cards"></div>
     <div class="filters">
-      <input id="search" placeholder="Search..." oninput="renderDashboard()">
+      <input id="search" placeholder="Search..." oninput="renderDashboard(true)">
       <select id="dashRegion" onchange="onRegionChange()"><option value="">All Region</option></select>
       <select id="dashState" onchange="onStateChange()"><option value="">All State</option></select>
       <select id="dashDivision" onchange="onDivisionChange()"><option value="">All Division</option></select>
       <select id="dashDistrict" onchange="onDistrictChange()"><option value="">All District</option></select>
+      <select id="dashChain" onchange="renderDashboard(true)"><option value="">All Chain</option></select>
+      <select id="dashDepartment" onchange="renderDashboard(true)"><option value="">All Department</option></select>
     </div>
     <div id="chartGrid" class="chart-grid">
       <div class="chart-card"><div class="chart-title">Reports by State</div><div class="chart-wrap"><canvas id="stateChart"></canvas></div></div>
@@ -159,7 +170,7 @@
       <div class="chart-card"><div class="chart-title">Reports by District</div><div class="chart-wrap"><canvas id="districtChart"></canvas></div></div>
     </div>
     <div id="dashInfo" class="dash-info"></div>
-    <div class="tablebox"><div id="dashMessage" class="dash-msg">Loading reports...</div><table id="dashTable" class="employee-table" style="display:none"><thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Chain</th><th>Level</th><th>Department</th><th>Report</th><th>District</th><th>Division</th><th>State</th><th>Region</th></tr></thead><tbody id="dashBody"></tbody></table></div>
+    <div class="tablebox"><div id="dashMessage" class="dash-msg">Loading reports...</div><table id="dashTable" class="employee-table" style="display:none"><thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Chain</th><th>Level</th><th>Department</th><th>Report</th><th>District</th><th>Division</th><th>State</th><th>Region</th></tr></thead><tbody id="dashBody"></tbody></table><div id="pagination" class="pagination" style="display:none"><div><button id="prevPage" type="button" onclick="changePage(-1)">Previous</button> <button id="nextPage" type="button" onclick="changePage(1)">Next</button></div><div id="pageInfo"></div><div><select id="pageSize" class="page-size" onchange="changePageSize()"><option value="25">25 rows</option><option value="50">50 rows</option><option value="100">100 rows</option></select></div></div></div>
   </div>
 </div>
 
@@ -404,10 +415,15 @@
         window.scrollTo(0,0);
     }
     let chartRefs = {};
+    let currentFilteredRows = [];
+    let currentPage = 1;
+    let pageSize = 25;
+
     function loadDashboard(token) {
         document.getElementById('dashMessage').style.display='block';
         document.getElementById('dashMessage').textContent='Loading reports...';
         document.getElementById('dashTable').style.display='none';
+        document.getElementById('pagination').style.display='none';
         fetch(scriptURL + '?action=dashboard&token=' + encodeURIComponent(token) + '&_=' + Date.now(), {cache:'no-store'})
           .then(r => r.json())
           .then(d => {
@@ -432,6 +448,7 @@
               window.dashboardSourceRows = Number(d.totalRows || 0);
               window.dashboardDebug = d.debug || {};
               populateDashboardFilters(true);
+              currentPage = 1;
               renderDashboard();
           })
           .catch(err => {
@@ -450,8 +467,7 @@
         const s=document.getElementById(id);
         const current = keepValue !== undefined ? keepValue : s.value;
         s.innerHTML='<option value="">'+firstText+'</option>'+arr.map(x=>'<option value="'+escapeHtml(x)+'">'+escapeHtml(x)+'</option>').join('');
-        if(arr.some(x => sameClient(x,current))) s.value=current;
-        else s.value='';
+        if(arr.some(x => sameClient(x,current))) s.value=current; else s.value='';
     }
     function rowsForHierarchy(region, state, division) {
         return officeRows.filter(x =>
@@ -461,45 +477,41 @@
         );
     }
     function populateDashboardFilters(resetAll) {
-        const region = resetAll ? '' : (document.getElementById('dashRegion').value || '');
-        const state = resetAll ? '' : (document.getElementById('dashState').value || '');
-        const division = resetAll ? '' : (document.getElementById('dashDivision').value || '');
-
+        const region = resetAll ? '' : document.getElementById('dashRegion').value;
+        const state = resetAll ? '' : document.getElementById('dashState').value;
+        const division = resetAll ? '' : document.getElementById('dashDivision').value;
         fillDash('dashRegion', uniqValues(officeRows,'region'), 'All Region', region);
-
         const regionRows = rowsForHierarchy(region, '', '');
         fillDash('dashState', uniqValues(regionRows,'state'), 'All State', state);
-
         const stateRows = rowsForHierarchy(region, state, '');
         fillDash('dashDivision', uniqValues(stateRows,'division'), 'All Division', division);
-
         const divisionRows = rowsForHierarchy(region, state, division);
         fillDash('dashDistrict', uniqValues(divisionRows,'district'), 'All District', '');
+        fillDash('dashChain', uniqValues(officeRows,'chain'), 'All Chain', '');
+        fillDash('dashDepartment', uniqValues(officeRows,'department'), 'All Department', '');
     }
     function onRegionChange() {
         const region = document.getElementById('dashRegion').value;
         fillDash('dashState', uniqValues(rowsForHierarchy(region,'',''),'state'), 'All State', '');
         fillDash('dashDivision', uniqValues(rowsForHierarchy(region,'',''),'division'), 'All Division', '');
         fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,'',''),'district'), 'All District', '');
-        renderDashboard();
+        currentPage=1; renderDashboard();
     }
     function onStateChange() {
         const region = document.getElementById('dashRegion').value;
         const state = document.getElementById('dashState').value;
         fillDash('dashDivision', uniqValues(rowsForHierarchy(region,state,''),'division'), 'All Division', '');
         fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,state,''),'district'), 'All District', '');
-        renderDashboard();
+        currentPage=1; renderDashboard();
     }
     function onDivisionChange() {
         const region = document.getElementById('dashRegion').value;
         const state = document.getElementById('dashState').value;
         const division = document.getElementById('dashDivision').value;
         fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,state,division),'district'), 'All District', '');
-        renderDashboard();
+        currentPage=1; renderDashboard();
     }
-    function onDistrictChange() {
-        renderDashboard();
-    }
+    function onDistrictChange() { currentPage=1; renderDashboard(); }
     function escapeHtml(x) { return String(x == null ? '' : x).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
     function groupCount(rows,key) {
         const map={};
@@ -529,99 +541,82 @@
         drawBarChart('departmentChart','department','Reports by Department',rows,'department');
         drawBarChart('districtChart','district','Reports by District',rows,'district');
     }
-    function renderDashboard() {
+    function getFilteredRows() {
         const q=document.getElementById('search').value.toLowerCase().trim();
         const rg=document.getElementById('dashRegion').value;
         const st=document.getElementById('dashState').value;
         const dv=document.getElementById('dashDivision').value;
         const di=document.getElementById('dashDistrict').value;
-        const a=officeRows.filter(x =>
-            (!rg||sameClient(x.region,rg)) &&
-            (!st||sameClient(x.state,st)) &&
-            (!dv||sameClient(x.division,dv)) &&
-            (!di||sameClient(x.district,di)) &&
-            (!q||JSON.stringify(x).toLowerCase().includes(q))
-        );
-        const reportSum=a.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0);
-        document.getElementById('stats').innerHTML=[['Total Entries',a.length],['Report Quantity',reportSum],['Districts',new Set(a.map(x=>x.district).filter(Boolean)).size],['Departments',new Set(a.map(x=>x.department).filter(Boolean)).size]].map(x=>'<div class="stat"><div>'+x[0]+'</div><div class="n">'+x[1]+'</div></div>').join('');
-        document.getElementById('dashBody').innerHTML=a.map(x=>'<tr><td>'+escapeHtml(x.date)+'</td><td>'+escapeHtml(x.name)+'</td><td>'+escapeHtml(x.contact)+'</td><td>'+escapeHtml(x.chain)+'</td><td>'+escapeHtml(x.level)+'</td><td>'+escapeHtml(x.department)+'</td><td>'+escapeHtml(x.report)+'</td><td>'+escapeHtml(x.district)+'</td><td>'+escapeHtml(x.division)+'</td><td>'+escapeHtml(x.state)+'</td><td>'+escapeHtml(x.region)+'</td></tr>').join('');
-        document.getElementById('dashTable').style.display=a.length?'table':'none';
-        document.getElementById('dashMessage').style.display=a.length?'none':'block';
-        if(!a.length) document.getElementById('dashMessage').textContent=officeRows.length ? 'Reports available hain, lekin current filter/search se koi match nahi mila.' : 'Responses sheet se koi report read nahi hui.';
-        document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+a.length+' • Report quantity: '+reportSum;
-        renderCharts(a);
-    }
-    function getFilteredDashboardRows() {
-        const q=document.getElementById('search').value.toLowerCase().trim();
-        const rg=document.getElementById('dashRegion').value;
-        const st=document.getElementById('dashState').value;
-        const dv=document.getElementById('dashDivision').value;
-        const di=document.getElementById('dashDistrict').value;
+        const ch=document.getElementById('dashChain').value;
+        const dp=document.getElementById('dashDepartment').value;
         return officeRows.filter(x =>
             (!rg||sameClient(x.region,rg)) &&
             (!st||sameClient(x.state,st)) &&
             (!dv||sameClient(x.division,dv)) &&
             (!di||sameClient(x.district,di)) &&
+            (!ch||sameClient(x.chain,ch)) &&
+            (!dp||sameClient(x.department,dp)) &&
             (!q||JSON.stringify(x).toLowerCase().includes(q))
         );
     }
+    function renderDashboard(resetPage) {
+        if (resetPage) currentPage=1;
+        currentFilteredRows = getFilteredRows();
+        const a=currentFilteredRows;
+        const reportSum=a.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0);
+        document.getElementById('stats').innerHTML=[['Total Entries',a.length],['Report Quantity',reportSum],['Districts',new Set(a.map(x=>x.district).filter(Boolean)).size],['Departments',new Set(a.map(x=>x.department).filter(Boolean)).size]].map(x=>'<div class="stat"><div>'+x[0]+'</div><div class="n">'+x[1]+'</div></div>').join('');
+        renderCharts(a);
+        renderTablePage();
+        document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+a.length+' • Report quantity: '+reportSum;
+    }
+    function renderTablePage() {
+        const total=currentFilteredRows.length;
+        const totalPages=Math.max(1,Math.ceil(total/pageSize));
+        if(currentPage>totalPages) currentPage=totalPages;
+        const start=(currentPage-1)*pageSize;
+        const pageRows=currentFilteredRows.slice(start,start+pageSize);
+        document.getElementById('dashBody').innerHTML=pageRows.map(x=>'<tr><td>'+escapeHtml(x.date)+'</td><td>'+escapeHtml(x.name)+'</td><td>'+escapeHtml(x.contact)+'</td><td>'+escapeHtml(x.chain)+'</td><td>'+escapeHtml(x.level)+'</td><td>'+escapeHtml(x.department)+'</td><td>'+escapeHtml(x.report)+'</td><td>'+escapeHtml(x.district)+'</td><td>'+escapeHtml(x.division)+'</td><td>'+escapeHtml(x.state)+'</td><td>'+escapeHtml(x.region)+'</td></tr>').join('');
+        const has=total>0;
+        document.getElementById('dashTable').style.display=has?'table':'none';
+        document.getElementById('dashMessage').style.display=has?'none':'block';
+        if(!has) document.getElementById('dashMessage').textContent=officeRows.length ? 'Reports available hain, lekin current filter/search se koi match nahi mila.' : 'Responses sheet se koi report read nahi hui.';
+        document.getElementById('pagination').style.display=has?'flex':'none';
+        document.getElementById('prevPage').disabled=currentPage<=1;
+        document.getElementById('nextPage').disabled=currentPage>=totalPages;
+        const from=has?start+1:0, to=Math.min(start+pageSize,total);
+        document.getElementById('pageInfo').textContent='Showing '+from+'–'+to+' of '+total+' rows • Page '+currentPage+'/'+totalPages;
+        document.getElementById('pageSize').value=String(pageSize);
+    }
+    function changePage(delta){ currentPage += delta; renderTablePage(); window.scrollTo({top:document.getElementById('dashTable').offsetTop-100,behavior:'smooth'}); }
+    function changePageSize(){ pageSize=Number(document.getElementById('pageSize').value)||25; currentPage=1; renderTablePage(); }
 
     function downloadExcel() {
-        const rows = getFilteredDashboardRows();
-        if (!rows.length) {
-            alert('Download karne ke liye koi report available nahi hai. Pehle filter/search check karein.');
-            return;
-        }
-        if (typeof XLSX === 'undefined') {
-            alert('Excel download library load nahi hui. Internet connection check karke page refresh karein.');
-            return;
-        }
-
-        const exportRows = rows.map(x => ({
-            'Date/Time': x.date || '',
-            'Name': x.name || '',
-            'Contact Number': x.contact || '',
-            'Chain Type': x.chain || '',
-            'Nigran Level': x.nigran || '',
-            'Zimmedar Level': x.zimmedar || '',
-            'Department': x.department || '',
-            'Risala Report': x.report || '',
-            'Pincode': x.pincode || '',
-            'District Name': x.district || '',
-            'Division Name': x.division || '',
-            'State Name': x.state || '',
-            'Region Name': x.region || '',
-            'Country': x.country || ''
-        }));
-
-        const ws = XLSX.utils.json_to_sheet(exportRows);
-        ws['!cols'] = [
-            {wch:20},{wch:24},{wch:16},{wch:14},{wch:22},{wch:22},{wch:34},
-            {wch:14},{wch:12},{wch:24},{wch:24},{wch:24},{wch:24},{wch:14}
-        ];
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Reports');
-
-        // Add a small summary sheet so the downloaded Excel also records the active filters.
-        const summary = [
-            ['Weekly Risala Report - Dashboard Export'],
-            ['Downloaded Rows', rows.length],
-            ['Report Quantity', rows.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0)],
-            ['Region Filter', document.getElementById('dashRegion').value || 'All Region'],
-            ['State Filter', document.getElementById('dashState').value || 'All State'],
-            ['Division Filter', document.getElementById('dashDivision').value || 'All Division'],
-            ['District Filter', document.getElementById('dashDistrict').value || 'All District'],
-            ['Search', document.getElementById('search').value || '']
-        ];
-        const sws = XLSX.utils.aoa_to_sheet(summary);
-        sws['!cols'] = [{wch:24},{wch:40}];
-        XLSX.utils.book_append_sheet(wb, sws, 'Summary');
-
-        const stamp = new Date().toISOString().slice(0,19).replace(/[T:]/g,'-');
-        XLSX.writeFile(wb, 'Weekly_Risala_Report_' + stamp + '.xlsx');
+        const btn=document.getElementById('downloadExcelBtn');
+        const status=document.getElementById('exportStatus');
+        const token=sessionStorage.getItem('risalaToken');
+        if(!token){ alert('Pehle login karein.'); return; }
+        const filters={
+            search:document.getElementById('search').value||'',
+            region:document.getElementById('dashRegion').value||'',
+            state:document.getElementById('dashState').value||'',
+            division:document.getElementById('dashDivision').value||'',
+            district:document.getElementById('dashDistrict').value||'',
+            chain:document.getElementById('dashChain').value||'',
+            department:document.getElementById('dashDepartment').value||''
+        };
+        btn.disabled=true; btn.textContent='Creating Excel...'; status.textContent='Excel file ban rahi hai, please wait...';
+        fetch(scriptURL+'?action=downloadExcel&token='+encodeURIComponent(token)+'&filters='+encodeURIComponent(JSON.stringify(filters))+'&_='+Date.now(),{cache:'no-store'})
+          .then(r=>r.json())
+          .then(d=>{
+             if(d.status!=='Success') throw new Error(d.message||'Excel create nahi ho saka.');
+             const bin=atob(d.data); const bytes=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+             const blob=new Blob([bytes],{type:d.mimeType||'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+             const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=d.fileName||'Weekly_Risala_Report.xlsx'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+             status.textContent='Excel download ready: '+(d.rows||0)+' rows.';
+          })
+          .catch(err=>{ console.error(err); status.textContent='Excel download error: '+err.message; alert(err.message); })
+          .finally(()=>{btn.disabled=false; btn.textContent='Download Excel';});
     }
-
-    function sameClient(a,b){return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();}
 
     // If an employee already has a valid browser session, reopen dashboard on same link.
     document.addEventListener('DOMContentLoaded', function(){
