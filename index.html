@@ -449,7 +449,12 @@
         document.getElementById('dashTable').style.display='none';
         document.getElementById('pagination').style.display='none';
         fetch(scriptURL + '?action=dashboard&token=' + encodeURIComponent(token) + '&_=' + Date.now(), {cache:'no-store'})
-          .then(r => r.json())
+          .then(async r => {
+              const text = await r.text();
+              if (!r.ok) throw new Error('HTTP ' + r.status + ': ' + text.slice(0,500));
+              try { return JSON.parse(text); }
+              catch(e) { throw new Error('Google Apps Script ne JSON ke bajaye yeh response diya: ' + text.slice(0,500)); }
+          })
           .then(d => {
               if (d.status !== 'Success') {
                   const msg = d.message || 'Dashboard load nahi ho saka.';
@@ -488,8 +493,10 @@
               renderDashboard();
           })
           .catch(err => {
-              console.error(err);
-              document.getElementById('dashMessage').textContent='Dashboard data load nahi ho saka. Google Apps Script deployment check karein.';
+              console.error('Dashboard load error:', err);
+              document.getElementById('dashMessage').style.display='block';
+              document.getElementById('dashMessage').style.whiteSpace='pre-line';
+              document.getElementById('dashMessage').textContent='Dashboard data load nahi ho saka.\n\n' + (err.message || err);
           });
     }
     function refreshDashboard() {
