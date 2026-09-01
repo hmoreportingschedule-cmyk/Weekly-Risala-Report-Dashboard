@@ -75,6 +75,7 @@
         @media(max-width:800px){ .cards{grid-template-columns:repeat(2,1fr)} .filters{grid-template-columns:1fr 1fr} .employee-top{align-items:flex-start;gap:10px;flex-wrap:wrap} .chart-grid{grid-template-columns:1fr} }
         @media(max-width:500px){ .cards,.filters{grid-template-columns:1fr} .employee-title{font-size:18px} .login-actions{flex-direction:column} }
 </style>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="site-shell">
@@ -142,7 +143,7 @@
     <div><button class="logout-btn" type="button" onclick="officeLogout()">Logout</button></div>
   </div>
   <div class="employee-wrap">
-    <div class="welcome"><b>Employee Dashboard</b><div id="scope" style="margin-top:7px;color:#666"></div><div style="margin-top:12px"><button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh Reports</button></div></div>
+    <div class="welcome"><b>Employee Dashboard</b><div id="scope" style="margin-top:7px;color:#666"></div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh Reports</button><button class="refresh-btn" type="button" onclick="downloadExcel()" style="background:#198754">Download Excel</button></div></div>
     <div id="stats" class="cards"></div>
     <div class="filters">
       <input id="search" placeholder="Search..." oninput="renderDashboard()">
@@ -550,6 +551,76 @@
         document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+a.length+' • Report quantity: '+reportSum;
         renderCharts(a);
     }
+    function getFilteredDashboardRows() {
+        const q=document.getElementById('search').value.toLowerCase().trim();
+        const rg=document.getElementById('dashRegion').value;
+        const st=document.getElementById('dashState').value;
+        const dv=document.getElementById('dashDivision').value;
+        const di=document.getElementById('dashDistrict').value;
+        return officeRows.filter(x =>
+            (!rg||sameClient(x.region,rg)) &&
+            (!st||sameClient(x.state,st)) &&
+            (!dv||sameClient(x.division,dv)) &&
+            (!di||sameClient(x.district,di)) &&
+            (!q||JSON.stringify(x).toLowerCase().includes(q))
+        );
+    }
+
+    function downloadExcel() {
+        const rows = getFilteredDashboardRows();
+        if (!rows.length) {
+            alert('Download karne ke liye koi report available nahi hai. Pehle filter/search check karein.');
+            return;
+        }
+        if (typeof XLSX === 'undefined') {
+            alert('Excel download library load nahi hui. Internet connection check karke page refresh karein.');
+            return;
+        }
+
+        const exportRows = rows.map(x => ({
+            'Date/Time': x.date || '',
+            'Name': x.name || '',
+            'Contact Number': x.contact || '',
+            'Chain Type': x.chain || '',
+            'Nigran Level': x.nigran || '',
+            'Zimmedar Level': x.zimmedar || '',
+            'Department': x.department || '',
+            'Risala Report': x.report || '',
+            'Pincode': x.pincode || '',
+            'District Name': x.district || '',
+            'Division Name': x.division || '',
+            'State Name': x.state || '',
+            'Region Name': x.region || '',
+            'Country': x.country || ''
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(exportRows);
+        ws['!cols'] = [
+            {wch:20},{wch:24},{wch:16},{wch:14},{wch:22},{wch:22},{wch:34},
+            {wch:14},{wch:12},{wch:24},{wch:24},{wch:24},{wch:24},{wch:14}
+        ];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Reports');
+
+        // Add a small summary sheet so the downloaded Excel also records the active filters.
+        const summary = [
+            ['Weekly Risala Report - Dashboard Export'],
+            ['Downloaded Rows', rows.length],
+            ['Report Quantity', rows.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0)],
+            ['Region Filter', document.getElementById('dashRegion').value || 'All Region'],
+            ['State Filter', document.getElementById('dashState').value || 'All State'],
+            ['Division Filter', document.getElementById('dashDivision').value || 'All Division'],
+            ['District Filter', document.getElementById('dashDistrict').value || 'All District'],
+            ['Search', document.getElementById('search').value || '']
+        ];
+        const sws = XLSX.utils.aoa_to_sheet(summary);
+        sws['!cols'] = [{wch:24},{wch:40}];
+        XLSX.utils.book_append_sheet(wb, sws, 'Summary');
+
+        const stamp = new Date().toISOString().slice(0,19).replace(/[T:]/g,'-');
+        XLSX.writeFile(wb, 'Weekly_Risala_Report_' + stamp + '.xlsx');
+    }
+
     function sameClient(a,b){return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();}
 
     // If an employee already has a valid browser session, reopen dashboard on same link.
