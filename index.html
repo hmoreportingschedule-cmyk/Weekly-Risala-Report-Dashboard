@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Risala Report</title>
     
-    <!-- WhatsApp & Social Media Link Preview Tags (Permanent Setup) -->
+    <!-- WhatsApp & Social Media Link Preview Tags -->
     <meta property="og:title" content="Weekly Risala Report">
     <meta property="og:description" content="Har Hafte Risala Parh Ya Sunkar Murshid Ki Duaon Me Hissa Paane Ke Liye Report Submit Kijiye.">
     <meta property="og:image" content="https://weekly-risala-report-dashboard-izvja41bq-risala-report.vercel.app/banner.jpg">
@@ -28,9 +28,7 @@
         .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; font-size: 16px; border-radius: 5px; margin-top: 25px; cursor: pointer; font-weight: bold; }
         
         .btn-submit:disabled { background-color: #7fbfbf; cursor: not-allowed; }
-        
         .hidden { display: none !important; }
-        
         .message-box { text-align: center; padding: 20px; font-size: 18px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; }
     
         .site-shell { width:100%; max-width:1200px; }
@@ -92,7 +90,6 @@
     <div id="dynamicSubheading" class="dynamic-subheading"></div>
     <div id="loadingOverlay" style="padding: 20px 0; font-size: 16px; color: var(--primary); font-weight: bold; text-align: center;">Checking Form Status... Please Wait.</div>
     
-    <!-- Link Off Message -->
     <div id="linkOffMessage" class="hidden message-box"></div>
     <div id="successMessage" class="hidden message-box">Allah Kareem Aap Ko Murshid Ki Dua Ka Faizan Nasib Farmaye<br>Aameen. جَزَاک اللہ خَیْرًا</div>
     
@@ -104,13 +101,8 @@
         </select>
         
         <div id="all-fields" class="hidden">
-            <!-- Name Field -->
             <input type="text" id="userName" placeholder="Name (English Only)" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" title="Sirf alphabets (text) hi allow hain" required>
-            
-            <!-- Contact Number Field -->
             <input type="text" id="contactNumber" placeholder="Mobile Number (10 Digits)" minlength="10" maxlength="10" pattern="[1-9][0-9]{9}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1);" title="10 digit ka number darj karein jo 0 se shuru na ho" required>
-            
-            <!-- Pincode Field -->
             <input type="text" id="pincode" placeholder="Pincode (6 Digits)" minlength="6" maxlength="6" pattern="[1-9][0-9]{5}" oninput="this.setCustomValidity(''); this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('0')) this.value = this.value.substring(1); if(this.value.length === 6) fetchDistrict();" title="6 digit ka Pincode darj karein jo 0 se shuru na ho" required>
             <div style="font-size: 12px; color: #555; margin-top: 5px; margin-bottom: 5px; line-height: 1.4;">
                 Jis Zimmedar Ki Jis District Men Zimmedari Hai Woh Disrict Ka Pincode Add Kare, HOD/RHM/Office Zimmedar Inki Rehaish Jis District Men Usi Ka Pincode Add Kare.
@@ -134,7 +126,6 @@
             <div style="font-size: 12px; color: #555; margin-top: 5px; margin-bottom: 5px; line-height: 1.4;">
                 Aap ki & Aap Ki Koshish Se Is Hafte Kitno Ne Risala Padha Suna.
             </div>
-            
         </div>
         <button type="submit" class="btn-submit" id="submitBtn">Submit Report</button>
     </form>
@@ -197,7 +188,6 @@
 <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyNFSCIJ_8T2VzVX0L6GtKTQPYR2izYeqx2JVfbDz3l7gUgnZ8tfVIM1jqntDMfQOzO/exec";
     
-    // Live Clock Function
     function updateClock() {
         const now = new Date();
         const pad = n => String(n).padStart(2, '0');
@@ -228,9 +218,9 @@
         document.documentElement.style.setProperty('--light-bg', s.lightBg); 
     }
     
-    // YAHAN SABSE BADA FIX HAI: window.onload ki jagah DOMContentLoaded
     document.addEventListener("DOMContentLoaded", function() {
-        fetch(scriptURL + "?checkStatus=true")
+        // Cache bypass query parameter (t=Time) is added to always fetch live status
+        fetch(scriptURL + "?checkStatus=true&t=" + new Date().getTime())
         .then(response => response.text()) 
         .then(text => {
             try {
@@ -264,7 +254,7 @@
                     document.getElementById("dataForm").classList.remove("hidden");
                 }
             } catch(e) {
-                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>Google App Script se data load nahi hua. Kripya ensure karein ki App Script me 'New Version' deploy kiya gaya hai aur 'Anyone' permission set hai.</div>";
+                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>Google App Script se data load nahi hua. Kripya ensure karein ki App Script me 'New Version' deploy kiya gaya hai.</div>";
             }
         })
         .catch(error => {
@@ -302,7 +292,6 @@
 
     function submitForm(e) { 
         e.preventDefault(); 
-        
         if (isSubmitting) return false;
         
         let chainVal = document.getElementById("chainType").value;
@@ -321,28 +310,23 @@
         if (chainVal === "central") {
             let nigranVal = document.getElementById("nigranLevel").value;
             if (!nigranVal || nigranVal === "Select Nigran Level") {
-                alert("Kripya Nigran Level select karein.");
-                return false;
+                alert("Kripya Nigran Level select karein."); return false;
             }
         } else if (chainVal === "department") {
             let zimmedarVal = document.getElementById("zimmedarLevel").value;
             let deptVal = document.getElementById("departmentList").value;
             if (!zimmedarVal || zimmedarVal === "Select Zimmedar Level") {
-                alert("Kripya Zimmedar Level select karein.");
-                return false;
+                alert("Kripya Zimmedar Level select karein."); return false;
             }
             if (!deptVal || deptVal === "Select Department") {
-                alert("Kripya Department select karein.");
-                return false;
+                alert("Kripya Department select karein."); return false;
             }
         } else {
-            alert("Kripya Chain select karein.");
-            return false;
+            alert("Kripya Chain select karein."); return false;
         }
 
         if (distVal === "" || distVal === "Not Found" || distVal === "Error") {
-            alert("Kripya sahi Pincode darj karein jo record mein maujood ho.");
-            return false;
+            alert("Kripya sahi Pincode darj karein jo record mein maujood ho."); return false;
         }
 
         isSubmitting = true;
@@ -369,8 +353,6 @@
         }); 
     }
 
-
-    // ===== OFFICE LOGIN + DASHBOARD (same Vercel link) =====
     let officeUser = {};
     let officeRows = [];
     let currentFilteredRows = [];
@@ -455,7 +437,6 @@
               }
               officeRows = Array.isArray(d.rows) ? d.rows : [];
               window.dashboardSourceRows = Number(d.totalRows || 0);
-              window.dashboardDebug = d.debug || {};
               populateDashboardFilters(true);
               renderDashboard();
           })
@@ -493,17 +474,12 @@
         const chain = resetAll ? '' : (document.getElementById('dashChain').value || '');
 
         fillDash('dashRegion', uniqValues(officeRows,'region'), 'All Region', region);
-
         const regionRows = rowsForHierarchy(region, '', '');
         fillDash('dashState', uniqValues(regionRows,'state'), 'All State', state);
-
         const stateRows = rowsForHierarchy(region, state, '');
         fillDash('dashDivision', uniqValues(stateRows,'division'), 'All Division', division);
-
         const divisionRows = rowsForHierarchy(region, state, division);
         fillDash('dashDistrict', uniqValues(divisionRows,'district'), 'All District', district);
-
-        // Chain is an independent filter and is also pre-limited by the logged-in user's Chain Type.
         fillDash('dashChain', uniqValues(officeRows,'chain'), 'All Chain', chain);
     }
     function onRegionChange() {
@@ -527,13 +503,11 @@
         fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,state,division),'district'), 'All District', '');
         renderDashboard();
     }
-    function onDistrictChange() {
-        renderDashboard();
-    }
-    function onChainChange() {
-        renderDashboard();
-    }
+    function onDistrictChange() { renderDashboard(); }
+    function onChainChange() { renderDashboard(); }
+    
     function escapeHtml(x) { return String(x == null ? '' : x).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    
     function groupCount(rows,key) {
         const map={};
         rows.forEach(x=>{
@@ -634,6 +608,7 @@
         document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+currentFilteredRows.length+' • Report quantity: '+reportSum;
         renderCharts(currentFilteredRows);
     }
+
     function getFilteredDashboardRows() {
         const q=document.getElementById('search').value.toLowerCase().trim();
         const rg=document.getElementById('dashRegion').value;
@@ -687,7 +662,6 @@
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Reports');
 
-        // Add a small summary sheet so the downloaded Excel also records the active filters.
         const summary = [
             ['Weekly Risala Report - Dashboard Export'],
             ['Downloaded Rows', rows.length],
@@ -709,7 +683,6 @@
 
     function sameClient(a,b){return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();}
 
-    // If an employee already has a valid browser session, reopen dashboard on same link.
     document.addEventListener('DOMContentLoaded', function(){
         if (sessionStorage.getItem('risalaToken')) {
             try { officeUser=JSON.parse(sessionStorage.getItem('risalaUser')||'{}'); } catch(e) { officeUser={}; }
