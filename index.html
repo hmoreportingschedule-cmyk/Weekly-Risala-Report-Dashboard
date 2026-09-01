@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Risala Report</title>
     
-    <!-- WhatsApp & Social Media Link Preview Tags -->
     <meta property="og:title" content="Weekly Risala Report">
     <meta property="og:description" content="Har Hafte Risala Parh Ya Sunkar Murshid Ki Duaon Me Hissa Paane Ke Liye Report Submit Kijiye.">
     <meta property="og:image" content="https://weekly-risala-report-dashboard-izvja41bq-risala-report.vercel.app/banner.jpg">
@@ -184,9 +183,12 @@
     </form>
   </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxQMdrzlp3krc3YincKfg7p1USTpLrj1l5NmCEvJY5YG53TL9GXAn8VBKiWJAKQvU9V/exec";
+    // 👇👇👇👇 YAHAN PAR APNA NAYA URL DALNA HAI 👇👇👇👇
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzzJGycJjU5GHQkTX6A8zjko3GGXt00wjgKT-9K2UglLSWJKxriFlkHD09tM2lymrwn/exec";
+    // 👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆
     
     function updateClock() {
         const now = new Date();
@@ -219,7 +221,6 @@
     }
     
     document.addEventListener("DOMContentLoaded", function() {
-        // Cache bypass query parameter (t=Time) is added to always fetch live status
         fetch(scriptURL + "?checkStatus=true&t=" + new Date().getTime())
         .then(response => response.text()) 
         .then(text => {
@@ -244,17 +245,17 @@
                 document.getElementById("dynamicSubheading").innerHTML = data.subheading || "";
                 applyTheme(data.theme || "Peacock");
                 
-                if(data.linkOffMsg) {
-                    document.getElementById("linkOffMessage").innerHTML = data.linkOffMsg;
-                }
-                
+                // EXPLICIT HIDDEN LOCK ADDED HERE
                 if(data.status === "OFF") {
+                    document.getElementById("linkOffMessage").innerHTML = data.linkOffMsg;
                     document.getElementById("linkOffMessage").classList.remove("hidden");
+                    document.getElementById("dataForm").classList.add("hidden"); 
                 } else {
+                    document.getElementById("linkOffMessage").classList.add("hidden");
                     document.getElementById("dataForm").classList.remove("hidden");
                 }
             } catch(e) {
-                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>Google App Script se data load nahi hua. Kripya ensure karein ki App Script me 'New Version' deploy kiya gaya hai.</div>";
+                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>Google App Script se data load nahi hua. Kripya ensure karein ki URL sahi hai.</div>";
             }
         })
         .catch(error => {
@@ -387,7 +388,7 @@
                   err.style.display = 'block';
               }
           })
-          .catch(() => { err.textContent = 'Login server se connection nahi ho raha.'; err.style.display='block'; })
+          .catch(() => { err.textContent = 'Login server se connection nahi ho raha. Ensure CORS/App Script is allowed.'; err.style.display='block'; })
           .finally(() => { btn.disabled=false; btn.textContent='Login'; });
     }
     function showEmployeeDashboard() {
@@ -518,18 +519,42 @@
         return Object.keys(map).sort((a,b)=>map[b]-map[a]).map(k=>({label:k,count:map[k]}));
     }
     function destroyChart(name){ if(chartRefs[name]) { chartRefs[name].destroy(); chartRefs[name]=null; } }
+    
     function drawBarChart(canvasId, refName, title, rows, key) {
         if(typeof Chart === 'undefined') return;
         destroyChart(refName);
-        const grouped=groupCount(rows,key);
-        const canvas=document.getElementById(canvasId);
+        const grouped = groupCount(rows,key);
+        const canvas = document.getElementById(canvasId);
         if(!canvas) return;
-        chartRefs[refName]=new Chart(canvas.getContext('2d'), {
-            type:'bar',
-            data:{labels:grouped.map(x=>x.label),datasets:[{label:'Report Quantity',data:grouped.map(x=>x.count),borderWidth:1}]},
-            options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:true}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}
+        
+        chartRefs[refName] = new Chart(canvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: grouped.map(x=>x.label),
+                datasets: [{
+                    label: 'Report Quantity',
+                    data: grouped.map(x=>x.count),
+                    borderWidth: 1,
+                    backgroundColor: '#90CAF9', 
+                    borderColor: '#64B5F6'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: false, text: title },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    x: { ticks: { color: 'black' } },
+                    y: { beginAtZero: true, ticks: { precision: 0, color: 'black' } }
+                }
+            }
         });
     }
+
     function renderCharts(rows) {
         drawBarChart('regionChart','region','Reports by Region',rows,'region');
         drawBarChart('stateChart','state','Reports by State',rows,'state');
