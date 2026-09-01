@@ -447,6 +447,18 @@
               officeRows = Array.isArray(d.rows) ? d.rows : [];
               window.dashboardSourceRows = Number(d.totalRows || 0);
               window.dashboardDebug = d.debug || {};
+              // If source rows exist but authorization returns zero, show the
+              // exact backend values instead of the generic empty message.
+              if (Number(d.totalRows || 0) > 0 && officeRows.length === 0) {
+                  const dbg = window.dashboardDebug || {};
+                  const msg = 'Responses rows: ' + d.totalRows + ' • Visible rows: 0\n' +
+                    'Role: ' + (dbg.userRole || officeUser.role || '') +
+                    ' | Country: ' + (dbg.userCountry || officeUser.country || '') +
+                    ' | Matched: ' + (dbg.matchedRows || 0);
+                  document.getElementById('dashMessage').style.display='block';
+                  document.getElementById('dashMessage').style.whiteSpace='pre-line';
+                  document.getElementById('dashMessage').textContent=msg;
+              }
               populateDashboardFilters(true);
               currentPage = 1;
               renderDashboard();
