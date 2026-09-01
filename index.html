@@ -58,7 +58,7 @@
         .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
         .stat { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); }
         .stat .n { font-size:30px; font-weight:bold; color:var(--primary); margin-top:6px; }
-        .filters { background:#fff; border-radius:12px; padding:18px; margin:18px 0; box-shadow:0 4px 16px rgba(0,0,0,.07); display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:12px; }
+        .filters { background:#fff; border-radius:12px; padding:18px; margin:18px 0; box-shadow:0 4px 16px rgba(0,0,0,.07); display:grid; grid-template-columns:1.55fr 1fr 1fr 1fr 1fr; gap:12px; }
         .filters input,.filters select { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; margin:0; }
         .tablebox { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); overflow:auto; }
         .employee-table { width:100%; border-collapse:collapse; min-width:950px; }
@@ -146,9 +146,10 @@
     <div id="stats" class="cards"></div>
     <div class="filters">
       <input id="search" placeholder="Search..." oninput="renderDashboard()">
-      <select id="dashState" onchange="renderDashboard()"><option value="">All State</option></select>
-      <select id="dashRegion" onchange="renderDashboard()"><option value="">All Region</option></select>
-      <select id="dashDistrict" onchange="renderDashboard()"><option value="">All District</option></select>
+      <select id="dashRegion" onchange="onRegionChange()"><option value="">All Region</option></select>
+      <select id="dashState" onchange="onStateChange()"><option value="">All State</option></select>
+      <select id="dashDivision" onchange="onDivisionChange()"><option value="">All Division</option></select>
+      <select id="dashDistrict" onchange="onDistrictChange()"><option value="">All District</option></select>
     </div>
     <div id="chartGrid" class="chart-grid">
       <div class="chart-card"><div class="chart-title">Reports by State</div><div class="chart-wrap"><canvas id="stateChart"></canvas></div></div>
@@ -429,7 +430,7 @@
               officeRows = Array.isArray(d.rows) ? d.rows : [];
               window.dashboardSourceRows = Number(d.totalRows || 0);
               window.dashboardDebug = d.debug || {};
-              populateDashboardFilters();
+              populateDashboardFilters(true);
               renderDashboard();
           })
           .catch(err => {
@@ -441,17 +442,62 @@
         const token = sessionStorage.getItem('risalaToken');
         if (token) loadDashboard(token);
     }
-    function uniqDash(key) { return [...new Set(officeRows.map(x => String(x[key] || '').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b)); }
-    function fillDash(id, arr, firstText) {
-        const s=document.getElementById(id);
-        const current=s.value;
-        s.innerHTML='<option value="">'+firstText+'</option>'+arr.map(x=>'<option value="'+escapeHtml(x)+'">'+escapeHtml(x)+'</option>').join('');
-        if(arr.includes(current)) s.value=current;
+    function uniqValues(rows, key) {
+        return [...new Set(rows.map(x => String(x[key] || '').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
     }
-    function populateDashboardFilters() {
-        fillDash('dashState', uniqDash('state'), 'All State');
-        fillDash('dashRegion', uniqDash('region'), 'All Region');
-        fillDash('dashDistrict', uniqDash('district'), 'All District');
+    function fillDash(id, arr, firstText, keepValue) {
+        const s=document.getElementById(id);
+        const current = keepValue !== undefined ? keepValue : s.value;
+        s.innerHTML='<option value="">'+firstText+'</option>'+arr.map(x=>'<option value="'+escapeHtml(x)+'">'+escapeHtml(x)+'</option>').join('');
+        if(arr.some(x => sameClient(x,current))) s.value=current;
+        else s.value='';
+    }
+    function rowsForHierarchy(region, state, division) {
+        return officeRows.filter(x =>
+            (!region || sameClient(x.region, region)) &&
+            (!state || sameClient(x.state, state)) &&
+            (!division || sameClient(x.division, division))
+        );
+    }
+    function populateDashboardFilters(resetAll) {
+        const region = resetAll ? '' : (document.getElementById('dashRegion').value || '');
+        const state = resetAll ? '' : (document.getElementById('dashState').value || '');
+        const division = resetAll ? '' : (document.getElementById('dashDivision').value || '');
+
+        fillDash('dashRegion', uniqValues(officeRows,'region'), 'All Region', region);
+
+        const regionRows = rowsForHierarchy(region, '', '');
+        fillDash('dashState', uniqValues(regionRows,'state'), 'All State', state);
+
+        const stateRows = rowsForHierarchy(region, state, '');
+        fillDash('dashDivision', uniqValues(stateRows,'division'), 'All Division', division);
+
+        const divisionRows = rowsForHierarchy(region, state, division);
+        fillDash('dashDistrict', uniqValues(divisionRows,'district'), 'All District', '');
+    }
+    function onRegionChange() {
+        const region = document.getElementById('dashRegion').value;
+        fillDash('dashState', uniqValues(rowsForHierarchy(region,'',''),'state'), 'All State', '');
+        fillDash('dashDivision', uniqValues(rowsForHierarchy(region,'',''),'division'), 'All Division', '');
+        fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,'',''),'district'), 'All District', '');
+        renderDashboard();
+    }
+    function onStateChange() {
+        const region = document.getElementById('dashRegion').value;
+        const state = document.getElementById('dashState').value;
+        fillDash('dashDivision', uniqValues(rowsForHierarchy(region,state,''),'division'), 'All Division', '');
+        fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,state,''),'district'), 'All District', '');
+        renderDashboard();
+    }
+    function onDivisionChange() {
+        const region = document.getElementById('dashRegion').value;
+        const state = document.getElementById('dashState').value;
+        const division = document.getElementById('dashDivision').value;
+        fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,state,division),'district'), 'All District', '');
+        renderDashboard();
+    }
+    function onDistrictChange() {
+        renderDashboard();
     }
     function escapeHtml(x) { return String(x == null ? '' : x).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
     function groupCount(rows,key) {
@@ -484,8 +530,17 @@
     }
     function renderDashboard() {
         const q=document.getElementById('search').value.toLowerCase().trim();
-        const st=document.getElementById('dashState').value, rg=document.getElementById('dashRegion').value, di=document.getElementById('dashDistrict').value;
-        const a=officeRows.filter(x => (!st||sameClient(x.state,st)) && (!rg||sameClient(x.region,rg)) && (!di||sameClient(x.district,di)) && (!q||JSON.stringify(x).toLowerCase().includes(q)));
+        const rg=document.getElementById('dashRegion').value;
+        const st=document.getElementById('dashState').value;
+        const dv=document.getElementById('dashDivision').value;
+        const di=document.getElementById('dashDistrict').value;
+        const a=officeRows.filter(x =>
+            (!rg||sameClient(x.region,rg)) &&
+            (!st||sameClient(x.state,st)) &&
+            (!dv||sameClient(x.division,dv)) &&
+            (!di||sameClient(x.district,di)) &&
+            (!q||JSON.stringify(x).toLowerCase().includes(q))
+        );
         const reportSum=a.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0);
         document.getElementById('stats').innerHTML=[['Total Entries',a.length],['Report Quantity',reportSum],['Districts',new Set(a.map(x=>x.district).filter(Boolean)).size],['Departments',new Set(a.map(x=>x.department).filter(Boolean)).size]].map(x=>'<div class="stat"><div>'+x[0]+'</div><div class="n">'+x[1]+'</div></div>').join('');
         document.getElementById('dashBody').innerHTML=a.map(x=>'<tr><td>'+escapeHtml(x.date)+'</td><td>'+escapeHtml(x.name)+'</td><td>'+escapeHtml(x.contact)+'</td><td>'+escapeHtml(x.chain)+'</td><td>'+escapeHtml(x.level)+'</td><td>'+escapeHtml(x.department)+'</td><td>'+escapeHtml(x.report)+'</td><td>'+escapeHtml(x.district)+'</td><td>'+escapeHtml(x.division)+'</td><td>'+escapeHtml(x.state)+'</td><td>'+escapeHtml(x.region)+'</td></tr>').join('');
