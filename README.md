@@ -1,18 +1,16 @@
-WEEKLY RISALA REPORT - CASCADING FILTERS + EXCEL DOWNLOAD
+WEEKLY RISALA - CHAIN TYPE ASSIGNMENT + DASHBOARD FILTER
 
-Updated:
-1. Search + Region + State + Division + District cascading filters.
-2. Dashboard report data and charts remain access-controlled by logged-in user.
-3. Added "Download Excel" button.
-4. Excel export contains ONLY the rows currently visible after the user's access scope, filters and search.
-5. Download includes Reports sheet and Summary sheet with active filters.
+1. User Id sheet me K column me header exactly: Chain Type
+2. Har user ke saamne chain type likhein, e.g. department ya central.
+3. Multiple chain types assign karne hon to comma se likhein: department,central
+4. Blank chhodne par user ko chain ke hisaab se restriction nahi lagegi.
+5. Code.gs aur index.html replace karein.
+6. Save -> Deploy -> Manage Deployments -> Edit -> New Version -> Deploy.
+7. Browser me Ctrl+F5 karein.
 
-INSTALL:
-- Replace Code.gs in Apps Script.
-- Replace index.html in Apps Script.
-- Save.
-- Deploy > Manage deployments > Edit > New version > Deploy.
-- Refresh dashboard with Ctrl+F5.
+Dashboard filter order:
+Search | Region | State | Division | District | Chain
 
-NOTE:
-Excel generation uses SheetJS from the official CDN in index.html, so the browser needs internet access when loading the dashboard.
+Chain Type Responses sheet ke Chain Type column se match hota hai.
+Assigned Chain Type user ke accessible rows ko bhi restrict karega.
+Excel Download bhi current chain filter + baaki filters + search ke mutabiq hoga.
