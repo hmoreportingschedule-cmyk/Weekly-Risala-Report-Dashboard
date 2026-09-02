@@ -186,7 +186,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // 👇 NAYA URL ADDED HERE 👇
     const scriptURL = "https://script.google.com/macros/s/AKfycbyCQmXtOgmcoV4mUG0j5HXVytNZuZbCAE8Dey-SJ7YlUTXWfiDcjnt4ZH-AqsYwdE8F/exec";
     
     function updateClock() {
@@ -226,6 +225,14 @@
             try {
                 let data = JSON.parse(text); 
                 document.getElementById("loadingOverlay").classList.add("hidden");
+
+                // STRICT ERROR CHECKING
+                if(data.status === "Error") {
+                    document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>" + data.message + "</div>";
+                    document.getElementById("loadingOverlay").classList.remove("hidden");
+                    document.getElementById("dataForm").classList.add("hidden"); 
+                    return;
+                }
                 
                 if(data.thumbnail) { 
                     try {
@@ -244,17 +251,16 @@
                 document.getElementById("dynamicSubheading").innerHTML = data.subheading || "";
                 applyTheme(data.theme || "Peacock");
                 
-                // EXPLICIT HIDDEN LOCK ADDED HERE
                 if(data.status === "OFF") {
                     document.getElementById("linkOffMessage").innerHTML = data.linkOffMsg || "Form is temporarily off.";
                     document.getElementById("linkOffMessage").classList.remove("hidden");
                     document.getElementById("dataForm").classList.add("hidden"); 
-                } else {
+                } else if(data.status === "ON") {
                     document.getElementById("linkOffMessage").classList.add("hidden");
                     document.getElementById("dataForm").classList.remove("hidden");
                 }
             } catch(e) {
-                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>Google App Script se data load nahi hua. Kripya ensure karein ki URL sahi hai.</div>";
+                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>System Error!</b><br>Code read nahi ho pa raha.</div>";
             }
         })
         .catch(error => {
