@@ -18,8 +18,6 @@
             --form-hover: #005959; 
             --form-bg: #e0f2f1; 
             --form-light-bg: #f0faf9;
-            
-            /* Dash Theme remains fixed */
             --dash-primary: #008080;
             --dash-hover: #005959;
             --dash-light-bg: #f0faf9;
@@ -64,16 +62,19 @@
         .employee-view { display:none; width:100%; max-width:1200px; margin:0 auto; }
         
         .employee-top { background:#fff; padding:20px 24px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow:0 4px 15px rgba(0,0,0,.04); border-radius:10px; margin-bottom: 16px; }
+        .employee-title { font-family: Arial, sans-serif; font-size:26px; font-weight:bold; color:var(--dash-primary); letter-spacing: 0.5px; }
+        .employee-scope { font-family: Arial, sans-serif; font-size:16px; color:#444; font-weight: bold; margin-top:10px; }
+        .employee-user { font-family: Arial, sans-serif; font-size:14px; color:#666; margin-top:6px; font-weight: bold; }
+        
         .logout-btn { border:0; background:#dc3545; color:#fff; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:700; font-size: 13px; transition: 0.2s; }
         .logout-btn:hover { background:#c82333; }
         .refresh-btn { border:0; background:var(--dash-primary); color:#fff; padding:9px 16px; border-radius:6px; cursor:pointer; font-weight:700; font-size:13px; transition: 0.2s; }
         .refresh-btn:hover { background:var(--dash-hover); }
         
         .employee-wrap { margin:0 auto; padding:0; }
-        .welcome { background:#fff; border-radius:10px; padding:16px 24px; box-shadow:0 4px 15px rgba(0,0,0,.04); margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; }
         
-        /* Adjusted Grid for specific sizes: Total (1fr), Dist (0.8fr), Dept (0.8fr), Report (1.3fr) */
-        .cards { display:grid; grid-template-columns: 1fr 0.8fr 0.8fr 1.3fr; gap:16px; margin-bottom:16px;}
+        /* Stats Sequence and Box Sizing Grid */
+        .cards { display:grid; grid-template-columns: 1.1fr 0.95fr 0.95fr 1.4fr; gap:16px; margin-bottom:16px;}
         .stat { background:#fff; border-radius:10px; padding:18px 20px; box-shadow:0 4px 15px rgba(0,0,0,.04); border-left: 5px solid var(--dash-primary); }
         
         .filters { background:#fff; border-radius:10px; padding:16px; margin-bottom: 16px; box-shadow:0 4px 15px rgba(0,0,0,.04); display:grid; grid-template-columns:1.25fr repeat(6,1fr); gap:12px; }
@@ -88,13 +89,13 @@
             min-height: 0; min-width: 0;
             box-sizing: border-box;
         }
-        .chart-title { font-weight:800; color:var(--dash-primary); margin-bottom:12px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .chart-title { font-family: Arial, sans-serif; font-weight:bold; color:var(--dash-primary); margin-bottom:12px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
         .chart-wrap { position:relative; flex: 1; min-height: 0; min-width: 0; width: 100%; overflow:hidden; }
         
         .tablebox { background:#fff; border-radius:10px; padding:18px; box-shadow:0 4px 15px rgba(0,0,0,.04); overflow-x:auto; margin-bottom: 24px;}
         .employee-table { width:100%; border-collapse:collapse; min-width:900px; text-align:left;}
         .employee-table th, .employee-table td { padding:10px 12px; border-bottom:1px solid #f0f0f0; font-size:13px; }
-        .employee-table th { background:#f8fafc; color:var(--dash-primary); font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        .employee-table th { font-family: Arial, sans-serif; background:#f8fafc; color:var(--dash-primary); font-weight: bold; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
         .employee-table tbody tr:hover { background-color: var(--dash-light-bg); }
         
         .dash-msg { padding:20px; text-align:center; color:#888; font-size: 15px; font-style: italic; }
@@ -188,19 +189,18 @@
     <div id="employeeView" class="employee-view">
       <div class="employee-top">
         <div>
-            <!-- Main Title Arial Bold -->
-            <div style="font-family: Arial, sans-serif; font-size:26px; font-weight:bold; color:var(--dash-primary); letter-spacing: 0.5px;">Weekly Risala Report - Office Dashboard</div>
-            <!-- Sub Heading Access Level Arial Bold -->
-            <div id="scope" style="font-family: Arial, sans-serif; font-size:16px; font-weight:bold; color:#444; margin-top:8px;"></div>
-            <!-- User Info -->
-            <div id="who" style="font-family: Arial, sans-serif; font-size:14px; color:#666; margin-top:4px; font-weight: bold;"></div>
+            <div id="dashMainTitle" class="employee-title">Weekly Risala Report - Dashboard</div>
+            <div id="scope" class="employee-scope"></div>
+            <div id="who" class="employee-user"></div>
         </div>
         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div id="liveDateTime" style="font-weight: 700; color: var(--dash-primary); font-size: 13px;"></div>
                 <button class="logout-btn" type="button" onclick="officeLogout()">Logout</button>
             </div>
-            <div style="display:flex; gap:10px;">
+            <div style="display:flex; gap:10px; align-items:center;">
+                <!-- New Notification Box -->
+                <div id="b6Box" style="background:var(--dash-light-bg); border: 2px solid var(--dash-primary); color:var(--dash-primary); padding:6px 16px; border-radius:6px; font-weight:bold; font-size:14px; display:none; align-items:center; text-align:center;"></div>
                 <button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh</button>
                 <button class="refresh-btn" type="button" onclick="downloadExcel()" style="background:#198754">Download Excel</button>
             </div>
@@ -535,6 +535,18 @@
                   }
                   return;
               }
+              
+              // Dynamic Title from Sheet B4
+              document.getElementById('dashMainTitle').innerText = 'Weekly Risala Report : ' + (d.b4Value ? d.b4Value + ' ' : '') + '- Dashboard';
+              
+              // B6 Info Box Display
+              if(d.b6Value) {
+                  document.getElementById('b6Box').innerText = d.b6Value;
+                  document.getElementById('b6Box').style.display = 'flex';
+              } else {
+                  document.getElementById('b6Box').style.display = 'none';
+              }
+
               officeRows = Array.isArray(d.rows) ? d.rows : [];
               window.dashboardSourceRows = Number(d.totalRows || 0);
               populateDashboardFilters(true);
@@ -633,8 +645,8 @@
         html += `<div style="flex: 1; overflow-y:auto; border: 1px solid #e2e8f0; border-radius: 6px; min-height: 0; min-width: 0; box-shadow: inset 0 0 5px rgba(0,0,0,0.01);">`;
         html += `<table style="width:100%; margin:0; border-collapse: collapse; text-align: left;">`;
         html += `<thead><tr>
-            <th style="position:sticky; top:0; z-index:2; background:var(--dash-primary); color:white; padding: 10px 12px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Name</th>
-            <th style="position:sticky; top:0; z-index:2; background:var(--dash-primary); color:white; padding: 10px 12px; font-weight: 700; text-align: right; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Report Qty</th>
+            <th style="font-family: Arial, sans-serif; font-weight: bold; position:sticky; top:0; z-index:2; background:var(--dash-primary); color:white; padding: 10px 12px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Name</th>
+            <th style="font-family: Arial, sans-serif; font-weight: bold; position:sticky; top:0; z-index:2; background:var(--dash-primary); color:white; padding: 10px 12px; text-align: right; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Report Qty</th>
             </tr></thead><tbody>`;
         
         if(data.length === 0) {
@@ -644,7 +656,7 @@
                 let bg = index % 2 === 0 ? '#ffffff' : '#f9fafb';
                 html += `<tr style="background-color: ${bg}; border-bottom: 1px solid #edf2f7;">`;
                 html += `<td style="padding: 10px 12px; color: #334155; font-size: 13px;">${escapeHtml(d.label)}</td>`;
-                html += `<td style="font-weight:700; padding: 10px 12px; text-align:right; color: var(--dash-primary); font-size: 14px;">${d.count.toLocaleString('en-IN')}</td>`;
+                html += `<td style="font-family: Arial, sans-serif; font-weight:bold; padding: 10px 12px; text-align:right; color: var(--dash-primary); font-size: 14px;">${d.count.toLocaleString('en-IN')}</td>`;
                 html += `</tr>`;
             });
         }
@@ -686,7 +698,7 @@
                         anchor: 'end',
                         align: 'top',
                         color: '#444',
-                        font: { weight: 'bold', size: 11 },
+                        font: { family: 'Arial', weight: 'bold', size: 11 },
                         formatter: function(value) { return value.toLocaleString('en-IN'); }
                     },
                     tooltip: { 
@@ -694,18 +706,18 @@
                         backgroundColor: 'rgba(15, 23, 42, 0.9)',
                         padding: 12,
                         cornerRadius: 8,
-                        titleFont: { size: 13 },
-                        bodyFont: { size: 14, weight: 'bold' }
+                        titleFont: { family: 'Arial', size: 13 },
+                        bodyFont: { family: 'Arial', size: 14, weight: 'bold' }
                     }
                 },
                 scales: {
                     x: { 
-                        ticks: { color: '#64748b', font: { size: 11 } },
+                        ticks: { color: '#64748b', font: { family: 'Arial', size: 11 } },
                         grid: { display: false }
                     },
                     y: { 
                         beginAtZero: true, 
-                        ticks: { precision: 0, color: '#64748b', font: { size: 11 } },
+                        ticks: { precision: 0, color: '#64748b', font: { family: 'Arial', size: 11 } },
                         border: { dash: [4, 4] }, 
                         grid: { color: '#f1f5f9' }
                     }
@@ -714,9 +726,15 @@
         });
     }
 
+    // Dynamic Hierarchy Logic
     function getHierarchyLevel() {
+        if (document.getElementById('dashDistrict').value) return 'district';
+        if (document.getElementById('dashDivision').value) return 'division';
         if (document.getElementById('dashState').value) return 'state';
         if (document.getElementById('dashRegion').value) return 'region';
+        
+        if (officeUser.district && officeUser.district.toLowerCase() !== 'all') return 'district';
+        if (officeUser.division && officeUser.division.toLowerCase() !== 'all') return 'division';
         if (officeUser.state && officeUser.state.toLowerCase() !== 'all') return 'state';
         if (officeUser.region && officeUser.region.toLowerCase() !== 'all') return 'region';
         return 'india';
@@ -819,10 +837,26 @@
             `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#20639B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`
         ];
 
+        // 1. DYNAMIC ROLL-BASED LABEL 
+        let dynamicLabel = 'DISTRICTS SUBMITTED';
+        let dynamicCount = new Set(currentFilteredRows.map(x=>x.district).filter(Boolean)).size.toLocaleString('en-IN');
+        let lvl = getHierarchyLevel();
+        if (lvl === 'india') {
+            dynamicLabel = 'REGIONS SUBMITTED';
+            dynamicCount = new Set(currentFilteredRows.map(x=>x.region).filter(Boolean)).size.toLocaleString('en-IN');
+        } else if (lvl === 'region') {
+            dynamicLabel = 'STATES SUBMITTED';
+            dynamicCount = new Set(currentFilteredRows.map(x=>x.state).filter(Boolean)).size.toLocaleString('en-IN');
+        } else if (lvl === 'state') {
+            dynamicLabel = 'DIVISIONS SUBMITTED';
+            dynamicCount = new Set(currentFilteredRows.map(x=>x.division).filter(Boolean)).size.toLocaleString('en-IN');
+        }
+
+        // 2. NEW SEQUENCE 
         const statsData = [
-            { label: 'TOTAL SUBMITED', count: currentFilteredRows.length.toLocaleString('en-IN'), iconIndex: 0 },
-            { label: 'DISTRICTS SUBMITED', count: new Set(currentFilteredRows.map(x=>x.district).filter(Boolean)).size.toLocaleString('en-IN'), iconIndex: 2 },
-            { label: 'DEPARTMENTS SUBMITED', count: new Set(currentFilteredRows.map(x=>x.department).filter(Boolean)).size.toLocaleString('en-IN'), iconIndex: 3 },
+            { label: dynamicLabel, count: dynamicCount, iconIndex: 2 },
+            { label: 'DEPARTMENTS SUBMITTED', count: new Set(currentFilteredRows.map(x=>x.department).filter(Boolean)).size.toLocaleString('en-IN'), iconIndex: 3 },
+            { label: 'TOTAL SUBMITTED', count: currentFilteredRows.length.toLocaleString('en-IN'), iconIndex: 0 },
             { label: 'REPORT', count: reportSum.toLocaleString('en-IN'), iconIndex: 1 }
         ];
 
@@ -832,7 +866,7 @@
                     ${icons[d.iconIndex]}
                     <div style="font-size:12px; color:#222; font-weight:700;">${d.label}</div>
                 </div>
-                <div style="font-family: Arial, sans-serif; font-size:24px; font-weight:600; color:var(--dash-primary); line-height: 1;">${d.count}</div>
+                <div style="font-family: Arial, sans-serif; font-size:24px; font-weight:bold; color:var(--dash-primary); line-height: 1;">${d.count}</div>
             </div>
         `).join('');
         
