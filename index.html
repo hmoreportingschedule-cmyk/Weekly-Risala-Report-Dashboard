@@ -532,15 +532,14 @@
     }
     function destroyChart(name){ if(chartRefs[name]) { chartRefs[name].destroy(); chartRefs[name]=null; } }
     
-    // HTML Builder for Dashboard Chart
     function buildChartHTML(id, title) {
         return `<div class="chart-card"><div class="chart-title">${title}</div><div class="chart-wrap"><canvas id="${id}"></canvas></div></div>`;
     }
 
-    // HTML Builder for Dashboard Scrollable Table (WITH STRICT HEIGHT FOR MAX 10 ROWS)
+    // UPDATED: max-height locked to 260px to perfectly match chart heights
     function buildTableHTML(title, data) {
         let html = `<div class="chart-card"><div class="chart-title">${title}</div>`;
-        html += `<div style="overflow-y:auto; max-height:350px; border: 1px solid #eee; border-radius: 4px;">`;
+        html += `<div class="chart-wrap" style="overflow-y:auto; height:260px; border: 1px solid #eee; border-radius: 4px;">`;
         html += `<table class="employee-table" style="width:100%; margin:0; border-collapse: collapse;">`;
         html += `<thead><tr><th style="position:sticky; top:0; z-index:2; border-radius:0; background:var(--light-bg); border-bottom: 2px solid var(--primary);">Name</th><th style="position:sticky; top:0; z-index:2; border-radius:0; background:var(--light-bg); border-bottom: 2px solid var(--primary);">Report Qty</th></tr></thead><tbody>`;
         
@@ -704,6 +703,7 @@
         
         document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+currentFilteredRows.length+' • Report quantity: '+reportSum;
         
+        // Dynamically trigger Layout based on selected views
         renderDynamicCharts(currentFilteredRows);
     }
 
