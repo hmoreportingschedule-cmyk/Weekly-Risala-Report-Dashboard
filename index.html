@@ -66,7 +66,6 @@
         .chart-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:18px 0; }
         .chart-card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.07); display: flex; flex-direction: column; }
         .chart-title { font-weight:700; color:var(--primary); margin-bottom:10px; }
-        .chart-wrap { position:relative; flex: 1; min-height: 260px; }
         .refresh-btn { border:0; background:var(--primary); color:#fff; padding:9px 13px; border-radius:6px; cursor:pointer; font-weight:700; }
         .dash-info { margin:10px 0; font-size:12px; color:#666; text-align:right; }
         
@@ -532,14 +531,15 @@
     }
     function destroyChart(name){ if(chartRefs[name]) { chartRefs[name].destroy(); chartRefs[name]=null; } }
     
+    // STRICT FIXED HEIGHT FOR GRAPHS
     function buildChartHTML(id, title) {
-        return `<div class="chart-card"><div class="chart-title">${title}</div><div class="chart-wrap"><canvas id="${id}"></canvas></div></div>`;
+        return `<div class="chart-card" style="height: 350px; display: flex; flex-direction: column;"><div class="chart-title">${title}</div><div class="chart-wrap" style="flex: 1; min-height: 0; position: relative;"><canvas id="${id}"></canvas></div></div>`;
     }
 
-    // UPDATED: max-height locked to 260px to perfectly match chart heights
+    // STRICT FIXED HEIGHT FOR TABLES (Match graph exactly)
     function buildTableHTML(title, data) {
-        let html = `<div class="chart-card"><div class="chart-title">${title}</div>`;
-        html += `<div class="chart-wrap" style="overflow-y:auto; height:260px; border: 1px solid #eee; border-radius: 4px;">`;
+        let html = `<div class="chart-card" style="height: 350px; display: flex; flex-direction: column;"><div class="chart-title">${title}</div>`;
+        html += `<div style="flex: 1; overflow-y:auto; border: 1px solid #eee; border-radius: 4px; min-height: 0;">`;
         html += `<table class="employee-table" style="width:100%; margin:0; border-collapse: collapse;">`;
         html += `<thead><tr><th style="position:sticky; top:0; z-index:2; border-radius:0; background:var(--light-bg); border-bottom: 2px solid var(--primary);">Name</th><th style="position:sticky; top:0; z-index:2; border-radius:0; background:var(--light-bg); border-bottom: 2px solid var(--primary);">Report Qty</th></tr></thead><tbody>`;
         
@@ -703,7 +703,6 @@
         
         document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+currentFilteredRows.length+' • Report quantity: '+reportSum;
         
-        // Dynamically trigger Layout based on selected views
         renderDynamicCharts(currentFilteredRows);
     }
 
