@@ -63,19 +63,17 @@
         
         .employee-view { display:none; width:100%; max-width:1200px; margin:0 auto; }
         
-        /* Compact Header with Title, Scope and Buttons */
         .employee-top { background:#fff; padding:20px 24px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow:0 4px 15px rgba(0,0,0,.04); border-radius:10px; margin-bottom: 16px; }
-        .employee-title { font-size:24px; font-weight:800; color:var(--dash-primary); letter-spacing: 0.5px; }
-        .employee-user { font-size:13px; color:#777; margin-top:4px; font-weight: 500; }
-        .employee-scope { font-size:14px; color:#444; font-weight: 700; margin-top:14px; }
         .logout-btn { border:0; background:#dc3545; color:#fff; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:700; font-size: 13px; transition: 0.2s; }
         .logout-btn:hover { background:#c82333; }
         .refresh-btn { border:0; background:var(--dash-primary); color:#fff; padding:9px 16px; border-radius:6px; cursor:pointer; font-weight:700; font-size:13px; transition: 0.2s; }
         .refresh-btn:hover { background:var(--dash-hover); }
         
         .employee-wrap { margin:0 auto; padding:0; }
+        .welcome { background:#fff; border-radius:10px; padding:16px 24px; box-shadow:0 4px 15px rgba(0,0,0,.04); margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; }
         
-        .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:16px;}
+        /* Adjusted Grid for specific sizes: Total (1fr), Dist (0.8fr), Dept (0.8fr), Report (1.3fr) */
+        .cards { display:grid; grid-template-columns: 1fr 0.8fr 0.8fr 1.3fr; gap:16px; margin-bottom:16px;}
         .stat { background:#fff; border-radius:10px; padding:18px 20px; box-shadow:0 4px 15px rgba(0,0,0,.04); border-left: 5px solid var(--dash-primary); }
         
         .filters { background:#fff; border-radius:10px; padding:16px; margin-bottom: 16px; box-shadow:0 4px 15px rgba(0,0,0,.04); display:grid; grid-template-columns:1.25fr repeat(6,1fr); gap:12px; }
@@ -120,7 +118,6 @@
         }
         @media(max-width:500px){ 
             .cards,.filters{grid-template-columns:1fr} 
-            .employee-title{font-size:20px} 
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -189,12 +186,14 @@
     </div>
 
     <div id="employeeView" class="employee-view">
-      <!-- Consolidated Premium Dashboard Header -->
       <div class="employee-top">
         <div>
-            <div class="employee-title">Weekly Risala Report - Office Dashboard</div>
-            <div id="who" class="employee-user"></div>
-            <div id="scope" class="employee-scope"></div>
+            <!-- Main Title Arial Bold -->
+            <div style="font-family: Arial, sans-serif; font-size:26px; font-weight:bold; color:var(--dash-primary); letter-spacing: 0.5px;">Weekly Risala Report - Office Dashboard</div>
+            <!-- Sub Heading Access Level Arial Bold -->
+            <div id="scope" style="font-family: Arial, sans-serif; font-size:16px; font-weight:bold; color:#444; margin-top:8px;"></div>
+            <!-- User Info -->
+            <div id="who" style="font-family: Arial, sans-serif; font-size:14px; color:#666; margin-top:4px; font-weight: bold;"></div>
         </div>
         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
             <div style="display: flex; align-items: center; gap: 15px;">
@@ -209,6 +208,7 @@
       </div>
       
       <div class="employee-wrap">
+        
         <div id="stats" class="cards"></div>
         
         <div class="filters">
@@ -259,7 +259,6 @@
     const scriptURL = "https://script.google.com/macros/s/AKfycbyCQmXtOgmcoV4mUG0j5HXVytNZuZbCAE8Dey-SJ7YlUTXWfiDcjnt4ZH-AqsYwdE8F/exec";
     const colorPalette = ['#173F5F', '#20639B', '#3CAEA3', '#F6D55C', '#ED553B', '#f0a014', '#dded7f', '#6b2013', '#51a496', '#b8d099', '#3e3456'];
 
-    // Auto-Refresh Every 3 Minutes (180000 ms)
     setInterval(() => {
         if (document.getElementById('employeeView').style.display === 'block') {
             refreshDashboard();
@@ -283,7 +282,6 @@
     setInterval(updateClock, 1000);
     document.addEventListener("DOMContentLoaded", updateClock);
 
-    // Apply theme only for Submission Form
     function applyTheme(colorStr) { 
         let primary = "#008080"; 
         if(colorStr) {
@@ -497,7 +495,7 @@
         document.getElementById('mainWrapper').parentElement.style.display = 'none';
         document.getElementById('employeeView').style.display = 'block';
         
-        document.getElementById('who').textContent = (officeUser.name || officeUser.userId || 'Employee') + ' • ' + (officeUser.role || 'Viewer');
+        document.getElementById('who').textContent = 'User : ' + (officeUser.name || officeUser.userId || 'Employee');
         document.getElementById('scope').textContent = 'Access: ' + [officeUser.country, officeUser.region, officeUser.state, officeUser.division, officeUser.district, officeUser.chain, officeUser.department].filter(Boolean).join(' / ');
         loadDashboard(token);
     }
@@ -570,7 +568,6 @@
         );
     }
     
-    // Updated filters array with Department
     function populateDashboardFilters(resetAll) {
         const region = resetAll ? '' : (document.getElementById('dashRegion').value || '');
         const state = resetAll ? '' : (document.getElementById('dashState').value || '');
@@ -731,7 +728,6 @@
         let html = '';
         let chartsToDraw = [];
 
-        // All Right-Side items are now Tables as requested
         if (level === 'india') {
             html += buildChartHTML('regionChart', 'REPORTS BY REGION');
             html += buildTableHTML('REPORTS BY STATE', groupCount(rows, 'state'));
@@ -816,7 +812,6 @@
         
         const reportSum=currentFilteredRows.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0);
         
-        // Beautiful SVG Icons for stats
         const icons = [
             `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f0a014" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
             `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3CAEA3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>`,
@@ -824,18 +819,20 @@
             `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#20639B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`
         ];
 
-        document.getElementById('stats').innerHTML=[
-            ['TOTAL SUBMITED', currentFilteredRows.length.toLocaleString('en-IN')],
-            ['REPORT', reportSum.toLocaleString('en-IN')],
-            ['DISTRICTS SUBMITED', new Set(currentFilteredRows.map(x=>x.district).filter(Boolean)).size.toLocaleString('en-IN')],
-            ['DEPARTMENTS SUBMITED', new Set(currentFilteredRows.map(x=>x.department).filter(Boolean)).size.toLocaleString('en-IN')]
-        ].map((x, i)=>`
+        const statsData = [
+            { label: 'TOTAL SUBMITED', count: currentFilteredRows.length.toLocaleString('en-IN'), iconIndex: 0 },
+            { label: 'DISTRICTS SUBMITED', count: new Set(currentFilteredRows.map(x=>x.district).filter(Boolean)).size.toLocaleString('en-IN'), iconIndex: 2 },
+            { label: 'DEPARTMENTS SUBMITED', count: new Set(currentFilteredRows.map(x=>x.department).filter(Boolean)).size.toLocaleString('en-IN'), iconIndex: 3 },
+            { label: 'REPORT', count: reportSum.toLocaleString('en-IN'), iconIndex: 1 }
+        ];
+
+        document.getElementById('stats').innerHTML = statsData.map(d => `
             <div class="stat" style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:8px;">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    ${icons[i]}
-                    <div style="font-size:12px; color:#222; font-weight:700;">${x[0]}</div>
+                    ${icons[d.iconIndex]}
+                    <div style="font-size:12px; color:#222; font-weight:700;">${d.label}</div>
                 </div>
-                <div style="font-family: Arial, sans-serif; font-size:24px; font-weight:600; color:var(--dash-primary); line-height: 1;">${x[1]}</div>
+                <div style="font-family: Arial, sans-serif; font-size:24px; font-weight:600; color:var(--dash-primary); line-height: 1;">${d.count}</div>
             </div>
         `).join('');
         
@@ -910,6 +907,21 @@
         ];
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Reports');
+
+        const summary = [
+            ['Weekly Risala Report - Dashboard Export'],
+            ['Downloaded Rows', rows.length],
+            ['Report Quantity', rows.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0)],
+            ['Region Filter', document.getElementById('dashRegion').value || 'All Region'],
+            ['State Filter', document.getElementById('dashState').value || 'All State'],
+            ['Division Filter', document.getElementById('dashDivision').value || 'All Division'],
+            ['District Filter', document.getElementById('dashDistrict').value || 'All District'],
+            ['Chain Filter', document.getElementById('dashChain').value || 'All Chain'],
+            ['Search', document.getElementById('search').value || '']
+        ];
+        const sws = XLSX.utils.aoa_to_sheet(summary);
+        sws['!cols'] = [{wch:24},{wch:40}];
+        XLSX.utils.book_append_sheet(wb, sws, 'Summary');
 
         const stamp = new Date().toISOString().slice(0,19).replace(/[T:]/g,'-');
         XLSX.writeFile(wb, 'Weekly_Risala_Report_' + stamp + '.xlsx');
