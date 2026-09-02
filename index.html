@@ -14,13 +14,12 @@
 
     <style>
         :root { 
-            /* Form Themes (Dynamic from Sheet) */
             --form-primary: #008080; 
             --form-hover: #005959; 
             --form-bg: #e0f2f1; 
             --form-light-bg: #f0faf9;
             
-            /* Dashboard Themes (Fixed Professional) */
+            /* Dash Theme remains fixed */
             --dash-primary: #008080;
             --dash-hover: #005959;
             --dash-light-bg: #f0faf9;
@@ -28,7 +27,6 @@
         
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--form-bg); margin: 0; padding: 15px; display: flex; justify-content: center; transition: background-color 0.3s; }
         
-        /* FORM STYLES */
         .form-container { background: white; width: 100%; box-sizing: border-box; padding: 25px; border-radius: 12px; box-shadow: 0px 8px 24px rgba(0,0,0,0.06); border-top: 6px solid var(--form-primary); margin: 0 auto 20px auto; transition: border-color 0.3s; }
         .header-image { width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; display: none; }
         h2 { color: var(--form-primary); text-align: center; border-bottom: 2px solid var(--form-primary); padding-bottom: 5px; margin-bottom: 5px; }
@@ -47,7 +45,6 @@
     
         .site-shell { width:100%; max-width:1200px; }
         
-        /* LOGIN / TOPBAR STYLES (Always Dash Theme) */
         .topbar { background:#fff; width: 100%; box-sizing: border-box; min-height:60px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,.05); display:flex; align-items:center; justify-content:space-between; padding:0 20px; margin-bottom:16px; }
         .brand { color:var(--dash-primary); font-size:19px; font-weight:800; letter-spacing: 0.5px; }
         .office-btn { border:0; background:var(--dash-primary); color:#fff; padding:10px 18px; border-radius:6px; font-weight:700; cursor:pointer; transition: 0.2s; }
@@ -64,25 +61,24 @@
         .btn-secondary:hover { background:#d0d0d0; }
         .login-error { display:none; margin-top:15px; background:#fde8e8; color:#b42318; padding:12px; border-radius:8px; text-align:center; font-weight:600; font-size:14px; }
         
-        /* DASHBOARD STYLES */
         .employee-view { display:none; width:100%; max-width:1200px; margin:0 auto; }
         
-        .employee-top { background:#fff; padding:15px 24px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow:0 4px 15px rgba(0,0,0,.04); border-radius:10px; margin-bottom: 12px; }
-        .employee-title { font-size:24px; font-weight:800; color:var(--dash-primary); }
-        .employee-user { font-size:13px; color:#666; margin-top:6px; font-weight: 500; }
-        .top-actions { display:flex; align-items:center; gap:15px; margin-top:4px;}
+        /* Compact Header with Title, Scope and Buttons */
+        .employee-top { background:#fff; padding:20px 24px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow:0 4px 15px rgba(0,0,0,.04); border-radius:10px; margin-bottom: 16px; }
+        .employee-title { font-size:24px; font-weight:800; color:var(--dash-primary); letter-spacing: 0.5px; }
+        .employee-user { font-size:13px; color:#777; margin-top:4px; font-weight: 500; }
+        .employee-scope { font-size:14px; color:#444; font-weight: 700; margin-top:14px; }
         .logout-btn { border:0; background:#dc3545; color:#fff; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:700; font-size: 13px; transition: 0.2s; }
         .logout-btn:hover { background:#c82333; }
+        .refresh-btn { border:0; background:var(--dash-primary); color:#fff; padding:9px 16px; border-radius:6px; cursor:pointer; font-weight:700; font-size:13px; transition: 0.2s; }
+        .refresh-btn:hover { background:var(--dash-hover); }
         
         .employee-wrap { margin:0 auto; padding:0; }
-        .welcome { background:#fff; border-radius:10px; padding:16px 24px; box-shadow:0 4px 15px rgba(0,0,0,.04); margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; }
         
         .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:16px;}
-        .stat { background:#fff; border-radius:10px; padding:20px; box-shadow:0 4px 15px rgba(0,0,0,.04); border-left: 5px solid var(--dash-primary); position: relative; overflow:hidden;}
-        .stat .n { font-size:24px; font-weight:900; color:var(--dash-primary); margin-top:6px; }
-        .stat-icon { position:absolute; right:15px; top:50%; transform:translateY(-50%) scale(1.8); opacity:0.1; pointer-events:none; }
+        .stat { background:#fff; border-radius:10px; padding:18px 20px; box-shadow:0 4px 15px rgba(0,0,0,.04); border-left: 5px solid var(--dash-primary); }
         
-        .filters { background:#fff; border-radius:10px; padding:16px; margin-bottom: 16px; box-shadow:0 4px 15px rgba(0,0,0,.04); display:grid; grid-template-columns:1.25fr repeat(5,1fr); gap:12px; }
+        .filters { background:#fff; border-radius:10px; padding:16px; margin-bottom: 16px; box-shadow:0 4px 15px rgba(0,0,0,.04); display:grid; grid-template-columns:1.25fr repeat(6,1fr); gap:12px; }
         .filters input,.filters select { width:100%; padding:10px; border:1px solid #dce1e4; border-radius:6px; box-sizing:border-box; margin:0; font-size: 13px; }
         
         .chart-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom: 16px; }
@@ -94,7 +90,7 @@
             min-height: 0; min-width: 0;
             box-sizing: border-box;
         }
-        .chart-title { font-weight:800; color:var(--dash-primary); margin-bottom:12px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .chart-title { font-weight:800; color:var(--dash-primary); margin-bottom:12px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
         .chart-wrap { position:relative; flex: 1; min-height: 0; min-width: 0; width: 100%; overflow:hidden; }
         
         .tablebox { background:#fff; border-radius:10px; padding:18px; box-shadow:0 4px 15px rgba(0,0,0,.04); overflow-x:auto; margin-bottom: 24px;}
@@ -104,8 +100,6 @@
         .employee-table tbody tr:hover { background-color: var(--dash-light-bg); }
         
         .dash-msg { padding:20px; text-align:center; color:#888; font-size: 15px; font-style: italic; }
-        .refresh-btn { border:0; background:var(--dash-primary); color:#fff; padding:9px 16px; border-radius:6px; cursor:pointer; font-weight:700; font-size:13px; transition: 0.2s; }
-        .refresh-btn:hover { background:var(--dash-hover); }
         .dash-info { margin:10px 0; font-size:12px; color:#888; text-align:right; font-weight: 500; }
         
         .page-btn { padding: 6px 12px; border: 1px solid var(--dash-primary); background: #fff; color: var(--dash-primary); cursor: pointer; border-radius: 5px; font-weight: 700; font-size: 13px; transition: 0.2s; }
@@ -129,7 +123,6 @@
             .employee-title{font-size:20px} 
         }
     </style>
-    <!-- Chart JS and DataLabels Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
@@ -138,7 +131,6 @@
 <div class="site-shell">
     
     <div style="width:100%;max-width:600px;position:relative;margin:0 auto;">
-        
         <div class="topbar">
             <div class="brand">Weekly Risala Report</div>
             <button class="office-btn" type="button" onclick="openOfficeLogin()">Office Login</button>
@@ -197,26 +189,26 @@
     </div>
 
     <div id="employeeView" class="employee-view">
+      <!-- Consolidated Premium Dashboard Header -->
       <div class="employee-top">
         <div>
             <div class="employee-title">Weekly Risala Report - Office Dashboard</div>
             <div id="who" class="employee-user"></div>
+            <div id="scope" class="employee-scope"></div>
         </div>
-        <div class="top-actions">
-            <div id="liveDateTime" style="font-weight: 700; color: var(--dash-primary); font-size: 15px;"></div>
-            <button class="logout-btn" type="button" onclick="officeLogout()">Logout</button>
-        </div>
-      </div>
-      
-      <div class="employee-wrap">
-        <div class="welcome">
-            <div id="scope" style="color:#555; font-size: 15px; font-weight:700;"></div>
-            <div style="display:flex;gap:10px;">
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div id="liveDateTime" style="font-weight: 700; color: var(--dash-primary); font-size: 13px;"></div>
+                <button class="logout-btn" type="button" onclick="officeLogout()">Logout</button>
+            </div>
+            <div style="display:flex; gap:10px;">
                 <button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh</button>
                 <button class="refresh-btn" type="button" onclick="downloadExcel()" style="background:#198754">Download Excel</button>
             </div>
         </div>
-        
+      </div>
+      
+      <div class="employee-wrap">
         <div id="stats" class="cards"></div>
         
         <div class="filters">
@@ -225,6 +217,7 @@
           <select id="dashState" onchange="onStateChange()"><option value="">All State</option></select>
           <select id="dashDivision" onchange="onDivisionChange()"><option value="">All Division</option></select>
           <select id="dashDistrict" onchange="onDistrictChange()"><option value="">All District</option></select>
+          <select id="dashDepartment" onchange="onDepartmentChange()"><option value="">All Department</option></select>
           <select id="dashChain" onchange="onChainChange()"><option value="">All Chain</option></select>
         </div>
         
@@ -290,6 +283,7 @@
     setInterval(updateClock, 1000);
     document.addEventListener("DOMContentLoaded", updateClock);
 
+    // Apply theme only for Submission Form
     function applyTheme(colorStr) { 
         let primary = "#008080"; 
         if(colorStr) {
@@ -575,11 +569,14 @@
             (!division || sameClient(x.division, division))
         );
     }
+    
+    // Updated filters array with Department
     function populateDashboardFilters(resetAll) {
         const region = resetAll ? '' : (document.getElementById('dashRegion').value || '');
         const state = resetAll ? '' : (document.getElementById('dashState').value || '');
         const division = resetAll ? '' : (document.getElementById('dashDivision').value || '');
         const district = resetAll ? '' : (document.getElementById('dashDistrict').value || '');
+        const dept = resetAll ? '' : (document.getElementById('dashDepartment').value || '');
         const chain = resetAll ? '' : (document.getElementById('dashChain').value || '');
 
         fillDash('dashRegion', uniqValues(officeRows,'region'), 'All Region', region);
@@ -589,6 +586,7 @@
         fillDash('dashDivision', uniqValues(stateRows,'division'), 'All Division', division);
         const divisionRows = rowsForHierarchy(region, state, division);
         fillDash('dashDistrict', uniqValues(divisionRows,'district'), 'All District', district);
+        fillDash('dashDepartment', uniqValues(officeRows,'department'), 'All Department', dept);
         fillDash('dashChain', uniqValues(officeRows,'chain'), 'All Chain', chain);
     }
     function onRegionChange() {
@@ -613,6 +611,7 @@
         renderDashboard();
     }
     function onDistrictChange() { renderDashboard(); }
+    function onDepartmentChange() { renderDashboard(); }
     function onChainChange() { renderDashboard(); }
     
     function escapeHtml(x) { return String(x == null ? '' : x).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -732,26 +731,27 @@
         let html = '';
         let chartsToDraw = [];
 
+        // All Right-Side items are now Tables as requested
         if (level === 'india') {
-            html += buildChartHTML('regionChart', 'Reports by Region');
-            html += buildChartHTML('stateChart', 'Reports by State');
-            html += buildTableHTML('Reports by Department', groupCount(rows, 'department'));
-            html += buildTableHTML('Reports by Division', groupCount(rows, 'division'));
-            chartsToDraw = [ {id: 'regionChart', key: 'region'}, {id: 'stateChart', key: 'state'} ];
+            html += buildChartHTML('regionChart', 'REPORTS BY REGION');
+            html += buildTableHTML('REPORTS BY STATE', groupCount(rows, 'state'));
+            html += buildTableHTML('REPORTS BY DEPARTMENT', groupCount(rows, 'department'));
+            html += buildTableHTML('REPORTS BY DIVISION', groupCount(rows, 'division'));
+            chartsToDraw = [ {id: 'regionChart', key: 'region'} ];
         } 
         else if (level === 'region') {
-            html += buildChartHTML('stateChart', 'Reports by State');
-            html += buildChartHTML('divisionChart', 'Reports by Division');
-            html += buildTableHTML('Reports by Department', groupCount(rows, 'department'));
-            html += buildTableHTML('Reports by District', groupCount(rows, 'district'));
-            chartsToDraw = [ {id: 'stateChart', key: 'state'}, {id: 'divisionChart', key: 'division'} ];
+            html += buildChartHTML('stateChart', 'REPORTS BY STATE');
+            html += buildTableHTML('REPORTS BY DIVISION', groupCount(rows, 'division'));
+            html += buildTableHTML('REPORTS BY DEPARTMENT', groupCount(rows, 'department'));
+            html += buildTableHTML('REPORTS BY DISTRICT', groupCount(rows, 'district'));
+            chartsToDraw = [ {id: 'stateChart', key: 'state'} ];
         } 
         else { 
-            html += buildChartHTML('divisionChart', 'Reports by Division');
-            html += buildChartHTML('districtChart', 'Reports by District');
-            html += buildTableHTML('Reports by Department', groupCount(rows, 'department'));
+            html += buildChartHTML('divisionChart', 'REPORTS BY DIVISION');
+            html += buildTableHTML('REPORTS BY DISTRICT', groupCount(rows, 'district'));
+            html += buildTableHTML('REPORTS BY DEPARTMENT', groupCount(rows, 'department'));
             html += `<div style="display:none;"></div>`; 
-            chartsToDraw = [ {id: 'divisionChart', key: 'division'}, {id: 'districtChart', key: 'district'} ];
+            chartsToDraw = [ {id: 'divisionChart', key: 'division'} ];
         }
 
         grid.innerHTML = html;
@@ -800,12 +800,15 @@
         const st=document.getElementById('dashState').value;
         const dv=document.getElementById('dashDivision').value;
         const di=document.getElementById('dashDistrict').value;
+        const dp=document.getElementById('dashDepartment').value;
         const ch=document.getElementById('dashChain').value;
+        
         currentFilteredRows=officeRows.filter(x =>
             (!rg||sameClient(x.region,rg)) &&
             (!st||sameClient(x.state,st)) &&
             (!dv||sameClient(x.division,dv)) &&
             (!di||sameClient(x.district,di)) &&
+            (!dp||sameClient(x.department,dp)) &&
             (!ch||sameClient(x.chain,ch)) &&
             (!q||JSON.stringify(x).toLowerCase().includes(q))
         );
@@ -813,22 +816,26 @@
         
         const reportSum=currentFilteredRows.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0);
         
+        // Beautiful SVG Icons for stats
         const icons = [
-            `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--dash-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
-            `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--dash-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>`,
-            `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--dash-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
-            `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--dash-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`
+            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f0a014" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3CAEA3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>`,
+            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ED553B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
+            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#20639B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`
         ];
 
         document.getElementById('stats').innerHTML=[
-            ['Total Entries', currentFilteredRows.length.toLocaleString('en-IN')],
-            ['Report Quantity', reportSum.toLocaleString('en-IN')],
-            ['Districts', new Set(currentFilteredRows.map(x=>x.district).filter(Boolean)).size.toLocaleString('en-IN')],
-            ['Departments', new Set(currentFilteredRows.map(x=>x.department).filter(Boolean)).size.toLocaleString('en-IN')]
+            ['TOTAL SUBMITED', currentFilteredRows.length.toLocaleString('en-IN')],
+            ['REPORT', reportSum.toLocaleString('en-IN')],
+            ['DISTRICTS SUBMITED', new Set(currentFilteredRows.map(x=>x.district).filter(Boolean)).size.toLocaleString('en-IN')],
+            ['DEPARTMENTS SUBMITED', new Set(currentFilteredRows.map(x=>x.department).filter(Boolean)).size.toLocaleString('en-IN')]
         ].map((x, i)=>`
-            <div class="stat">
-                <div><div style="font-size:14px; color:#555;">${x[0]}</div><div class="n">${x[1]}</div></div>
-                <div class="stat-icon">${icons[i]}</div>
+            <div class="stat" style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    ${icons[i]}
+                    <div style="font-size:12px; color:#222; font-weight:700;">${x[0]}</div>
+                </div>
+                <div style="font-family: Arial, sans-serif; font-size:24px; font-weight:600; color:var(--dash-primary); line-height: 1;">${x[1]}</div>
             </div>
         `).join('');
         
@@ -855,12 +862,14 @@
         const st=document.getElementById('dashState').value;
         const dv=document.getElementById('dashDivision').value;
         const di=document.getElementById('dashDistrict').value;
+        const dp=document.getElementById('dashDepartment').value;
         const ch=document.getElementById('dashChain').value;
         return officeRows.filter(x =>
             (!rg||sameClient(x.region,rg)) &&
             (!st||sameClient(x.state,st)) &&
             (!dv||sameClient(x.division,dv)) &&
             (!di||sameClient(x.district,di)) &&
+            (!dp||sameClient(x.department,dp)) &&
             (!ch||sameClient(x.chain,ch)) &&
             (!q||JSON.stringify(x).toLowerCase().includes(q))
         );
@@ -901,21 +910,6 @@
         ];
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Reports');
-
-        const summary = [
-            ['Weekly Risala Report - Dashboard Export'],
-            ['Downloaded Rows', rows.length],
-            ['Report Quantity', rows.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0)],
-            ['Region Filter', document.getElementById('dashRegion').value || 'All Region'],
-            ['State Filter', document.getElementById('dashState').value || 'All State'],
-            ['Division Filter', document.getElementById('dashDivision').value || 'All Division'],
-            ['District Filter', document.getElementById('dashDistrict').value || 'All District'],
-            ['Chain Filter', document.getElementById('dashChain').value || 'All Chain'],
-            ['Search', document.getElementById('search').value || '']
-        ];
-        const sws = XLSX.utils.aoa_to_sheet(summary);
-        sws['!cols'] = [{wch:24},{wch:40}];
-        XLSX.utils.book_append_sheet(wb, sws, 'Summary');
 
         const stamp = new Date().toISOString().slice(0,19).replace(/[T:]/g,'-');
         XLSX.writeFile(wb, 'Weekly_Risala_Report_' + stamp + '.xlsx');
