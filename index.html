@@ -62,10 +62,14 @@
         .employee-view { display:none; width:100%; max-width:1200px; margin:0 auto; }
         
         .employee-top { background:#fff; padding:20px 24px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow:0 4px 15px rgba(0,0,0,.04); border-radius:10px; margin-bottom: 16px; }
-        .employee-title { font-family: Arial, sans-serif; font-size:26px; font-weight:bold; color:var(--dash-primary); letter-spacing: 0.5px; }
-        .employee-subtitle { font-family: Arial, sans-serif; font-size:18px; font-weight:bold; color:#000000; margin-top:4px; display:none; }
-        .employee-scope { font-family: Arial, sans-serif; font-size:16px; color:#444; font-weight: bold; margin-top:10px; }
-        .employee-user { font-family: Arial, sans-serif; font-size:14px; color:#666; margin-top:4px; font-weight: bold; }
+        
+        /* Colored Box for Main Heading */
+        .employee-title-box { background-color: var(--dash-primary); color: white; padding: 12px 18px; border-radius: 8px; margin-bottom: 10px; display: inline-block; }
+        .employee-title { font-family: Arial, sans-serif; font-size:24px; font-weight:bold; color: #ffffff; letter-spacing: 0.5px; }
+        
+        .employee-subtitle { font-family: Arial, sans-serif; font-size:16px; font-weight:bold; color:#000000; margin-top:4px; }
+        .employee-scope { font-family: Arial, sans-serif; font-size:15px; color:#444; font-weight: bold; margin-top:8px; }
+        .employee-user { font-family: Arial, sans-serif; font-size:13px; color:#666; margin-top:4px; font-weight: bold; }
         
         .logout-btn { border:0; background:#dc3545; color:#fff; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:700; font-size: 13px; transition: 0.2s; }
         .logout-btn:hover { background:#c82333; }
@@ -74,9 +78,9 @@
         
         .employee-wrap { margin:0 auto; padding:0; }
         
-        /* 5 Cards Grid */
-        .cards { display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; margin-bottom:16px;}
-        .stat { background:#fff; border-radius:10px; padding:15px 16px; box-shadow:0 4px 15px rgba(0,0,0,.04); border-left: 5px solid var(--dash-primary); }
+        /* Exactly 2 Large Side-by-Side Cards */
+        .cards { display:grid; grid-template-columns: repeat(2, 1fr); gap:16px; margin-bottom:16px;}
+        .stat { background:#fff; border-radius:10px; padding:22px 24px; box-shadow:0 4px 15px rgba(0,0,0,.04); border-left: 6px solid var(--dash-primary); }
         
         .filters { background:#fff; border-radius:10px; padding:16px; margin-bottom: 16px; box-shadow:0 4px 15px rgba(0,0,0,.04); display:grid; grid-template-columns:1.25fr repeat(6,1fr); gap:12px; }
         .filters input,.filters select { width:100%; padding:10px; border:1px solid #dce1e4; border-radius:6px; box-sizing:border-box; margin:0; font-size: 13px; }
@@ -112,8 +116,8 @@
         ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--dash-primary); }
 
-        @media(max-width:900px){ 
-            .cards{grid-template-columns:repeat(2,1fr)} 
+        @media(max-width:800px){ 
+            .cards{grid-template-columns:1fr} 
             .filters{grid-template-columns:1fr 1fr} 
             .chart-grid{grid-template-columns:1fr} 
             .employee-top{flex-direction:column; gap:15px;}
@@ -190,8 +194,13 @@
     <div id="employeeView" class="employee-view">
       <div class="employee-top">
         <div>
-            <div id="dashMainTitle" class="employee-title">Weekly Risala Report - Dashboard</div>
+            <!-- Color Box for Main Title -->
+            <div class="employee-title-box">
+                <div class="employee-title">Weekly Risala Report - Dashboard</div>
+            </div>
+            <!-- Dynamic Subtitle (B4 Cell) -->
             <div id="dashSubTitle" class="employee-subtitle"></div>
+            <!-- Access & User Info -->
             <div id="scope" class="employee-scope"></div>
             <div id="who" class="employee-user"></div>
         </div>
@@ -210,6 +219,7 @@
       
       <div class="employee-wrap">
         
+        <!-- Only 2 Large Cards (Total Submitted & Report) -->
         <div id="stats" class="cards"></div>
         
         <div class="filters">
@@ -835,17 +845,11 @@
         
         const icons = [
             `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f0a014" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
-            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3CAEA3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>`,
-            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ED553B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
-            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#20639B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`
+            `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3CAEA3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>`
         ];
 
-        // ZIMMEDAR LEVEL count from Responses sheet
-        const zimmedarCount = new Set(currentFilteredRows.map(x=>x.level).filter(Boolean)).size.toLocaleString('en-IN');
-
+        // Exactly 2 Large Cards (Total Submitted & Report)
         const statsData = [
-            { label: 'ZIMMEDAR LEVEL', count: zimmedarCount, iconIndex: 2 },
-            { label: 'DEPARTMENTS SUBMITTED', count: new Set(currentFilteredRows.map(x=>x.department).filter(Boolean)).size.toLocaleString('en-IN'), iconIndex: 3 },
             { label: 'TOTAL SUBMITTED', count: currentFilteredRows.length.toLocaleString('en-IN'), iconIndex: 0 },
             { label: 'REPORT', count: reportSum.toLocaleString('en-IN'), iconIndex: 1 }
         ];
@@ -854,9 +858,9 @@
             <div class="stat" style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:8px;">
                 <div style="display:flex; align-items:center; gap:8px;">
                     ${icons[d.iconIndex]}
-                    <div style="font-size:12px; color:#222; font-weight:700;">${d.label}</div>
+                    <div style="font-size:14px; color:#222; font-weight:700;">${d.label}</div>
                 </div>
-                <div style="font-family: Arial, sans-serif; font-size:24px; font-weight:bold; color:var(--dash-primary); line-height: 1;">${d.count}</div>
+                <div style="font-family: Arial, sans-serif; font-size:32px; font-weight:bold; color:var(--dash-primary); line-height: 1.1;">${d.count}</div>
             </div>
         `).join('');
         
