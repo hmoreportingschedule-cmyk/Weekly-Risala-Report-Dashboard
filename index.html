@@ -28,6 +28,8 @@
         
         .btn-submit:disabled { background-color: #7fbfbf; cursor: not-allowed; }
         .hidden { display: none !important; }
+        
+        /* Updated Message Box Style (Will be made RED via JS for OFF status) */
         .message-box { text-align: center; padding: 20px; font-size: 18px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; }
     
         .site-shell { width:100%; max-width:1200px; }
@@ -219,48 +221,48 @@
     }
     
     document.addEventListener("DOMContentLoaded", function() {
-        fetch(scriptURL + "?checkStatus=true&t=" + new Date().getTime())
-        .then(response => response.text()) 
-        .then(text => {
-            try {
-                let data = JSON.parse(text); 
-                document.getElementById("loadingOverlay").classList.add("hidden");
+        fetch(scriptURL + "?checkStatus=true&nocache=" + new Date().getTime(), { cache: "no-store" })
+        .then(response => response.json()) 
+        .then(data => {
+            document.getElementById("loadingOverlay").classList.add("hidden");
 
-                // STRICT ERROR CHECKING
-                if(data.status === "Error") {
-                    document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>" + data.message + "</div>";
-                    document.getElementById("loadingOverlay").classList.remove("hidden");
-                    document.getElementById("dataForm").classList.add("hidden"); 
-                    return;
-                }
+            if(data.status === "Error") {
+                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>Backend Error!</b><br>" + data.message + "</div>";
+                document.getElementById("loadingOverlay").classList.remove("hidden");
+                document.getElementById("dataForm").classList.add("hidden"); 
+                return;
+            }
+            
+            if(data.thumbnail) { 
+                try {
+                    let img = document.getElementById("dynamicThumbnail");
+                    if (data.thumbnail.includes('/d/')) {
+                        let fId = data.thumbnail.split('/d/')[1].split('/')[0];
+                        img.src = "https://lh3.googleusercontent.com/d/" + fId;
+                    } else {
+                        img.src = data.thumbnail; 
+                    }
+                    img.style.display = "block"; 
+                } catch(err) { console.log("Thumbnail Error:", err); }
+            }
+            
+            document.getElementById("dynamicHeading").innerHTML = data.heading || "Weekly Risala Report";
+            document.getElementById("dynamicSubheading").innerHTML = data.subheading || "";
+            applyTheme(data.theme || "Peacock");
+            
+            if(data.status === "OFF") {
+                let offMsgBox = document.getElementById("linkOffMessage");
+                offMsgBox.innerHTML = data.linkOffMsg || "Form is temporarily off.";
                 
-                if(data.thumbnail) { 
-                    try {
-                        let img = document.getElementById("dynamicThumbnail");
-                        if (data.thumbnail.includes('/d/')) {
-                            let fId = data.thumbnail.split('/d/')[1].split('/')[0];
-                            img.src = "https://lh3.googleusercontent.com/d/" + fId;
-                        } else {
-                            img.src = data.thumbnail; 
-                        }
-                        img.style.display = "block"; 
-                    } catch(err) { console.log("Thumbnail Error:", err); }
-                }
-                
-                document.getElementById("dynamicHeading").innerHTML = data.heading || "Weekly Risala Report";
-                document.getElementById("dynamicSubheading").innerHTML = data.subheading || "";
-                applyTheme(data.theme || "Peacock");
-                
-                if(data.status === "OFF") {
-                    document.getElementById("linkOffMessage").innerHTML = data.linkOffMsg || "Form is temporarily off.";
-                    document.getElementById("linkOffMessage").classList.remove("hidden");
-                    document.getElementById("dataForm").classList.add("hidden"); 
-                } else if(data.status === "ON") {
-                    document.getElementById("linkOffMessage").classList.add("hidden");
-                    document.getElementById("dataForm").classList.remove("hidden");
-                }
-            } catch(e) {
-                document.getElementById("loadingOverlay").innerHTML = "<div class='message-box' style='background-color:#dc3545;'><b>System Error!</b><br>Code read nahi ho pa raha.</div>";
+                // RED COLOR FOR PUBLIC OFF MESSAGE
+                offMsgBox.style.backgroundColor = "#dc3545"; 
+                offMsgBox.style.color = "white";             
+                offMsgBox.classList.remove("hidden");
+
+                document.getElementById("dataForm").classList.add("hidden"); 
+            } else {
+                document.getElementById("linkOffMessage").classList.add("hidden");
+                document.getElementById("dataForm").classList.remove("hidden");
             }
         })
         .catch(error => {
@@ -379,6 +381,7 @@
         const userId = document.getElementById('officeUserId').value.trim();
         const password = document.getElementById('officePassword').value;
         btn.disabled = true; btn.textContent = 'Checking...'; err.style.display = 'none';
+        
         fetch(scriptURL + '?action=login&userId=' + encodeURIComponent(userId) + '&password=' + encodeURIComponent(password))
           .then(r => r.json())
           .then(d => {
@@ -390,10 +393,20 @@
                   showEmployeeDashboard();
               } else {
                   err.textContent = d.message || 'Invalid User ID ya Password.';
+                  
+                  // RED COLOR FOR OFFICE LOGIN OFF MESSAGE
+                  if (d.isOffMsg) {
+                      err.style.backgroundColor = "#dc3545";
+                      err.style.color = "white";
+                  } else {
+                      err.style.backgroundColor = "#fde8e8";
+                      err.style.color = "#b42318";
+                  }
+                  
                   err.style.display = 'block';
               }
           })
-          .catch(() => { err.textContent = 'Login server se connection nahi ho raha. Ensure CORS/App Script is allowed.'; err.style.display='block'; })
+          .catch(() => { err.textContent = 'Login server se connection nahi ho raha.'; err.style.display='block'; })
           .finally(() => { btn.disabled=false; btn.textContent='Login'; });
     }
     function showEmployeeDashboard() {
