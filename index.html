@@ -63,7 +63,6 @@
         
         .employee-top { background:#fff; padding:20px 24px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow:0 4px 15px rgba(0,0,0,.04); border-radius:10px; margin-bottom: 16px; }
         
-        /* Colored Box for Main Heading */
         .employee-title-box { background-color: var(--dash-primary); color: white; padding: 12px 18px; border-radius: 8px; margin-bottom: 10px; display: inline-block; }
         .employee-title { font-family: Arial, sans-serif; font-size:24px; font-weight:bold; color: #ffffff; letter-spacing: 0.5px; }
         
@@ -78,9 +77,9 @@
         
         .employee-wrap { margin:0 auto; padding:0; }
         
-        /* Exactly 2 Large Side-by-Side Cards */
+        /* 2 Large Side-by-Side Cards (Reduced Thickness & Inline Digits) */
         .cards { display:grid; grid-template-columns: repeat(2, 1fr); gap:16px; margin-bottom:16px;}
-        .stat { background:#fff; border-radius:10px; padding:22px 24px; box-shadow:0 4px 15px rgba(0,0,0,.04); border-left: 6px solid var(--dash-primary); }
+        .stat { background:#fff; border-radius:10px; padding:14px 20px; box-shadow:0 4px 15px rgba(0,0,0,.04); border-left: 6px solid var(--dash-primary); display: flex; align-items: center; justify-content: space-between; }
         
         .filters { background:#fff; border-radius:10px; padding:16px; margin-bottom: 16px; box-shadow:0 4px 15px rgba(0,0,0,.04); display:grid; grid-template-columns:1.25fr repeat(6,1fr); gap:12px; }
         .filters input,.filters select { width:100%; padding:10px; border:1px solid #dce1e4; border-radius:6px; box-sizing:border-box; margin:0; font-size: 13px; }
@@ -194,13 +193,10 @@
     <div id="employeeView" class="employee-view">
       <div class="employee-top">
         <div>
-            <!-- Color Box for Main Title -->
             <div class="employee-title-box">
                 <div class="employee-title">Weekly Risala Report - Dashboard</div>
             </div>
-            <!-- Dynamic Subtitle (B4 Cell) -->
             <div id="dashSubTitle" class="employee-subtitle"></div>
-            <!-- Access & User Info -->
             <div id="scope" class="employee-scope"></div>
             <div id="who" class="employee-user"></div>
         </div>
@@ -219,17 +215,16 @@
       
       <div class="employee-wrap">
         
-        <!-- Only 2 Large Cards (Total Submitted & Report) -->
         <div id="stats" class="cards"></div>
         
         <div class="filters">
           <input id="search" placeholder="Search..." oninput="renderDashboard()">
-          <select id="dashRegion" onchange="onRegionChange()"><option value="">All Region</option></select>
-          <select id="dashState" onchange="onStateChange()"><option value="">All State</option></select>
-          <select id="dashDivision" onchange="onDivisionChange()"><option value="">All Division</option></select>
-          <select id="dashDistrict" onchange="onDistrictChange()"><option value="">All District</option></select>
-          <select id="dashDepartment" onchange="onDepartmentChange()"><option value="">All Department</option></select>
-          <select id="dashChain" onchange="onChainChange()"><option value="">All Chain</option></select>
+          <select id="dashRegion" onchange="onRegionChange()"><option value="">Region</option></select>
+          <select id="dashState" onchange="onStateChange()"><option value="">State</option></select>
+          <select id="dashDivision" onchange="onDivisionChange()"><option value="">Division</option></select>
+          <select id="dashDistrict" onchange="onDistrictChange()"><option value="">District</option></select>
+          <select id="dashDepartment" onchange="onDepartmentChange()"><option value="">Department</option></select>
+          <select id="dashChain" onchange="onChainChange()"><option value="">Chain</option></select>
         </div>
         
         <div id="chartGrid" class="chart-grid"></div>
@@ -602,35 +597,35 @@
         const dept = resetAll ? '' : (document.getElementById('dashDepartment').value || '');
         const chain = resetAll ? '' : (document.getElementById('dashChain').value || '');
 
-        fillDash('dashRegion', uniqValues(officeRows,'region'), 'All Region', region);
+        fillDash('dashRegion', uniqValues(officeRows,'region'), 'Region', region);
         const regionRows = rowsForHierarchy(region, '', '');
-        fillDash('dashState', uniqValues(regionRows,'state'), 'All State', state);
+        fillDash('dashState', uniqValues(regionRows,'state'), 'State', state);
         const stateRows = rowsForHierarchy(region, state, '');
-        fillDash('dashDivision', uniqValues(stateRows,'division'), 'All Division', division);
+        fillDash('dashDivision', uniqValues(stateRows,'division'), 'Division', division);
         const divisionRows = rowsForHierarchy(region, state, division);
-        fillDash('dashDistrict', uniqValues(divisionRows,'district'), 'All District', district);
-        fillDash('dashDepartment', uniqValues(officeRows,'department'), 'All Department', dept);
-        fillDash('dashChain', uniqValues(officeRows,'chain'), 'All Chain', chain);
+        fillDash('dashDistrict', uniqValues(divisionRows,'district'), 'District', district);
+        fillDash('dashDepartment', uniqValues(officeRows,'department'), 'Department', dept);
+        fillDash('dashChain', uniqValues(officeRows,'chain'), 'Chain', chain);
     }
     function onRegionChange() {
         const region = document.getElementById('dashRegion').value;
-        fillDash('dashState', uniqValues(rowsForHierarchy(region,'',''),'state'), 'All State', '');
-        fillDash('dashDivision', uniqValues(rowsForHierarchy(region,'',''),'division'), 'All Division', '');
-        fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,'',''),'district'), 'All District', '');
+        fillDash('dashState', uniqValues(rowsForHierarchy(region,'',''),'state'), 'State', '');
+        fillDash('dashDivision', uniqValues(rowsForHierarchy(region,'',''),'division'), 'Division', '');
+        fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,'',''),'district'), 'District', '');
         renderDashboard();
     }
     function onStateChange() {
         const region = document.getElementById('dashRegion').value;
         const state = document.getElementById('dashState').value;
-        fillDash('dashDivision', uniqValues(rowsForHierarchy(region,state,''),'division'), 'All Division', '');
-        fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,state,''),'district'), 'All District', '');
+        fillDash('dashDivision', uniqValues(rowsForHierarchy(region,state,''),'division'), 'Division', '');
+        fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,state,''),'district'), 'District', '');
         renderDashboard();
     }
     function onDivisionChange() {
         const region = document.getElementById('dashRegion').value;
         const state = document.getElementById('dashState').value;
         const division = document.getElementById('dashDivision').value;
-        fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,state,division),'district'), 'All District', '');
+        fillDash('dashDistrict', uniqValues(rowsForHierarchy(region,state,division),'district'), 'District', '');
         renderDashboard();
     }
     function onDistrictChange() { renderDashboard(); }
@@ -848,19 +843,18 @@
             `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3CAEA3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>`
         ];
 
-        // Exactly 2 Large Cards (Total Submitted & Report)
         const statsData = [
             { label: 'TOTAL SUBMITTED', count: currentFilteredRows.length.toLocaleString('en-IN'), iconIndex: 0 },
             { label: 'REPORT', count: reportSum.toLocaleString('en-IN'), iconIndex: 1 }
         ];
 
         document.getElementById('stats').innerHTML = statsData.map(d => `
-            <div class="stat" style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:8px;">
+            <div class="stat">
                 <div style="display:flex; align-items:center; gap:8px;">
                     ${icons[d.iconIndex]}
-                    <div style="font-size:14px; color:#222; font-weight:700;">${d.label}</div>
+                    <div style="font-size:12px; color:#222; font-weight:700;">${d.label}</div>
                 </div>
-                <div style="font-family: Arial, sans-serif; font-size:32px; font-weight:bold; color:var(--dash-primary); line-height: 1.1;">${d.count}</div>
+                <div style="font-family: Arial, sans-serif; font-size:26px; font-weight:bold; color:var(--dash-primary); line-height: 1;">${d.count}</div>
             </div>
         `).join('');
         
@@ -940,11 +934,11 @@
             ['Weekly Risala Report - Dashboard Export'],
             ['Downloaded Rows', rows.length],
             ['Report Quantity', rows.reduce((sum,x)=>{const n=Number(String(x.report||'').replace(/,/g,''));return sum+(isNaN(n)?0:n);},0)],
-            ['Region Filter', document.getElementById('dashRegion').value || 'All Region'],
-            ['State Filter', document.getElementById('dashState').value || 'All State'],
-            ['Division Filter', document.getElementById('dashDivision').value || 'All Division'],
-            ['District Filter', document.getElementById('dashDistrict').value || 'All District'],
-            ['Chain Filter', document.getElementById('dashChain').value || 'All Chain'],
+            ['Region Filter', document.getElementById('dashRegion').value || 'Region'],
+            ['State Filter', document.getElementById('dashState').value || 'State'],
+            ['Division Filter', document.getElementById('dashDivision').value || 'Division'],
+            ['District Filter', document.getElementById('dashDistrict').value || 'District'],
+            ['Chain Filter', document.getElementById('dashChain').value || 'Chain'],
             ['Search', document.getElementById('search').value || '']
         ];
         const sws = XLSX.utils.aoa_to_sheet(summary);
