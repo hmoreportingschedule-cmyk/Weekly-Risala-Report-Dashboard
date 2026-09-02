@@ -16,7 +16,7 @@
         :root { --primary: #008080; --hover: #005959; --bg: #e0f2f1; --light-bg: #f0faf9; }
         body { font-family: Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
         
-        .form-container { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 10px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); margin: 20px auto; }
+        .form-container { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 10px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); margin: 0 auto 20px auto; }
         .header-image { width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; display: none; }
         h2 { color: var(--primary); text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin-bottom: 5px; }
         
@@ -30,9 +30,12 @@
         .hidden { display: none !important; }
         .message-box { text-align: center; padding: 20px; font-size: 18px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; }
     
-        /* Dashboard Strict Layout Fixes */
+        /* Dashboard Layout */
         .site-shell { width:100%; max-width:1200px; }
-        .topbar { background:#fff; min-height:50px; border-radius:8px; box-shadow:0 3px 10px rgba(0,0,0,.08); display:flex; align-items:center; justify-content:space-between; padding:0 12px 0 18px; margin-bottom:12px; }
+        
+        /* Updated Topbar to match form container width */
+        .topbar { background:#fff; width: 100%; max-width: 600px; min-height:50px; border-radius:8px; box-shadow:0 3px 10px rgba(0,0,0,.08); display:flex; align-items:center; justify-content:space-between; padding:0 12px 0 18px; margin: 0 auto 12px auto; box-sizing: border-box; }
+        .topbar.expanded { max-width: 1200px; } /* Expands to full width when dashboard opens */
         .brand { color:var(--primary); font-size:18px; font-weight:700; }
         .office-btn { border:0; background:var(--primary); color:#fff; padding:8px 14px; border-radius:6px; font-weight:700; cursor:pointer; }
         .office-btn:hover { background:var(--hover); }
@@ -104,7 +107,7 @@
 </head>
 <body>
 <div class="site-shell">
-<div class="topbar"><div class="brand">Weekly Risala Report</div><button class="office-btn" type="button" onclick="openOfficeLogin()">Office Login</button></div>
+<div class="topbar" id="mainTopbar"><div class="brand">Weekly Risala Report</div><button class="office-btn" type="button" onclick="openOfficeLogin()">Office Login</button></div>
 <div style="width:100%;max-width:600px;position:relative;margin:0 auto;">
 <div class="form-container" id="mainWrapper">
     <img id="dynamicThumbnail" src="" alt="Thumbnail" class="header-image">
@@ -182,7 +185,7 @@
       <select id="dashChain" onchange="onChainChange()"><option value="">All Chain</option></select>
     </div>
     
-    <!-- Dynamic Chart/Table Grid Slot (Strict 260px containers) -->
+    <!-- Dynamic Chart/Table Grid Slot -->
     <div id="chartGrid" class="chart-grid"></div>
 
     <div id="dashInfo" class="dash-info"></div>
@@ -430,7 +433,7 @@
                   err.style.display = 'block';
               }
           })
-          .catch(() => { err.textContent = 'Login server se connection nahi ho raha.'; err.style.display='block'; })
+          .catch(() => { err.textContent = 'Login server se connection nahi ho raha. Ensure CORS/App Script is allowed.'; err.style.display='block'; })
           .finally(() => { btn.disabled=false; btn.textContent='Login'; });
     }
     
@@ -438,9 +441,11 @@
         try { officeUser = JSON.parse(sessionStorage.getItem('risalaUser') || '{}'); } catch(e) { officeUser = {}; }
         const token = sessionStorage.getItem('risalaToken');
         if (!token) { openOfficeLogin(); return; }
+        
         document.getElementById('mainWrapper').style.display = 'none';
-        document.querySelector('.topbar').style.display = 'none';
+        document.getElementById('mainTopbar').classList.add('expanded'); // Make Topbar Full Width
         document.getElementById('employeeView').style.display = 'block';
+        
         document.getElementById('who').textContent = (officeUser.name || officeUser.userId || 'Employee') + ' • ' + (officeUser.role || 'Viewer');
         document.getElementById('scope').textContent = 'Access: ' + [officeUser.country, officeUser.region, officeUser.state, officeUser.division, officeUser.district, officeUser.chain, officeUser.department].filter(Boolean).join(' / ');
         loadDashboard(token);
@@ -450,9 +455,11 @@
         sessionStorage.removeItem('risalaToken');
         sessionStorage.removeItem('risalaUser');
         officeRows = []; officeUser = {}; currentFilteredRows = [];
+        
         document.getElementById('employeeView').style.display = 'none';
         document.getElementById('mainWrapper').style.display = '';
-        document.querySelector('.topbar').style.display = 'flex';
+        document.getElementById('mainTopbar').classList.remove('expanded'); // Revert Topbar to compact width
+        
         window.scrollTo(0,0);
     }
     
@@ -472,7 +479,7 @@
                       sessionStorage.removeItem('risalaUser');
                       document.getElementById('employeeView').style.display='none';
                       document.getElementById('mainWrapper').style.display='';
-                      document.querySelector('.topbar').style.display='flex';
+                      document.getElementById('mainTopbar').classList.remove('expanded');
                       alert(msg + ' Dobara login karein.');
                       openOfficeLogin();
                   } else {
