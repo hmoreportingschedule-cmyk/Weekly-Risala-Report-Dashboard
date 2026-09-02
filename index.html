@@ -18,6 +18,8 @@
             --form-hover: #005959; 
             --form-bg: #e0f2f1; 
             --form-light-bg: #f0faf9;
+            
+            /* Dash Theme remains fixed */
             --dash-primary: #008080;
             --dash-hover: #005959;
             --dash-light-bg: #f0faf9;
@@ -63,8 +65,9 @@
         
         .employee-top { background:#fff; padding:20px 24px; display:flex; justify-content:space-between; align-items:flex-start; box-shadow:0 4px 15px rgba(0,0,0,.04); border-radius:10px; margin-bottom: 16px; }
         .employee-title { font-family: Arial, sans-serif; font-size:26px; font-weight:bold; color:var(--dash-primary); letter-spacing: 0.5px; }
+        .employee-subtitle { font-family: Arial, sans-serif; font-size:18px; font-weight:bold; color:#000000; margin-top:4px; display:none; }
         .employee-scope { font-family: Arial, sans-serif; font-size:16px; color:#444; font-weight: bold; margin-top:10px; }
-        .employee-user { font-family: Arial, sans-serif; font-size:14px; color:#666; margin-top:6px; font-weight: bold; }
+        .employee-user { font-family: Arial, sans-serif; font-size:14px; color:#666; margin-top:4px; font-weight: bold; }
         
         .logout-btn { border:0; background:#dc3545; color:#fff; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:700; font-size: 13px; transition: 0.2s; }
         .logout-btn:hover { background:#c82333; }
@@ -189,7 +192,11 @@
     <div id="employeeView" class="employee-view">
       <div class="employee-top">
         <div>
+            <!-- Fixed Main Title -->
             <div id="dashMainTitle" class="employee-title">Weekly Risala Report - Dashboard</div>
+            <!-- Dynamic Subtitle (B4 Cell) -->
+            <div id="dashSubTitle" class="employee-subtitle"></div>
+            <!-- Access & User Info -->
             <div id="scope" class="employee-scope"></div>
             <div id="who" class="employee-user"></div>
         </div>
@@ -199,7 +206,7 @@
                 <button class="logout-btn" type="button" onclick="officeLogout()">Logout</button>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
-                <!-- New Notification Box -->
+                <!-- B6 Box -->
                 <div id="b6Box" style="background:var(--dash-light-bg); border: 2px solid var(--dash-primary); color:var(--dash-primary); padding:6px 16px; border-radius:6px; font-weight:bold; font-size:14px; display:none; align-items:center; text-align:center;"></div>
                 <button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh</button>
                 <button class="refresh-btn" type="button" onclick="downloadExcel()" style="background:#198754">Download Excel</button>
@@ -536,10 +543,13 @@
                   return;
               }
               
-              // Dynamic Title from Sheet B4
-              document.getElementById('dashMainTitle').innerText = 'Weekly Risala Report : ' + (d.b4Value ? d.b4Value + ' ' : '') + '- Dashboard';
+              if(d.b4Value) {
+                  document.getElementById('dashSubTitle').innerText = d.b4Value;
+                  document.getElementById('dashSubTitle').style.display = 'block';
+              } else {
+                  document.getElementById('dashSubTitle').style.display = 'none';
+              }
               
-              // B6 Info Box Display
               if(d.b6Value) {
                   document.getElementById('b6Box').innerText = d.b6Value;
                   document.getElementById('b6Box').style.display = 'flex';
@@ -726,7 +736,6 @@
         });
     }
 
-    // Dynamic Hierarchy Logic
     function getHierarchyLevel() {
         if (document.getElementById('dashDistrict').value) return 'district';
         if (document.getElementById('dashDivision').value) return 'division';
@@ -837,7 +846,6 @@
             `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#20639B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`
         ];
 
-        // 1. DYNAMIC ROLL-BASED LABEL 
         let dynamicLabel = 'DISTRICTS SUBMITTED';
         let dynamicCount = new Set(currentFilteredRows.map(x=>x.district).filter(Boolean)).size.toLocaleString('en-IN');
         let lvl = getHierarchyLevel();
@@ -852,11 +860,10 @@
             dynamicCount = new Set(currentFilteredRows.map(x=>x.division).filter(Boolean)).size.toLocaleString('en-IN');
         }
 
-        // 2. NEW SEQUENCE 
         const statsData = [
+            { label: 'TOTAL SUBMITTED', count: currentFilteredRows.length.toLocaleString('en-IN'), iconIndex: 0 },
             { label: dynamicLabel, count: dynamicCount, iconIndex: 2 },
             { label: 'DEPARTMENTS SUBMITTED', count: new Set(currentFilteredRows.map(x=>x.department).filter(Boolean)).size.toLocaleString('en-IN'), iconIndex: 3 },
-            { label: 'TOTAL SUBMITTED', count: currentFilteredRows.length.toLocaleString('en-IN'), iconIndex: 0 },
             { label: 'REPORT', count: reportSum.toLocaleString('en-IN'), iconIndex: 1 }
         ];
 
