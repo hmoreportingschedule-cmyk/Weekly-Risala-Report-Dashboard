@@ -28,8 +28,6 @@
         
         .btn-submit:disabled { background-color: #7fbfbf; cursor: not-allowed; }
         .hidden { display: none !important; }
-        
-        /* Updated Message Box Style (Will be made RED via JS for OFF status) */
         .message-box { text-align: center; padding: 20px; font-size: 18px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; }
     
         .site-shell { width:100%; max-width:1200px; }
@@ -66,9 +64,9 @@
         .dash-msg { padding:20px; text-align:center; color:#666; }
 
         .chart-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:18px 0; }
-        .chart-card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.07); min-height:300px; }
+        .chart-card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.07); min-height:300px; display: flex; flex-direction: column; }
         .chart-title { font-weight:700; color:var(--primary); margin-bottom:10px; }
-        .chart-wrap { position:relative; height:260px; }
+        .chart-wrap { position:relative; flex: 1; min-height: 260px; }
         .refresh-btn { border:0; background:var(--primary); color:#fff; padding:9px 13px; border-radius:6px; cursor:pointer; font-weight:700; }
         .dash-info { margin:10px 0; font-size:12px; color:#666; text-align:right; }
         
@@ -153,12 +151,10 @@
       <select id="dashDistrict" onchange="onDistrictChange()"><option value="">All District</option></select>
       <select id="dashChain" onchange="onChainChange()"><option value="">All Chain</option></select>
     </div>
-    <div id="chartGrid" class="chart-grid">
-      <div class="chart-card"><div class="chart-title">Reports by Region</div><div class="chart-wrap"><canvas id="regionChart"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">Reports by State</div><div class="chart-wrap"><canvas id="stateChart"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">Reports by Division</div><div class="chart-wrap"><canvas id="divisionChart"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">Reports by Department</div><div class="chart-wrap"><canvas id="departmentChart"></canvas></div></div>
-    </div>
+    
+    <!-- Dynamic Chart/Table Grid Slot -->
+    <div id="chartGrid" class="chart-grid"></div>
+
     <div id="dashInfo" class="dash-info"></div>
     <div class="tablebox">
       <div id="dashMessage" class="dash-msg">Loading reports...</div>
@@ -190,6 +186,9 @@
 <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyCQmXtOgmcoV4mUG0j5HXVytNZuZbCAE8Dey-SJ7YlUTXWfiDcjnt4ZH-AqsYwdE8F/exec";
     
+    // Colorful Palette for Graphs (Image 4 format)
+    const colorPalette = ['#173F5F', '#20639B', '#3CAEA3', '#F6D55C', '#ED553B', '#f0a014', '#dded7f', '#6b2013', '#51a496', '#b8d099', '#3e3456'];
+
     function updateClock() {
         const now = new Date();
         const pad = n => String(n).padStart(2, '0');
@@ -199,25 +198,27 @@
     setInterval(updateClock, 1000);
     document.addEventListener("DOMContentLoaded", updateClock);
 
-    const themes = {
-        "Peacock": { primary: "#008080", hover: "#005959", bg: "#e0f2f1", lightBg: "#f0faf9" },
-        "Blue":    { primary: "#0056b3", hover: "#003d82", bg: "#e6f2ff", lightBg: "#f0f7ff" },
-        "Red":     { primary: "#dc3545", hover: "#a71d2a", bg: "#fcebec", lightBg: "#fdf3f4" },
-        "Green":   { primary: "#28a745", hover: "#1e7e34", bg: "#e8f5e9", lightBg: "#f1f8f1" },
-        "Orange":  { primary: "#fd7e14", hover: "#c6600d", bg: "#fff2e6", lightBg: "#fff8f0" },
-        "Purple":  { primary: "#6f42c1", hover: "#59339d", bg: "#f3e8ff", lightBg: "#f9f4ff" },
-        "Dark":    { primary: "#343a40", hover: "#23272b", bg: "#e9ecef", lightBg: "#f8f9fa" },
-        "Teal":    { primary: "#20c997", hover: "#17a2b8", bg: "#e0fafa", lightBg: "#f0fcfc" },
-        "Brown":   { primary: "#795548", hover: "#5d4037", bg: "#efebe9", lightBg: "#f5f3f1" },
-        "Pink":    { primary: "#e83e8c", hover: "#c23373", bg: "#fcecf3", lightBg: "#fdf4f7" }
-    };
-
-    function applyTheme(t) { 
-        let s = themes[t] || themes["Peacock"]; 
-        document.documentElement.style.setProperty('--primary', s.primary); 
-        document.documentElement.style.setProperty('--hover', s.hover); 
-        document.documentElement.style.setProperty('--bg', s.bg); 
-        document.documentElement.style.setProperty('--light-bg', s.lightBg); 
+    // Dynamic Theme Color Applicator
+    function applyTheme(colorStr) { 
+        let primary = "#008080"; 
+        if(colorStr) {
+            colorStr = colorStr.trim();
+            // Automatically detect if it's a Hex code missing the '#'
+            if(/^[0-9A-F]{6}$/i.test(colorStr)) colorStr = '#' + colorStr;
+            primary = colorStr;
+        }
+        
+        document.documentElement.style.setProperty('--primary', primary); 
+        document.documentElement.style.setProperty('--hover', primary); 
+        
+        // Generate light backgrounds if valid hex code
+        if(/^#[0-9A-F]{6}$/i.test(primary)) {
+            document.documentElement.style.setProperty('--bg', primary + '1A'); // 10% Opacity
+            document.documentElement.style.setProperty('--light-bg', primary + '0D'); // 5% Opacity
+        } else {
+            document.documentElement.style.setProperty('--bg', '#e0f2f1');
+            document.documentElement.style.setProperty('--light-bg', '#f0faf9');
+        }
     }
     
     document.addEventListener("DOMContentLoaded", function() {
@@ -233,6 +234,7 @@
                 return;
             }
             
+            // Thumbnail is always processed and shown if available
             if(data.thumbnail) { 
                 try {
                     let img = document.getElementById("dynamicThumbnail");
@@ -248,17 +250,16 @@
             
             document.getElementById("dynamicHeading").innerHTML = data.heading || "Weekly Risala Report";
             document.getElementById("dynamicSubheading").innerHTML = data.subheading || "";
-            applyTheme(data.theme || "Peacock");
+            
+            // Apply Custom Theme
+            applyTheme(data.theme);
             
             if(data.status === "OFF") {
                 let offMsgBox = document.getElementById("linkOffMessage");
                 offMsgBox.innerHTML = data.linkOffMsg || "Form is temporarily off.";
-                
-                // RED COLOR FOR PUBLIC OFF MESSAGE
                 offMsgBox.style.backgroundColor = "#dc3545"; 
                 offMsgBox.style.color = "white";             
                 offMsgBox.classList.remove("hidden");
-
                 document.getElementById("dataForm").classList.add("hidden"); 
             } else {
                 document.getElementById("linkOffMessage").classList.add("hidden");
@@ -394,7 +395,6 @@
               } else {
                   err.textContent = d.message || 'Invalid User ID ya Password.';
                   
-                  // RED COLOR FOR OFFICE LOGIN OFF MESSAGE
                   if (d.isOffMsg) {
                       err.style.backgroundColor = "#dc3545";
                       err.style.color = "white";
@@ -406,7 +406,7 @@
                   err.style.display = 'block';
               }
           })
-          .catch(() => { err.textContent = 'Login server se connection nahi ho raha.'; err.style.display='block'; })
+          .catch(() => { err.textContent = 'Login server se connection nahi ho raha. Ensure CORS/App Script is allowed.'; err.style.display='block'; })
           .finally(() => { btn.disabled=false; btn.textContent='Login'; });
     }
     function showEmployeeDashboard() {
@@ -538,6 +538,29 @@
     }
     function destroyChart(name){ if(chartRefs[name]) { chartRefs[name].destroy(); chartRefs[name]=null; } }
     
+    // HTML Builder for Dashboard Chart
+    function buildChartHTML(id, title) {
+        return `<div class="chart-card"><div class="chart-title">${title}</div><div class="chart-wrap"><canvas id="${id}"></canvas></div></div>`;
+    }
+
+    // HTML Builder for Dashboard Scrollable Table
+    function buildTableHTML(title, data) {
+        let html = `<div class="chart-card"><div class="chart-title">${title}</div>`;
+        html += `<div class="chart-wrap" style="overflow-y:auto; height:260px; display:block; border: 1px solid #eee; border-radius: 4px;">`;
+        html += `<table class="employee-table" style="width:100%; min-width:auto; margin:0;">`;
+        html += `<thead><tr><th style="position:sticky; top:0; z-index:1; border-radius:0;">Name</th><th style="position:sticky; top:0; z-index:1; border-radius:0;">Report Qty</th></tr></thead><tbody>`;
+        
+        if(data.length === 0) {
+            html += `<tr><td colspan="2" style="text-align:center;">No data available</td></tr>`;
+        } else {
+            data.forEach(d => {
+                html += `<tr><td>${escapeHtml(d.label)}</td><td style="font-weight:bold;">${d.count}</td></tr>`;
+            });
+        }
+        html += `</tbody></table></div></div>`;
+        return html;
+    }
+
     function drawBarChart(canvasId, refName, title, rows, key) {
         if(typeof Chart === 'undefined') return;
         destroyChart(refName);
@@ -545,6 +568,9 @@
         const canvas = document.getElementById(canvasId);
         if(!canvas) return;
         
+        // Multi-color dynamic mapping
+        const bgColors = grouped.map((x, i) => colorPalette[i % colorPalette.length]);
+
         chartRefs[refName] = new Chart(canvas.getContext('2d'), {
             type: 'bar',
             data: {
@@ -553,8 +579,8 @@
                     label: 'Report Quantity',
                     data: grouped.map(x=>x.count),
                     borderWidth: 1,
-                    backgroundColor: '#90CAF9', 
-                    borderColor: '#64B5F6'
+                    backgroundColor: bgColors, 
+                    borderColor: bgColors
                 }]
             },
             options: {
@@ -573,11 +599,50 @@
         });
     }
 
-    function renderCharts(rows) {
-        drawBarChart('regionChart','region','Reports by Region',rows,'region');
-        drawBarChart('stateChart','state','Reports by State',rows,'state');
-        drawBarChart('divisionChart','division','Reports by Division',rows,'division');
-        drawBarChart('departmentChart','department','Reports by Department',rows,'department');
+    function getHierarchyLevel() {
+        // Evaluate dynamic filter selections first
+        if (document.getElementById('dashState').value) return 'state';
+        if (document.getElementById('dashRegion').value) return 'region';
+        
+        // Fallback to assigned role configuration
+        if (officeUser.state && officeUser.state.toLowerCase() !== 'all') return 'state';
+        if (officeUser.region && officeUser.region.toLowerCase() !== 'all') return 'region';
+        
+        return 'india';
+    }
+
+    function renderDynamicCharts(rows) {
+        const level = getHierarchyLevel();
+        const grid = document.getElementById('chartGrid');
+        let html = '';
+        let chartsToDraw = [];
+
+        if (level === 'india') {
+            html += buildChartHTML('regionChart', 'Reports by Region');
+            html += buildChartHTML('stateChart', 'Reports by State');
+            html += buildTableHTML('Reports by Department', groupCount(rows, 'department'));
+            html += buildTableHTML('Reports by Division', groupCount(rows, 'division'));
+            chartsToDraw = [ {id: 'regionChart', key: 'region'}, {id: 'stateChart', key: 'state'} ];
+        } 
+        else if (level === 'region') {
+            html += buildChartHTML('stateChart', 'Reports by State');
+            html += buildChartHTML('divisionChart', 'Reports by Division');
+            html += buildTableHTML('Reports by Department', groupCount(rows, 'department'));
+            html += buildTableHTML('Reports by District', groupCount(rows, 'district'));
+            chartsToDraw = [ {id: 'stateChart', key: 'state'}, {id: 'divisionChart', key: 'division'} ];
+        } 
+        else { // state level and below
+            html += buildChartHTML('divisionChart', 'Reports by Division');
+            html += buildChartHTML('districtChart', 'Reports by District');
+            html += buildTableHTML('Reports by Department', groupCount(rows, 'department'));
+            html += `<div style="display:none;"></div>`; // To maintain layout symmetry
+            chartsToDraw = [ {id: 'divisionChart', key: 'division'}, {id: 'districtChart', key: 'district'} ];
+        }
+
+        grid.innerHTML = html;
+
+        // Draw mapped charts after DOM insertion
+        chartsToDraw.forEach(c => drawBarChart(c.id, c.id, c.title, rows, c.key));
     }
     
     function renderTablePage(page) {
@@ -649,7 +714,9 @@
         }
         
         document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+currentFilteredRows.length+' • Report quantity: '+reportSum;
-        renderCharts(currentFilteredRows);
+        
+        // Dynamically trigger Layout based on selected views
+        renderDynamicCharts(currentFilteredRows);
     }
 
     function getFilteredDashboardRows() {
