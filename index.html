@@ -14,75 +14,98 @@
 
     <style>
         :root { --primary: #008080; --hover: #005959; --bg: #e0f2f1; --light-bg: #f0faf9; }
-        body { font-family: Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .form-container { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 10px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); }
+        body { font-family: Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        
+        .form-container { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 10px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); margin: 20px auto; }
         .header-image { width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; display: none; }
         h2 { color: var(--primary); text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin-bottom: 5px; }
         
         .dynamic-subheading { text-align: center; color: white; background-color: var(--primary); padding: 10px; border-radius: 5px; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
-        
         label { font-weight: bold; display: block; margin-top: 15px; color: #333; }
-        input, select { width: 100%; padding: 10px; margin-top: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 15px; }
+        input, select { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
         input[readonly] { background-color: var(--light-bg); color: var(--primary); font-weight: bold; }
-        .btn-submit { background-color: var(--primary); color: white; padding: 14px; border: none; width: 100%; font-size: 16px; border-radius: 5px; margin-top: 25px; cursor: pointer; font-weight: bold; }
         
+        .btn-submit { background-color: var(--primary); color: white; padding: 12px; border: none; width: 100%; font-size: 16px; border-radius: 5px; margin-top: 20px; cursor: pointer; font-weight: bold; }
         .btn-submit:disabled { background-color: #7fbfbf; cursor: not-allowed; }
         .hidden { display: none !important; }
         .message-box { text-align: center; padding: 20px; font-size: 18px; background-color: var(--primary); color: white; font-weight: bold; border-radius: 8px; margin-bottom: 15px; }
     
+        /* Dashboard Strict Layout Fixes */
         .site-shell { width:100%; max-width:1200px; }
-        .topbar { background:#fff; min-height:56px; border-radius:10px; box-shadow:0 5px 18px rgba(0,0,0,.08); display:flex; align-items:center; justify-content:space-between; padding:0 12px 0 18px; margin-bottom:16px; }
+        .topbar { background:#fff; min-height:50px; border-radius:8px; box-shadow:0 3px 10px rgba(0,0,0,.08); display:flex; align-items:center; justify-content:space-between; padding:0 12px 0 18px; margin-bottom:12px; }
         .brand { color:var(--primary); font-size:18px; font-weight:700; }
-        .office-btn { border:0; background:var(--primary); color:#fff; padding:10px 16px; border-radius:6px; font-weight:700; cursor:pointer; }
+        .office-btn { border:0; background:var(--primary); color:#fff; padding:8px 14px; border-radius:6px; font-weight:700; cursor:pointer; }
         .office-btn:hover { background:var(--hover); }
+        
         .login-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:1000; }
-        .login-card { width:100%; max-width:420px; background:#fff; border-radius:14px; padding:28px; box-shadow:0 12px 40px rgba(0,0,0,.22); border-top:6px solid var(--primary); }
+        .login-card { width:100%; max-width:400px; background:#fff; border-radius:12px; padding:24px; box-shadow:0 12px 40px rgba(0,0,0,.22); border-top:6px solid var(--primary); }
         .login-card h2 { border:0; margin:0 0 6px; padding:0; }
-        .login-card p { text-align:center; color:#666; margin:0 0 18px; }
-        .login-card label { margin-top:12px; }
-        .login-card input { margin-top:6px; }
-        .login-actions { display:flex; gap:10px; }
+        .login-card p { text-align:center; color:#666; margin:0 0 16px; }
+        .login-actions { display:flex; gap:10px; margin-top: 15px; }
         .login-actions button { flex:1; }
         .btn-secondary { background:#eee; color:#333; border:0; padding:12px; border-radius:6px; font-weight:700; cursor:pointer; }
-        .login-error { display:none; margin-top:12px; background:#fde8e8; color:#b42318; padding:10px; border-radius:7px; text-align:center; font-weight:600; }
-        .employee-view { display:none; width:100%; max-width:1200px; margin:0 auto; }
-        .employee-top { background:#fff; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,.08); border-radius:10px; }
-        .employee-title { font-size:21px; font-weight:bold; color:var(--primary); }
-        .employee-user { font-size:14px; color:#555; margin-top:4px; }
-        .logout-btn { border:0; background:#dc3545; color:#fff; padding:9px 13px; border-radius:6px; cursor:pointer; font-weight:700; }
-        .employee-wrap { margin:22px auto; padding:0 2px; }
-        .welcome { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.08); margin-bottom:18px; }
-        .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
-        .stat { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); }
-        .stat .n { font-size:30px; font-weight:bold; color:var(--primary); margin-top:6px; }
-        .filters { background:#fff; border-radius:12px; padding:18px; margin:18px 0; box-shadow:0 4px 16px rgba(0,0,0,.07); display:grid; grid-template-columns:1.25fr repeat(5,1fr); gap:12px; }
-        .filters input,.filters select { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; margin:0; }
-        .tablebox { background:#fff; border-radius:12px; padding:18px; box-shadow:0 4px 16px rgba(0,0,0,.07); overflow:auto; }
-        .employee-table { width:100%; border-collapse:collapse; min-width:950px; }
-        .employee-table th,.employee-table td { padding:9px; border-bottom:1px solid #eee; text-align:left; font-size:13px; }
-        .employee-table th { background:#f2f7f7; color:var(--primary); }
-        .dash-msg { padding:20px; text-align:center; color:#666; }
-
-        .chart-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:18px 0; }
-        .chart-card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.07); min-height:300px; display: flex; flex-direction: column; }
-        .chart-title { font-weight:700; color:var(--primary); margin-bottom:10px; }
-        .chart-wrap { position:relative; flex: 1; min-height: 260px; }
-        .refresh-btn { border:0; background:var(--primary); color:#fff; padding:9px 13px; border-radius:6px; cursor:pointer; font-weight:700; }
-        .dash-info { margin:10px 0; font-size:12px; color:#666; text-align:right; }
+        .login-error { display:none; margin-top:12px; background:#fde8e8; color:#b42318; padding:10px; border-radius:7px; text-align:center; font-weight:600; font-size:14px; }
         
-        .page-btn { padding: 6px 12px; border: 1px solid var(--primary); background: #fff; color: var(--primary); cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .employee-view { display:none; width:100%; max-width:1200px; margin:0 auto; }
+        .employee-top { background:#fff; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px rgba(0,0,0,.08); border-radius:8px; margin-bottom: 12px; }
+        .employee-title { font-size:18px; font-weight:bold; color:var(--primary); }
+        .employee-user { font-size:13px; color:#555; margin-top:2px; }
+        .logout-btn { border:0; background:#dc3545; color:#fff; padding:7px 12px; border-radius:5px; cursor:pointer; font-weight:700; font-size: 13px; }
+        
+        .employee-wrap { margin:0 auto; padding:0; }
+        .welcome { background:#fff; border-radius:8px; padding:12px 18px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+        
+        .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:12px;}
+        .stat { background:#fff; border-radius:8px; padding:14px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+        .stat .n { font-size:26px; font-weight:bold; color:var(--primary); margin-top:4px; }
+        
+        .filters { background:#fff; border-radius:8px; padding:12px; margin-bottom: 12px; box-shadow:0 2px 8px rgba(0,0,0,.06); display:grid; grid-template-columns:1.25fr repeat(5,1fr); gap:10px; }
+        .filters input,.filters select { width:100%; padding:8px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box; margin:0; font-size: 13px; }
+        
+        /* Strict Height Graph/Table Containers */
+        .chart-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom: 12px; }
+        .chart-card { 
+            background:#fff; border-radius:8px; padding:12px; 
+            box-shadow:0 2px 8px rgba(0,0,0,.06); 
+            display: flex; flex-direction: column; 
+            height: 260px; /* STRICT LOCK */
+            min-height: 0; min-width: 0;
+            box-sizing: border-box;
+        }
+        .chart-title { font-weight:700; color:var(--primary); margin-bottom:8px; font-size: 14px; }
+        .chart-wrap { position:relative; flex: 1; min-height: 0; min-width: 0; width: 100%; overflow:hidden; }
+        
+        /* Main Entry Table (10 Rows) */
+        .tablebox { background:#fff; border-radius:8px; padding:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow-x:auto; margin-bottom: 20px;}
+        .employee-table { width:100%; border-collapse:collapse; min-width:900px; }
+        .employee-table th, .employee-table td { padding:7px 9px; border-bottom:1px solid #eee; text-align:left; font-size:12px; }
+        .employee-table th { background:#f2f7f7; color:var(--primary); }
+        
+        .dash-msg { padding:15px; text-align:center; color:#666; font-size: 14px; }
+        .refresh-btn { border:0; background:var(--primary); color:#fff; padding:7px 12px; border-radius:5px; cursor:pointer; font-weight:700; font-size:13px; }
+        .dash-info { margin:8px 0; font-size:11px; color:#666; text-align:right; }
+        
+        /* Compact Pagination */
+        .page-btn { padding: 4px 10px; border: 1px solid var(--primary); background: #fff; color: var(--primary); cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 12px; }
         .page-btn.active { background: var(--primary); color: #fff; }
         .page-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #f9f9f9; border-color: #ccc; color: #ccc; }
 
-        @media(max-width:800px){ .cards{grid-template-columns:repeat(2,1fr)} .filters{grid-template-columns:1fr 1fr} .employee-top{align-items:flex-start;gap:10px;flex-wrap:wrap} .chart-grid{grid-template-columns:1fr} }
-        @media(max-width:500px){ .cards,.filters{grid-template-columns:1fr} .employee-title{font-size:18px} .login-actions{flex-direction:column} }
-</style>
+        @media(max-width:800px){ 
+            .cards{grid-template-columns:repeat(2,1fr)} 
+            .filters{grid-template-columns:1fr 1fr} 
+            .chart-grid{grid-template-columns:1fr} 
+        }
+        @media(max-width:500px){ 
+            .cards,.filters{grid-template-columns:1fr} 
+            .employee-title{font-size:16px} 
+        }
+    </style>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="site-shell">
 <div class="topbar"><div class="brand">Weekly Risala Report</div><button class="office-btn" type="button" onclick="openOfficeLogin()">Office Login</button></div>
-<div style="width:100%;max-width:600px;position:relative;">
+<div style="width:100%;max-width:600px;position:relative;margin:0 auto;">
 <div class="form-container" id="mainWrapper">
     <img id="dynamicThumbnail" src="" alt="Thumbnail" class="header-image">
     <h2 id="dynamicHeading">Loading...</h2>
@@ -136,12 +159,19 @@
   <div class="employee-top">
     <div><div class="employee-title">Weekly Risala Report - Office Dashboard</div><div id="who" class="employee-user"></div></div>
     <div style="display: flex; align-items: center; gap: 15px;">
-        <div id="liveDateTime" style="font-weight: bold; color: var(--primary); font-size: 14px;"></div>
+        <div id="liveDateTime" style="font-weight: bold; color: var(--primary); font-size: 13px;"></div>
         <button class="logout-btn" type="button" onclick="officeLogout()">Logout</button>
     </div>
   </div>
   <div class="employee-wrap">
-    <div class="welcome"><div id="scope" style="color:#666"></div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh Reports</button><button class="refresh-btn" type="button" onclick="downloadExcel()" style="background:#198754">Download Excel</button></div></div>
+    <div class="welcome">
+        <div id="scope" style="color:#666; font-size: 13px; font-weight:bold;"></div>
+        <div style="display:flex;gap:8px;">
+            <button class="refresh-btn" type="button" onclick="refreshDashboard()">Refresh</button>
+            <button class="refresh-btn" type="button" onclick="downloadExcel()" style="background:#198754">Excel</button>
+        </div>
+    </div>
+    
     <div id="stats" class="cards"></div>
     <div class="filters">
       <input id="search" placeholder="Search..." oninput="renderDashboard()">
@@ -152,14 +182,16 @@
       <select id="dashChain" onchange="onChainChange()"><option value="">All Chain</option></select>
     </div>
     
-    <!-- Dynamic Chart/Table Grid Slot -->
+    <!-- Dynamic Chart/Table Grid Slot (Strict 260px containers) -->
     <div id="chartGrid" class="chart-grid"></div>
 
     <div id="dashInfo" class="dash-info"></div>
+    
+    <!-- Row Data Table -->
     <div class="tablebox">
       <div id="dashMessage" class="dash-msg">Loading reports...</div>
       <table id="dashTable" class="employee-table" style="display:none"><thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Chain</th><th>Level</th><th>Department</th><th>Report</th><th>District</th><th>Division</th><th>State</th><th>Region</th></tr></thead><tbody id="dashBody"></tbody></table>
-      <div id="paginationControls" style="display: flex; justify-content: center; gap: 5px; margin-top: 15px;"></div>
+      <div id="paginationControls" style="display: flex; justify-content: center; gap: 4px; margin-top: 10px;"></div>
     </div>
   </div>
 </div>
@@ -186,24 +218,21 @@
 <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyCQmXtOgmcoV4mUG0j5HXVytNZuZbCAE8Dey-SJ7YlUTXWfiDcjnt4ZH-AqsYwdE8F/exec";
     
-    // Colorful Palette for Graphs (Image 4 format)
     const colorPalette = ['#173F5F', '#20639B', '#3CAEA3', '#F6D55C', '#ED553B', '#f0a014', '#dded7f', '#6b2013', '#51a496', '#b8d099', '#3e3456'];
 
     function updateClock() {
         const now = new Date();
         const pad = n => String(n).padStart(2, '0');
         const dt = document.getElementById('liveDateTime');
-        if(dt) dt.textContent = `Date: ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()}, Time: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        if(dt) dt.textContent = `Date: ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} | Time: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
     }
     setInterval(updateClock, 1000);
     document.addEventListener("DOMContentLoaded", updateClock);
 
-    // Dynamic Theme Color Applicator
     function applyTheme(colorStr) { 
         let primary = "#008080"; 
         if(colorStr) {
             colorStr = colorStr.trim();
-            // Automatically detect if it's a Hex code missing the '#'
             if(/^[0-9A-F]{6}$/i.test(colorStr)) colorStr = '#' + colorStr;
             primary = colorStr;
         }
@@ -211,10 +240,9 @@
         document.documentElement.style.setProperty('--primary', primary); 
         document.documentElement.style.setProperty('--hover', primary); 
         
-        // Generate light backgrounds if valid hex code
         if(/^#[0-9A-F]{6}$/i.test(primary)) {
-            document.documentElement.style.setProperty('--bg', primary + '1A'); // 10% Opacity
-            document.documentElement.style.setProperty('--light-bg', primary + '0D'); // 5% Opacity
+            document.documentElement.style.setProperty('--bg', primary + '1A'); 
+            document.documentElement.style.setProperty('--light-bg', primary + '0D'); 
         } else {
             document.documentElement.style.setProperty('--bg', '#e0f2f1');
             document.documentElement.style.setProperty('--light-bg', '#f0faf9');
@@ -234,7 +262,6 @@
                 return;
             }
             
-            // Thumbnail is always processed and shown if available
             if(data.thumbnail) { 
                 try {
                     let img = document.getElementById("dynamicThumbnail");
@@ -251,7 +278,6 @@
             document.getElementById("dynamicHeading").innerHTML = data.heading || "Weekly Risala Report";
             document.getElementById("dynamicSubheading").innerHTML = data.subheading || "";
             
-            // Apply Custom Theme
             applyTheme(data.theme);
             
             if(data.status === "OFF") {
@@ -394,7 +420,6 @@
                   showEmployeeDashboard();
               } else {
                   err.textContent = d.message || 'Invalid User ID ya Password.';
-                  
                   if (d.isOffMsg) {
                       err.style.backgroundColor = "#dc3545";
                       err.style.color = "white";
@@ -402,13 +427,13 @@
                       err.style.backgroundColor = "#fde8e8";
                       err.style.color = "#b42318";
                   }
-                  
                   err.style.display = 'block';
               }
           })
-          .catch(() => { err.textContent = 'Login server se connection nahi ho raha. Ensure CORS/App Script is allowed.'; err.style.display='block'; })
+          .catch(() => { err.textContent = 'Login server se connection nahi ho raha.'; err.style.display='block'; })
           .finally(() => { btn.disabled=false; btn.textContent='Login'; });
     }
+    
     function showEmployeeDashboard() {
         try { officeUser = JSON.parse(sessionStorage.getItem('risalaUser') || '{}'); } catch(e) { officeUser = {}; }
         const token = sessionStorage.getItem('risalaToken');
@@ -420,6 +445,7 @@
         document.getElementById('scope').textContent = 'Access: ' + [officeUser.country, officeUser.region, officeUser.state, officeUser.division, officeUser.district, officeUser.chain, officeUser.department].filter(Boolean).join(' / ');
         loadDashboard(token);
     }
+    
     function officeLogout() {
         sessionStorage.removeItem('risalaToken');
         sessionStorage.removeItem('risalaUser');
@@ -429,6 +455,7 @@
         document.querySelector('.topbar').style.display = 'flex';
         window.scrollTo(0,0);
     }
+    
     let chartRefs = {};
     function loadDashboard(token) {
         document.getElementById('dashMessage').style.display='block';
@@ -464,6 +491,7 @@
               document.getElementById('dashMessage').textContent='Dashboard data load nahi ho saka. Google Apps Script deployment check karein.';
           });
     }
+    
     function refreshDashboard() {
         const token = sessionStorage.getItem('risalaToken');
         if (token) loadDashboard(token);
@@ -538,23 +566,22 @@
     }
     function destroyChart(name){ if(chartRefs[name]) { chartRefs[name].destroy(); chartRefs[name]=null; } }
     
-    // HTML Builder for Dashboard Chart
+    // BUILDERS WITH STRICT 260px HEIGHT FOR COMPACT DASHBOARD
     function buildChartHTML(id, title) {
         return `<div class="chart-card"><div class="chart-title">${title}</div><div class="chart-wrap"><canvas id="${id}"></canvas></div></div>`;
     }
 
-    // HTML Builder for Dashboard Scrollable Table
     function buildTableHTML(title, data) {
         let html = `<div class="chart-card"><div class="chart-title">${title}</div>`;
-        html += `<div class="chart-wrap" style="overflow-y:auto; height:260px; display:block; border: 1px solid #eee; border-radius: 4px;">`;
-        html += `<table class="employee-table" style="width:100%; min-width:auto; margin:0;">`;
-        html += `<thead><tr><th style="position:sticky; top:0; z-index:1; border-radius:0;">Name</th><th style="position:sticky; top:0; z-index:1; border-radius:0;">Report Qty</th></tr></thead><tbody>`;
+        html += `<div style="flex: 1; overflow-y:auto; border: 1px solid #eee; border-radius: 4px; min-height: 0; min-width: 0;">`;
+        html += `<table class="employee-table" style="width:100%; margin:0; border-collapse: collapse;">`;
+        html += `<thead><tr><th style="position:sticky; top:0; z-index:2; border-radius:0; background:var(--light-bg); border-bottom: 2px solid var(--primary); padding: 5px;">Name</th><th style="position:sticky; top:0; z-index:2; border-radius:0; background:var(--light-bg); border-bottom: 2px solid var(--primary); padding: 5px;">Report Qty</th></tr></thead><tbody>`;
         
         if(data.length === 0) {
-            html += `<tr><td colspan="2" style="text-align:center;">No data available</td></tr>`;
+            html += `<tr><td colspan="2" style="text-align:center; padding: 5px;">No data available</td></tr>`;
         } else {
             data.forEach(d => {
-                html += `<tr><td>${escapeHtml(d.label)}</td><td style="font-weight:bold;">${d.count}</td></tr>`;
+                html += `<tr><td style="padding: 5px;">${escapeHtml(d.label)}</td><td style="font-weight:bold; padding: 5px;">${d.count}</td></tr>`;
             });
         }
         html += `</tbody></table></div></div>`;
@@ -568,7 +595,6 @@
         const canvas = document.getElementById(canvasId);
         if(!canvas) return;
         
-        // Multi-color dynamic mapping
         const bgColors = grouped.map((x, i) => colorPalette[i % colorPalette.length]);
 
         chartRefs[refName] = new Chart(canvas.getContext('2d'), {
@@ -600,14 +626,10 @@
     }
 
     function getHierarchyLevel() {
-        // Evaluate dynamic filter selections first
         if (document.getElementById('dashState').value) return 'state';
         if (document.getElementById('dashRegion').value) return 'region';
-        
-        // Fallback to assigned role configuration
         if (officeUser.state && officeUser.state.toLowerCase() !== 'all') return 'state';
         if (officeUser.region && officeUser.region.toLowerCase() !== 'all') return 'region';
-        
         return 'india';
     }
 
@@ -631,17 +653,15 @@
             html += buildTableHTML('Reports by District', groupCount(rows, 'district'));
             chartsToDraw = [ {id: 'stateChart', key: 'state'}, {id: 'divisionChart', key: 'division'} ];
         } 
-        else { // state level and below
+        else { 
             html += buildChartHTML('divisionChart', 'Reports by Division');
             html += buildChartHTML('districtChart', 'Reports by District');
             html += buildTableHTML('Reports by Department', groupCount(rows, 'department'));
-            html += `<div style="display:none;"></div>`; // To maintain layout symmetry
+            html += `<div style="display:none;"></div>`; 
             chartsToDraw = [ {id: 'divisionChart', key: 'division'}, {id: 'districtChart', key: 'district'} ];
         }
 
         grid.innerHTML = html;
-
-        // Draw mapped charts after DOM insertion
         chartsToDraw.forEach(c => drawBarChart(c.id, c.id, c.title, rows, c.key));
     }
     
@@ -715,7 +735,6 @@
         
         document.getElementById('dashInfo').textContent='Responses rows: '+(window.dashboardSourceRows||0)+' • Visible rows: '+currentFilteredRows.length+' • Report quantity: '+reportSum;
         
-        // Dynamically trigger Layout based on selected views
         renderDynamicCharts(currentFilteredRows);
     }
 
